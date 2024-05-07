@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:getup/kalman.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,6 +34,56 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  final KalmanLatLong kalmanFilter = KalmanLatLong(6.0); // idealno
+  final GeolocatorPlatform _geolocator = GeolocatorPlatform.instance;
+  Position? _startPosition;
+  Position? _currentPosition;
+  double _totalDistance = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+
+  void _startTracking() async {
+    _startPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best);
+
+    _geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        if (kalmanFilter.variance < 0) {
+          kalmanFilter.setState(position.latitude, position.longitude,
+              position.accuracy, position.timestamp.millisecondsSinceEpoch);
+        } else {
+          kalmanFilter.process(position.latitude, position.longitude,
+              position.accuracy, position.timestamp.millisecondsSinceEpoch);
+        }
+        _currentPosition = position;
+        if (_startPosition == null) {
+          _startPosition = position; // Set start position if not already set
+        } else {
+          _totalDistance = Geolocator.distanceBetween(
+            _startPosition!.latitude,
+            _startPosition!.longitude,
+            kalmanFilter.latitude,
+            kalmanFilter.longitude,
+          );
+        }
+      });
+    });
+  }
+
+  Future<void> _checkPermissions() async {
+    LocationPermission permission = await _geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await _geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return; // Permissions are denied, next steps not executed
+      }
+    }
+  }
+
   int selectedValue = 0;
   var list = List.generate(60, (index) => index + 1);
 
@@ -49,6 +101,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              ElevatedButton(
+                onPressed: _startTracking,
+                child: Text('Start Tracking'),
+              ),
+              if (_currentPosition != null)
+                Text('Current Position: $_currentPosition'),
+              Text(
+                  'Total Distance: ${_totalDistance.toStringAsFixed(2)} meters'),
               const Gap(24.0),
               Row(
                 children: [
@@ -156,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Gap(36),
+                  const Gap(36),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -367,7 +427,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
