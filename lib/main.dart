@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:getup/kalman.dart';
+import 'package:getup/setup_model.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,13 +15,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [Provider(create: (_) => SetupModel())],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -34,54 +39,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  final KalmanLatLong kalmanFilter = KalmanLatLong(6.0); // idealno
-  final GeolocatorPlatform _geolocator = GeolocatorPlatform.instance;
-  Position? _startPosition;
-  Position? _currentPosition;
-  double _totalDistance = 0.0;
+  Set<FocusDuration> focusDurations = <FocusDuration>{
+    FocusDuration.thirty,
+  };
+  Set<BreakDuration> breakDurations = <BreakDuration>{
+    BreakDuration.five,
+  };
 
   @override
   void initState() {
     super.initState();
-    _checkPermissions();
-  }
-
-  void _startTracking() async {
-    _startPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best);
-
-    _geolocator.getPositionStream().listen((Position position) {
-      setState(() {
-        if (kalmanFilter.variance < 0) {
-          kalmanFilter.setState(position.latitude, position.longitude,
-              position.accuracy, position.timestamp.millisecondsSinceEpoch);
-        } else {
-          kalmanFilter.process(position.latitude, position.longitude,
-              position.accuracy, position.timestamp.millisecondsSinceEpoch);
-        }
-        _currentPosition = position;
-        if (_startPosition == null) {
-          _startPosition = position; // Set start position if not already set
-        } else {
-          _totalDistance = Geolocator.distanceBetween(
-            _startPosition!.latitude,
-            _startPosition!.longitude,
-            kalmanFilter.latitude,
-            kalmanFilter.longitude,
-          );
-        }
-      });
-    });
-  }
-
-  Future<void> _checkPermissions() async {
-    LocationPermission permission = await _geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await _geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return; // Permissions are denied, next steps not executed
-      }
-    }
+    // _checkPermissions();
   }
 
   int selectedValue = 0;
@@ -95,338 +63,62 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           padding: const EdgeInsets.only(
             left: 24.0,
             right: 24.0,
-            top: 200.0,
+            top: 48.0,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ElevatedButton(
-                onPressed: _startTracking,
-                child: Text('Start Tracking'),
-              ),
-              if (_currentPosition != null)
-                Text('Current Position: $_currentPosition'),
-              Text(
-                  'Total Distance: ${_totalDistance.toStringAsFixed(2)} meters'),
               const Gap(24.0),
-              Row(
-                children: [
-                  const Text(
-                    'Get up',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Gap(36),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Every',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 36,
-                            decoration: const BoxDecoration(
-                              color: Color.fromARGB(126, 185, 201, 214),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(12.0),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 100,
-                            width: 100,
-                            child: ListWheelScrollView.useDelegate(
-                              physics: const FixedExtentScrollPhysics(),
-                              itemExtent: 36,
-                              perspective: 0.005,
-                              onSelectedItemChanged: (value) =>
-                                  {setState(() => selectedValue = value)},
-                              childDelegate: ListWheelChildLoopingListDelegate(
-                                children: List<Widget>.generate(
-                                  list.length,
-                                  (index) {
-                                    double distance =
-                                        (selectedValue - index).abs() > 1
-                                            ? 1.0
-                                            : (selectedValue - index)
-                                                .toDouble();
-
-                                    double scale = 1.0 - (0.1 * distance.abs());
-
-                                    return TweenAnimationBuilder<double>(
-                                      tween:
-                                          Tween<double>(begin: 0.5, end: scale),
-                                      duration:
-                                          const Duration(milliseconds: 100),
-                                      builder: (context, value, child) {
-                                        return Transform.scale(
-                                          scale: value,
-                                          child: Opacity(
-                                            opacity: value,
-                                            child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  style: const TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.w300,
-                                                  ),
-                                                  '${index + 1}',
-                                                )),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Text(
-                        'minutes',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ],
-                  ),
+              const Text('Focus duration'),
+              SegmentedButton<FocusDuration>(
+                showSelectedIcon: false,
+                style: const ButtonStyle(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity(horizontal: 0, vertical: -1),
+                ),
+                segments: [
+                  ButtonSegment(
+                      value: FocusDuration.thirty,
+                      label: Text('${FocusDuration.thirty.duration} min')),
+                  ButtonSegment(
+                      value: FocusDuration.fortyFive,
+                      label: Text('${FocusDuration.fortyFive.duration} min')),
+                  ButtonSegment(
+                      value: FocusDuration.sixty,
+                      label: Text('${FocusDuration.sixty.duration} min')),
                 ],
+                selected: focusDurations,
+                onSelectionChanged: (Set<FocusDuration> durations) {
+                  setState(() {
+                    focusDurations = durations;
+                  });
+                },
               ),
-              const Gap(36),
-              Row(
-                children: [
-                  const Text(
-                    'Take a break',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Gap(36),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'For',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 36,
-                            decoration: const BoxDecoration(
-                              color: Color.fromARGB(126, 185, 201, 214),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(12.0),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 100,
-                            width: 100,
-                            child: ListWheelScrollView.useDelegate(
-                              physics: const FixedExtentScrollPhysics(),
-                              itemExtent: 36,
-                              perspective: 0.005,
-                              onSelectedItemChanged: (value) =>
-                                  {setState(() => selectedValue = value)},
-                              childDelegate: ListWheelChildLoopingListDelegate(
-                                children: List<Widget>.generate(
-                                  list.length,
-                                  (index) {
-                                    double distance =
-                                        (selectedValue - index).abs() > 1
-                                            ? 1.0
-                                            : (selectedValue - index)
-                                                .toDouble();
-
-                                    double scale = 1.0 - (0.1 * distance.abs());
-
-                                    return TweenAnimationBuilder<double>(
-                                      tween:
-                                          Tween<double>(begin: 0.5, end: scale),
-                                      duration:
-                                          const Duration(milliseconds: 100),
-                                      builder: (context, value, child) {
-                                        return Transform.scale(
-                                          scale: value,
-                                          child: Opacity(
-                                            opacity: value,
-                                            child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  style: const TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.w300,
-                                                  ),
-                                                  '${index + 1}',
-                                                )),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Text(
-                        'minutes',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ],
-                  ),
+              const Text('Break duration'),
+              SegmentedButton<BreakDuration>(
+                showSelectedIcon: false,
+                style: const ButtonStyle(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity(horizontal: -1, vertical: -1),
+                ),
+                segments: [
+                  ButtonSegment(
+                      value: BreakDuration.five,
+                      label: Text('${BreakDuration.five.duration} min')),
+                  ButtonSegment(
+                      value: BreakDuration.ten,
+                      label: Text('${BreakDuration.ten.duration} min')),
+                  ButtonSegment(
+                      value: BreakDuration.fifteen,
+                      label: Text('${BreakDuration.fifteen.duration} min')),
                 ],
-              ),
-              const Gap(36),
-              Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Text(
-                          'From',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Gap(16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: 100,
-                              width: 40,
-                              child: ListWheelScrollView.useDelegate(
-                                  physics: const FixedExtentScrollPhysics(),
-                                  itemExtent: 36,
-                                  childDelegate: ListWheelChildBuilderDelegate(
-                                    childCount: hoursList.length,
-                                    builder: (context, index) => Text(
-                                      hoursList[index].toString(),
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  )),
-                            ),
-                            const Text(
-                              ':',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 100,
-                              width: 40,
-                              child: ListWheelScrollView.useDelegate(
-                                  physics: const FixedExtentScrollPhysics(),
-                                  itemExtent: 36,
-                                  childDelegate: ListWheelChildBuilderDelegate(
-                                    childCount: minutesList.length,
-                                    builder: (context, index) => Text(
-                                      minutesList[index].toString(),
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Text(
-                          'To',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Gap(16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: 100,
-                              width: 40,
-                              child: ListWheelScrollView.useDelegate(
-                                  physics: const FixedExtentScrollPhysics(),
-                                  itemExtent: 36,
-                                  childDelegate: ListWheelChildBuilderDelegate(
-                                    childCount: hoursList.length,
-                                    builder: (context, index) => Text(
-                                      hoursList[index].toString(),
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  )),
-                            ),
-                            const Text(
-                              ':',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 100,
-                              width: 40,
-                              child: ListWheelScrollView.useDelegate(
-                                  physics: const FixedExtentScrollPhysics(),
-                                  itemExtent: 36,
-                                  childDelegate: ListWheelChildBuilderDelegate(
-                                    childCount: minutesList.length,
-                                    builder: (context, index) => Text(
-                                      minutesList[index].toString(),
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  )),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+                selected: breakDurations,
+                onSelectionChanged: (Set<BreakDuration> durations) {
+                  setState(() {
+                    breakDurations = durations;
+                  });
+                },
               ),
             ],
           ),
@@ -434,6 +126,26 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ),
     );
   }
+}
+
+enum FocusDuration {
+  thirty(30),
+  fortyFive(45),
+  sixty(60);
+
+  const FocusDuration(this.duration);
+
+  final int duration;
+}
+
+enum BreakDuration {
+  five(5),
+  ten(10),
+  fifteen(15);
+
+  const BreakDuration(this.duration);
+
+  final int duration;
 }
 
 var hoursList = [
