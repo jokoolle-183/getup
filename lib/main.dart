@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:getup/kalman.dart';
 import 'package:getup/setup_model.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [Provider(create: (_) => SetupModel())],
+      providers: [ChangeNotifierProvider(create: (_) => SetupModel())],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -39,6 +37,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  TimeOfDay selectedFromTime =
+      TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0));
+  TimeOfDay selectedToTime =
+      TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 17, minute: 0));
+
   Set<FocusDuration> focusDurations = <FocusDuration>{
     FocusDuration.thirty,
   };
@@ -71,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             children: [
               const Gap(24.0),
               const Text('Focus duration'),
+              const Gap(16.0),
               SegmentedButton<FocusDuration>(
                 showSelectedIcon: false,
                 style: const ButtonStyle(
@@ -95,7 +99,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   });
                 },
               ),
+              const Gap(24.0),
               const Text('Break duration'),
+              const Gap(16.0),
               SegmentedButton<BreakDuration>(
                 showSelectedIcon: false,
                 style: const ButtonStyle(
@@ -120,6 +126,43 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   });
                 },
               ),
+              const Gap(24.0),
+              const Text('Time frame'),
+              Row(
+                children: [
+                  const Text('From: '),
+                  ActionChip(
+                    label: Text(selectedFromTime.format(context)),
+                    onPressed: () async {
+                      final TimeOfDay? time = await showTimePicker(
+                        context: context,
+                        initialTime: selectedFromTime,
+                        initialEntryMode: TimePickerEntryMode.dial,
+                      );
+                      setState(() {
+                        if (time != null) {
+                          selectedFromTime = time;
+                        }
+                      });
+                    },
+                  ),
+                  const Text(' To: '),
+                  ActionChip(
+                      label: Text(selectedToTime.format(context)),
+                      onPressed: () async {
+                        final TimeOfDay? time = await showTimePicker(
+                          context: context,
+                          initialTime: selectedToTime,
+                          initialEntryMode: TimePickerEntryMode.dial,
+                        );
+                        setState(() {
+                          if (time != null) {
+                            selectedToTime = time;
+                          }
+                        });
+                      }),
+                ],
+              )
             ],
           ),
         ),
