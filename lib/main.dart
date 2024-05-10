@@ -1,9 +1,85 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:gap/gap.dart';
 import 'package:getup/setup_model.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
-void main() {
+int id = 0;
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
+    StreamController<ReceivedNotification>.broadcast();
+
+final StreamController<String?> selectNotificationStream =
+    StreamController<String?>.broadcast();
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  // ignore: avoid_print
+  print('notification(${notificationResponse.id}) action tapped: '
+      '${notificationResponse.actionId} with'
+      ' payload: ${notificationResponse.payload}');
+  if (notificationResponse.input?.isNotEmpty ?? false) {
+    // ignore: avoid_print
+    print(
+        'notification action tapped with input: ${notificationResponse.input}');
+  }
+}
+
+const String navigationActionId = 'id_3';
+
+class ReceivedNotification {
+  ReceivedNotification({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.payload,
+  });
+
+  final int id;
+  final String? title;
+  final String? body;
+  final String? payload;
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  String timeZoneName = await getIANATimeZone();
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse:
+        (NotificationResponse notificationResponse) {
+      switch (notificationResponse.notificationResponseType) {
+        case NotificationResponseType.selectedNotification:
+          selectNotificationStream.add(notificationResponse.payload);
+          break;
+        case NotificationResponseType.selectedNotificationAction:
+          if (notificationResponse.actionId == navigationActionId) {
+            selectNotificationStream.add(notificationResponse.payload);
+          }
+          break;
+      }
+    },
+    onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+  );
+
   runApp(const MyApp());
 }
 
@@ -37,10 +113,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  TimeOfDay selectedFromTime =
+  bool _notificationsEnabled = false;
+  TimeOfDay selectedFromTimeToday =
       TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0));
-  TimeOfDay selectedToTime =
+  TimeOfDay selectedToTimeToday =
       TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 17, minute: 0));
+
+  final currentDate = DateTime.now();
+
+  DateTime? selectedFromTimeDate;
 
   Set<FocusDuration> focusDurations = <FocusDuration>{
     FocusDuration.thirty,
@@ -52,11 +133,34 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    // _checkPermissions();
+    _isAndroidPermissionGranted();
+    _requestPermissions();
   }
 
-  int selectedValue = 0;
-  var list = List.generate(60, (index) => index + 1);
+  Future<void> _isAndroidPermissionGranted() async {
+    final bool granted = await flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>()
+            ?.areNotificationsEnabled() ??
+        false;
+
+    setState(() {
+      _notificationsEnabled = granted;
+    });
+  }
+
+  Future<void> _requestPermissions() async {
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    final bool? grantedNotificationPermission =
+        await androidImplementation?.requestNotificationsPermission();
+
+    setState(() {
+      _notificationsEnabled = grantedNotificationPermission ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,43 +236,79 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 children: [
                   const Text('From: '),
                   ActionChip(
-                    label: Text(selectedFromTime.format(context)),
+                    label: Text(selectedFromTimeToday.format(context)),
                     onPressed: () async {
                       final TimeOfDay? time = await showTimePicker(
                         context: context,
-                        initialTime: selectedFromTime,
+                        initialTime: selectedFromTimeToday,
                         initialEntryMode: TimePickerEntryMode.dial,
                       );
                       setState(() {
                         if (time != null) {
-                          selectedFromTime = time;
+                          selectedFromTimeToday = time;
+                          selectedFromTimeDate =
+                              convertTimeOfDayToDateTime(selectedFromTimeToday);
                         }
                       });
                     },
                   ),
                   const Text(' To: '),
                   ActionChip(
-                      label: Text(selectedToTime.format(context)),
+                      label: Text(selectedToTimeToday.format(context)),
                       onPressed: () async {
                         final TimeOfDay? time = await showTimePicker(
                           context: context,
-                          initialTime: selectedToTime,
+                          initialTime: selectedToTimeToday,
                           initialEntryMode: TimePickerEntryMode.dial,
                         );
                         setState(() {
                           if (time != null) {
-                            selectedToTime = time;
+                            selectedToTimeToday = time;
                           }
                         });
                       }),
                 ],
-              )
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    if (selectedFromTimeDate != null) {
+                      final tzDateTime = await convertDateTimeToTZDateTime(
+                          selectedFromTimeDate!);
+                      _showNotification(tzDateTime);
+                    }
+                  },
+                  child: const Text('Set alarm'))
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Future<void> _showNotification(tz.TZDateTime tzDateTime) async {
+  const AndroidNotificationDetails androidNotificationDetails =
+      AndroidNotificationDetails('getup_channel', 'Getup',
+          channelDescription: 'Getup channel description',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker');
+  const NotificationDetails notificationDetails =
+      NotificationDetails(android: androidNotificationDetails);
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    id++,
+    'Getup title',
+    'Getcho ass up',
+    tzDateTime,
+    notificationDetails,
+    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+  );
+}
+
+Future<String> getIANATimeZone() async {
+  return await FlutterTimezone.getLocalTimezone();
 }
 
 enum FocusDuration {
@@ -280,3 +420,15 @@ var minutesList = [
   "58",
   "59"
 ];
+
+DateTime convertTimeOfDayToDateTime(TimeOfDay timeOfDay, [DateTime? date]) {
+  final currentDate = date ?? DateTime.now();
+  return DateTime(currentDate.year, currentDate.month, currentDate.day,
+      timeOfDay.hour, timeOfDay.minute);
+}
+
+Future<tz.TZDateTime> convertDateTimeToTZDateTime(DateTime dateTime) async {
+  tz.Location location =
+      tz.getLocation(await FlutterTimezone.getLocalTimezone());
+  return tz.TZDateTime.from(dateTime, location);
+}
