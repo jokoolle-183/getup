@@ -1,84 +1,37 @@
 import 'dart:async';
 
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:gap/gap.dart';
 import 'package:getup/setup_model.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
-int id = 0;
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
-final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
-    StreamController<ReceivedNotification>.broadcast();
-
-final StreamController<String?> selectNotificationStream =
-    StreamController<String?>.broadcast();
+import 'package:workmanager/workmanager.dart';
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  // ignore: avoid_print
-  print('notification(${notificationResponse.id}) action tapped: '
-      '${notificationResponse.actionId} with'
-      ' payload: ${notificationResponse.payload}');
-  if (notificationResponse.input?.isNotEmpty ?? false) {
-    // ignore: avoid_print
-    print(
-        'notification action tapped with input: ${notificationResponse.input}');
-  }
-}
-
-const String navigationActionId = 'id_3';
-
-class ReceivedNotification {
-  ReceivedNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.payload,
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    print("Native called background task: $task");
+    await Alarm.init();
+    return Future.value(true);
   });
-
-  final int id;
-  final String? title;
-  final String? body;
-  final String? payload;
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(
+      callbackDispatcher, // The top level function, aka callbackDispatcher
+      isInDebugMode:
+          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+      );
   String timeZoneName = await getIANATimeZone();
+  await Alarm.init();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(timeZoneName));
-
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse:
-        (NotificationResponse notificationResponse) {
-      switch (notificationResponse.notificationResponseType) {
-        case NotificationResponseType.selectedNotification:
-          selectNotificationStream.add(notificationResponse.payload);
-          break;
-        case NotificationResponseType.selectedNotificationAction:
-          if (notificationResponse.actionId == navigationActionId) {
-            selectNotificationStream.add(notificationResponse.payload);
-          }
-          break;
-      }
-    },
-    onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
-  );
 
   runApp(const MyApp());
 }
@@ -113,7 +66,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  bool _notificationsEnabled = false;
   TimeOfDay selectedFromTimeToday =
       TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0));
   TimeOfDay selectedToTimeToday =
@@ -122,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final currentDate = DateTime.now();
 
   DateTime? selectedFromTimeDate;
+  DateTime? selectedToTimeDate;
 
   Set<FocusDuration> focusDurations = <FocusDuration>{
     FocusDuration.thirty,
@@ -130,36 +83,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     BreakDuration.five,
   };
 
+  StreamSubscription<AlarmSettings>? ringStream;
+  int _currentAlarmId = 0;
+
   @override
   void initState() {
     super.initState();
-    _isAndroidPermissionGranted();
-    _requestPermissions();
+    selectedFromTimeDate = convertTimeOfDayToDateTime(selectedFromTimeToday);
+    selectedToTimeDate = convertTimeOfDayToDateTime(selectedToTimeToday);
+    checkAndroidNotificationPermission();
+    checkAndroidScheduleExactAlarmPermission();
+    ringStream ??= Alarm.ringStream.stream.listen(handleAlarm);
   }
 
-  Future<void> _isAndroidPermissionGranted() async {
-    final bool granted = await flutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.areNotificationsEnabled() ??
-        false;
-
-    setState(() {
-      _notificationsEnabled = granted;
-    });
-  }
-
-  Future<void> _requestPermissions() async {
-    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-
-    final bool? grantedNotificationPermission =
-        await androidImplementation?.requestNotificationsPermission();
-
-    setState(() {
-      _notificationsEnabled = grantedNotificationPermission ?? false;
-    });
+  @override
+  void dispose() {
+    ringStream?.cancel();
+    super.dispose();
   }
 
   @override
@@ -264,51 +204,114 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         setState(() {
                           if (time != null) {
                             selectedToTimeToday = time;
+                            selectedToTimeDate =
+                                convertTimeOfDayToDateTime(selectedToTimeToday);
                           }
                         });
                       }),
                 ],
               ),
               ElevatedButton(
-                  onPressed: () async {
-                    if (selectedFromTimeDate != null) {
-                      final tzDateTime = await convertDateTimeToTZDateTime(
-                          selectedFromTimeDate!);
-                      _showNotification(tzDateTime);
-                    }
-                  },
-                  child: const Text('Set alarm'))
+                onPressed: () {
+                  if (selectedFromTimeDate != null &&
+                      selectedToTimeDate != null) {
+                    _setAlarm(
+                      selectedFromTimeDate!,
+                      selectedToTimeDate!,
+                      focusDurations.first,
+                      breakDurations.first,
+                    );
+                    Workmanager().registerPeriodicTask(
+                      "task-identifier",
+                      "simpleTask",
+                      backoffPolicy: BackoffPolicy.exponential,
+                      backoffPolicyDelay: const Duration(seconds: 30),
+                      frequency: const Duration(minutes: 18),
+                    );
+                  }
+                },
+                child: const Text('Set alarm'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  print("Stopping alarm with id $_currentAlarmId");
+                  await Alarm.stop(_currentAlarmId);
+                },
+                child: const Text('Stop alarm'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await Alarm.stopAll();
+                },
+                child: const Text('Stop all'),
+              )
             ],
           ),
         ),
       ),
     );
   }
-}
 
-Future<void> _showNotification(tz.TZDateTime tzDateTime) async {
-  const AndroidNotificationDetails androidNotificationDetails =
-      AndroidNotificationDetails('getup_channel', 'Getup',
-          channelDescription: 'Getup channel description',
-          importance: Importance.max,
-          priority: Priority.high,
-          ticker: 'ticker');
-  const NotificationDetails notificationDetails =
-      NotificationDetails(android: androidNotificationDetails);
-  await flutterLocalNotificationsPlugin.zonedSchedule(
-    id++,
-    'Getup title',
-    'Getcho ass up',
-    tzDateTime,
-    notificationDetails,
-    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
-  );
+  Future<void> checkAndroidNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (status.isDenied) {
+      alarmPrint('Requesting notification permission...');
+      final res = await Permission.notification.request();
+      alarmPrint(
+        'Notification permission ${res.isGranted ? '' : 'not '}granted',
+      );
+    }
+  }
+
+  Future<void> checkAndroidScheduleExactAlarmPermission() async {
+    final status = await Permission.scheduleExactAlarm.status;
+    alarmPrint('Schedule exact alarm permission: $status.');
+    if (status.isDenied) {
+      alarmPrint('Requesting schedule exact alarm permission...');
+      final res = await Permission.scheduleExactAlarm.request();
+      alarmPrint(
+        'Schedule exact alarm permission ${res.isGranted ? '' : 'not'} granted',
+      );
+    }
+  }
+
+  void handleAlarm(AlarmSettings event) {
+    setState(() {
+      _currentAlarmId = event.id;
+    });
+  }
 }
 
 Future<String> getIANATimeZone() async {
   return await FlutterTimezone.getLocalTimezone();
+}
+
+Future<void> _setAlarm(
+  DateTime selectedFromTime,
+  DateTime selectedToTime,
+  FocusDuration focusDuration,
+  BreakDuration breakDuration,
+) async {
+  Duration difference = selectedToTime.difference(selectedFromTime);
+  int occurrences = difference.inMinutes ~/ focusDuration.duration;
+
+  for (int i = 1; i <= occurrences; i++) {
+    DateTime newTime =
+        selectedFromTime.add(Duration(minutes: focusDuration.duration * i));
+    print("$newTime");
+    final alarmSettings = AlarmSettings(
+      id: i,
+      dateTime: newTime,
+      assetAudioPath: 'assets/perfect_alarm.mp3',
+      loopAudio: true,
+      vibrate: true,
+      fadeDuration: 3.0,
+      notificationTitle: 'Getup',
+      notificationBody: 'Getcho ass up',
+      enableNotificationOnKill: true,
+    );
+    await Alarm.set(alarmSettings: alarmSettings);
+  }
 }
 
 enum FocusDuration {
@@ -330,96 +333,6 @@ enum BreakDuration {
 
   final int duration;
 }
-
-var hoursList = [
-  "00",
-  "01",
-  "02",
-  "03",
-  "04",
-  "05",
-  "06",
-  "07",
-  "08",
-  "09",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-];
-
-var minutesList = [
-  "00",
-  "01",
-  "02",
-  "03",
-  "04",
-  "05",
-  "06",
-  "07",
-  "08",
-  "09",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31",
-  "32",
-  "33",
-  "34",
-  "35",
-  "36",
-  "37",
-  "38",
-  "39",
-  "40",
-  "41",
-  "42",
-  "43",
-  "44",
-  "45",
-  "46",
-  "47",
-  "48",
-  "49",
-  "50",
-  "51",
-  "52",
-  "53",
-  "54",
-  "55",
-  "56",
-  "57",
-  "58",
-  "59"
-];
 
 DateTime convertTimeOfDayToDateTime(TimeOfDay timeOfDay, [DateTime? date]) {
   final currentDate = date ?? DateTime.now();
