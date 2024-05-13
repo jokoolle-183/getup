@@ -5,6 +5,7 @@ import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:gap/gap.dart';
+import 'package:getup/ring_screen.dart';
 import 'package:getup/setup_model.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -16,14 +17,18 @@ import 'package:workmanager/workmanager.dart';
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     print("Native called background task: $task");
-    await Alarm.init();
-    return Future.value(true);
+    try {
+      await Alarm.init();
+      return Future.value(true);
+    } on Exception catch (error, stacktrace) {
+      return Future.error(error, stacktrace);
+    }
   });
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().initialize(
+  await Workmanager().initialize(
       callbackDispatcher, // The top level function, aka callbackDispatcher
       isInDebugMode:
           true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
@@ -66,34 +71,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  late List<AlarmSettings> alarms;
   TimeOfDay selectedFromTimeToday =
       TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0));
   TimeOfDay selectedToTimeToday =
       TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 17, minute: 0));
 
-  final currentDate = DateTime.now();
-
   DateTime? selectedFromTimeDate;
   DateTime? selectedToTimeDate;
 
   Set<FocusDuration> focusDurations = <FocusDuration>{
-    FocusDuration.thirty,
+    FocusDuration.ten,
   };
   Set<BreakDuration> breakDurations = <BreakDuration>{
     BreakDuration.five,
   };
 
   StreamSubscription<AlarmSettings>? ringStream;
-  int _currentAlarmId = 0;
-
   @override
   void initState() {
     super.initState();
+    loadAlarms();
     selectedFromTimeDate = convertTimeOfDayToDateTime(selectedFromTimeToday);
     selectedToTimeDate = convertTimeOfDayToDateTime(selectedToTimeToday);
     checkAndroidNotificationPermission();
     checkAndroidScheduleExactAlarmPermission();
-    ringStream ??= Alarm.ringStream.stream.listen(handleAlarm);
+    ringStream ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+  }
+
+  @override
+  void didUpdateWidget(covariant MyHomePage oldWidget) {
+    ringStream?.cancel();
+    ringStream ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -126,15 +136,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   visualDensity: VisualDensity(horizontal: 0, vertical: -1),
                 ),
                 segments: [
-                  ButtonSegment(
-                      value: FocusDuration.thirty,
-                      label: Text('${FocusDuration.thirty.duration} min')),
-                  ButtonSegment(
-                      value: FocusDuration.fortyFive,
-                      label: Text('${FocusDuration.fortyFive.duration} min')),
-                  ButtonSegment(
-                      value: FocusDuration.sixty,
-                      label: Text('${FocusDuration.sixty.duration} min')),
+                  for (final dur in FocusDuration.values)
+                    ButtonSegment(
+                      value: dur,
+                      label: Text('${dur.duration} min'),
+                    ),
                 ],
                 selected: focusDurations,
                 onSelectionChanged: (Set<FocusDuration> durations) {
@@ -212,42 +218,50 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ],
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (selectedFromTimeDate != null &&
                       selectedToTimeDate != null) {
-                    _setAlarm(
+                    await _setAlarm(
                       selectedFromTimeDate!,
                       selectedToTimeDate!,
                       focusDurations.first,
                       breakDurations.first,
                     );
-                    Workmanager().registerPeriodicTask(
-                      "task-identifier",
-                      "simpleTask",
-                      backoffPolicy: BackoffPolicy.exponential,
-                      backoffPolicyDelay: const Duration(seconds: 30),
-                      frequency: const Duration(minutes: 18),
-                    );
+                    scheduleTaskAtTime(
+                        selectedFromTimeToday, focusDurations.first);
+                    loadAlarms();
                   }
                 },
                 child: const Text('Set alarm'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  print("Stopping alarm with id $_currentAlarmId");
-                  await Alarm.stop(_currentAlarmId);
+                  await Alarm.stopAll();
+                  loadAlarms();
                 },
-                child: const Text('Stop alarm'),
+                child: const Text('Stop all alarms'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await Alarm.stopAll();
+                  await Workmanager().cancelAll();
                 },
-                child: const Text('Stop all'),
-              )
+                child: const Text('Cancel all tasks'),
+              ),
+              for (final alarm in alarms)
+                Text('Alarm ${alarm.id} at ${alarm.dateTime}')
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
+    await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            ExampleAlarmRingScreen(alarmSettings: alarmSettings),
       ),
     );
   }
@@ -275,15 +289,71 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     }
   }
 
-  void handleAlarm(AlarmSettings event) {
+  void loadAlarms() {
     setState(() {
-      _currentAlarmId = event.id;
+      alarms = Alarm.getAlarms();
+      alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
+      print(alarms);
     });
   }
 }
 
 Future<String> getIANATimeZone() async {
   return await FlutterTimezone.getLocalTimezone();
+}
+
+void scheduleTaskAtTime(
+    TimeOfDay scheduledTime, FocusDuration focusDuration) async {
+  final now = DateTime.now();
+  final todayScheduledTime = DateTime(now.year, now.month, now.day,
+      scheduledTime.hour, scheduledTime.minute + focusDuration.duration);
+  Duration initialDelay1;
+  Duration initialDelay2;
+
+  DateTime actualStartTime;
+
+  if (todayScheduledTime.isAfter(now)) {
+    // Subtract 3 minutes from the scheduled time
+    actualStartTime = todayScheduledTime.subtract(const Duration(minutes: 3));
+    if (actualStartTime.isBefore(now)) {
+      // If subtracting 3 minutes puts the start time in the past, set it for tomorrow
+      actualStartTime = actualStartTime.add(const Duration(days: 1));
+    }
+  } else {
+    // Scheduled time is for tomorrow but subtract 3 minutes
+    actualStartTime = todayScheduledTime
+        .add(Duration(days: 1))
+        .subtract(Duration(minutes: 3));
+  }
+
+  // Calculate initial delay based on the adjusted actual start time
+  initialDelay1 = actualStartTime.difference(now);
+  initialDelay2 = initialDelay1 + Duration(minutes: focusDuration.duration);
+
+  // await Workmanager().registerPeriodicTask(
+  //   "task-identifier-1",
+  //   "simpleTask1",
+  //   backoffPolicy: BackoffPolicy.exponential,
+  //   backoffPolicyDelay: const Duration(seconds: 30),
+  //   initialDelay: initialDelay1,
+  //   frequency: Duration(minutes: focusDuration.duration * 2),
+  // );
+
+  // await Workmanager().registerPeriodicTask(
+  //   "task-identifier-2",
+  //   "simpleTask2",
+  //   backoffPolicy: BackoffPolicy.exponential,
+  //   backoffPolicyDelay: const Duration(seconds: 30),
+  //   initialDelay: initialDelay2,
+  //   frequency: Duration(minutes: focusDuration.duration * 2),
+  // );
+
+  final DateTime startTime2 =
+      actualStartTime.add(Duration(minutes: focusDuration.duration));
+  print(
+      "Task 1 to start at $actualStartTime, preceeding alarm at $todayScheduledTime, making initial delay equal to $initialDelay1");
+  print(
+      "Task 2  to start at $startTime2, making initial delay equal to $initialDelay2");
 }
 
 Future<void> _setAlarm(
@@ -315,6 +385,8 @@ Future<void> _setAlarm(
 }
 
 enum FocusDuration {
+  five(5),
+  ten(10),
   thirty(30),
   fortyFive(45),
   sixty(60);
