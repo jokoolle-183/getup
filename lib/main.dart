@@ -213,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       MaterialPageRoute<void>(
         builder: (context) => RingScreen(alarmSettings: alarmSettings),
       ),
-    );
+    ).then((value) => loadAlarms());
   }
 
   Future<void> _isAndroidPermissionGranted() async {
@@ -271,12 +271,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     if (list.isNotEmpty) {
       var nextAlarm = list.removeAt(0);
       await Alarm.set(
-          alarmSettings: AlarmSettings(
-              id: nextAlarm.id,
-              dateTime: nextAlarm.dateTime,
-              assetAudioPath: nextAlarm.assetAudioPath,
-              notificationTitle: nextAlarm.notificationTitle,
-              notificationBody: nextAlarm.notificationBody));
+        alarmSettings: AlarmSettings(
+          id: nextAlarm.id,
+          vibrate: false,
+          dateTime: nextAlarm.dateTime,
+          assetAudioPath: nextAlarm.assetAudioPath,
+          notificationTitle: nextAlarm.notificationTitle,
+          notificationBody: nextAlarm.notificationBody,
+        ),
+      );
 
       String encodedList = encodeAlarmDetailsList(list);
       await prefs.setString(ALARMS, encodedList);
