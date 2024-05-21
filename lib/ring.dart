@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:getup/alarm_details.dart';
 import 'package:getup/main.dart';
-import 'package:getup/ring_screen.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -142,4 +143,14 @@ class _RingScreenState extends State<RingScreen> {
       ),
     );
   }
+}
+
+List<AlarmDetails> decodeAlarmDetailsList(String jsonString) {
+  return (jsonDecode(jsonString) as List<dynamic>)
+      .map<AlarmDetails>((item) => AlarmDetails.fromJson(item))
+      .toList();
+}
+
+String encodeAlarmDetailsList(List<AlarmDetails> alarms) {
+  return jsonEncode(alarms.map((alarm) => alarm.toJson()).toList());
 }
