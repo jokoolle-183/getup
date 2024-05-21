@@ -15,15 +15,10 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:gap/gap.dart';
 import 'package:getup/alarm_details.dart';
 import 'package:getup/ring.dart';
-import 'package:getup/ring_screen.dart';
-import 'package:getup/setup_model.dart';
-import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:workmanager/workmanager.dart';
 
 int _id = 0;
 
@@ -89,115 +84,14 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 StreamSubscription<AlarmSettings>? ringStream;
 
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    try {
-      print("Native called background task: $task");
-      await Alarm.init()
-          .then((value) => taskController.add("Alarm initiated"))
-          .then((value) async =>
-              await showNotification('WorkManager', "Work success"))
-          .catchError((error, stacktrace) async =>
-              await showNotification('WorkManager', error.toString()));
-      return Future.value(true);
-    } on AlarmException catch (error, stacktrace) {
-      await showNotification('WorkManager', error.toString());
-      return Future.error(error, stacktrace);
-    }
-  });
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Workmanager().initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
-      isInDebugMode:
-          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-      );
   String timeZoneName = await getIANATimeZone();
   await Alarm.init();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(timeZoneName));
 
-  final NotificationAppLaunchDetails? notificationAppLaunchDetails = !kIsWeb &&
-          Platform.isLinux
-      ? null
-      : await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  final List<DarwinNotificationCategory> darwinNotificationCategories =
-      <DarwinNotificationCategory>[
-    DarwinNotificationCategory(
-      darwinNotificationCategoryText,
-      actions: <DarwinNotificationAction>[
-        DarwinNotificationAction.text(
-          'text_1',
-          'Action 1',
-          buttonTitle: 'Send',
-          placeholder: 'Placeholder',
-        ),
-      ],
-    ),
-    DarwinNotificationCategory(
-      darwinNotificationCategoryPlain,
-      actions: <DarwinNotificationAction>[
-        DarwinNotificationAction.plain('id_1', 'Action 1'),
-        DarwinNotificationAction.plain(
-          'id_2',
-          'Action 2 (destructive)',
-          options: <DarwinNotificationActionOption>{
-            DarwinNotificationActionOption.destructive,
-          },
-        ),
-        DarwinNotificationAction.plain(
-          navigationActionId,
-          'Action 3 (foreground)',
-          options: <DarwinNotificationActionOption>{
-            DarwinNotificationActionOption.foreground,
-          },
-        ),
-        DarwinNotificationAction.plain(
-          'id_4',
-          'Action 4 (auth required)',
-          options: <DarwinNotificationActionOption>{
-            DarwinNotificationActionOption.authenticationRequired,
-          },
-        ),
-      ],
-      options: <DarwinNotificationCategoryOption>{
-        DarwinNotificationCategoryOption.hiddenPreviewShowTitle,
-      },
-    )
-  ];
-
-  final DarwinInitializationSettings initializationSettingsDarwin =
-      DarwinInitializationSettings(
-    requestAlertPermission: false,
-    requestBadgePermission: false,
-    requestSoundPermission: false,
-    onDidReceiveLocalNotification:
-        (int id, String? title, String? body, String? payload) async {
-      didReceiveLocalNotificationStream.add(
-        ReceivedNotification(
-          id: id,
-          title: title,
-          body: body,
-          payload: payload,
-        ),
-      );
-    },
-    notificationCategories: darwinNotificationCategories,
-  );
-
-  final InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-    iOS: initializationSettingsDarwin,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(notificationInit());
 
   runApp(const MyApp());
 }
@@ -208,16 +102,13 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => SetupModel())],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -232,7 +123,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   late List<AlarmSettings> alarms;
   TimeOfDay selectedFromTimeToday =
       TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0));
@@ -241,8 +131,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   DateTime? selectedFromTimeDate;
   DateTime? selectedToTimeDate;
-
-  bool _notificationsEnabled = false;
 
   Set<FocusDuration> focusDurations = <FocusDuration>{
     FocusDuration.ten,
@@ -262,7 +150,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     checkAndroidScheduleExactAlarmPermission();
     ignoreBatteryOptimizationsPermission();
     openBatteryOptimizationSettings();
-    ringStream ??= Alarm.ringStream.stream.listen(navigateToRingScreen);
+    ringStream ??= Alarm.ringStream.stream.listen((AlarmSettings data) {
+      navigateToRingScreen(data);
+    });
   }
 
   @override
@@ -348,10 +238,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   AndroidFlutterLocalNotificationsPlugin>()
               ?.areNotificationsEnabled() ??
           false;
-
-      setState(() {
-        _notificationsEnabled = granted;
-      });
     }
   }
 
@@ -544,12 +430,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 },
                 child: const Text('Stop all alarms'),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  await Workmanager().cancelAll();
-                },
-                child: const Text('Cancel all tasks'),
-              ),
               for (final alarm in alarms)
                 Text('Alarm ${alarm.id} at ${alarm.dateTime}')
             ],
@@ -562,60 +442,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
 Future<String> getIANATimeZone() async {
   return await FlutterTimezone.getLocalTimezone();
-}
-
-void scheduleTaskAtTime(
-    TimeOfDay scheduledTime, FocusDuration focusDuration) async {
-  final now = DateTime.now();
-  final todayScheduledTime = DateTime(now.year, now.month, now.day,
-      scheduledTime.hour, scheduledTime.minute + focusDuration.duration);
-  Duration initialDelay1;
-  Duration initialDelay2;
-
-  DateTime actualStartTime;
-
-  if (todayScheduledTime.isAfter(now)) {
-    // Subtract 3 minutes from the scheduled time
-    actualStartTime = todayScheduledTime.subtract(const Duration(seconds: 30));
-    if (actualStartTime.isBefore(now)) {
-      // If subtracting 3 minutes puts the start time in the past, set it for tomorrow
-      actualStartTime = actualStartTime.add(const Duration(days: 1));
-    }
-  } else {
-    // Scheduled time is for tomorrow but subtract 3 minutes
-    actualStartTime = todayScheduledTime
-        .add(Duration(days: 1))
-        .subtract(Duration(seconds: 30));
-  }
-
-  // Calculate initial delay based on the adjusted actual start time
-  initialDelay1 = actualStartTime.difference(now);
-  initialDelay2 = initialDelay1 + Duration(minutes: focusDuration.duration);
-
-  await Workmanager().registerPeriodicTask(
-    "task-identifier-1",
-    "simpleTask1",
-    backoffPolicy: BackoffPolicy.linear,
-    backoffPolicyDelay: const Duration(seconds: 10),
-    initialDelay: initialDelay1,
-    frequency: Duration(minutes: focusDuration.duration * 2),
-  );
-
-  await Workmanager().registerPeriodicTask(
-    "task-identifier-2",
-    "simpleTask2",
-    backoffPolicy: BackoffPolicy.linear,
-    backoffPolicyDelay: const Duration(seconds: 10),
-    initialDelay: initialDelay2,
-    frequency: Duration(minutes: focusDuration.duration * 2),
-  );
-
-  final DateTime startTime2 =
-      actualStartTime.add(Duration(minutes: focusDuration.duration));
-  print(
-      "Task 1 to start at $actualStartTime, preceeding alarm at $todayScheduledTime, making initial delay equal to $initialDelay1");
-  print(
-      "Task 2  to start at $startTime2, making initial delay equal to $initialDelay2");
 }
 
 enum FocusDuration {
@@ -664,4 +490,78 @@ Future<void> showNotification(String title, String body) async {
   );
   await flutterLocalNotificationsPlugin.show(
       ++_id, title, body, notificationDetails);
+}
+
+InitializationSettings notificationInit() {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  final List<DarwinNotificationCategory> darwinNotificationCategories =
+      <DarwinNotificationCategory>[
+    DarwinNotificationCategory(
+      darwinNotificationCategoryText,
+      actions: <DarwinNotificationAction>[
+        DarwinNotificationAction.text(
+          'text_1',
+          'Action 1',
+          buttonTitle: 'Send',
+          placeholder: 'Placeholder',
+        ),
+      ],
+    ),
+    DarwinNotificationCategory(
+      darwinNotificationCategoryPlain,
+      actions: <DarwinNotificationAction>[
+        DarwinNotificationAction.plain('id_1', 'Action 1'),
+        DarwinNotificationAction.plain(
+          'id_2',
+          'Action 2 (destructive)',
+          options: <DarwinNotificationActionOption>{
+            DarwinNotificationActionOption.destructive,
+          },
+        ),
+        DarwinNotificationAction.plain(
+          navigationActionId,
+          'Action 3 (foreground)',
+          options: <DarwinNotificationActionOption>{
+            DarwinNotificationActionOption.foreground,
+          },
+        ),
+        DarwinNotificationAction.plain(
+          'id_4',
+          'Action 4 (auth required)',
+          options: <DarwinNotificationActionOption>{
+            DarwinNotificationActionOption.authenticationRequired,
+          },
+        ),
+      ],
+      options: <DarwinNotificationCategoryOption>{
+        DarwinNotificationCategoryOption.hiddenPreviewShowTitle,
+      },
+    )
+  ];
+
+  final DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+    onDidReceiveLocalNotification:
+        (int id, String? title, String? body, String? payload) async {
+      didReceiveLocalNotificationStream.add(
+        ReceivedNotification(
+          id: id,
+          title: title,
+          body: body,
+          payload: payload,
+        ),
+      );
+    },
+    notificationCategories: darwinNotificationCategories,
+  );
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsDarwin,
+  );
+  return initializationSettings;
 }

@@ -17,8 +17,8 @@ class RingScreen extends StatefulWidget {
 }
 
 class _RingScreenState extends State<RingScreen> {
-  Stream<StepCount>? _stepCountStream;
-  Stream<PedestrianStatus>? _pedestrianStatusStream;
+  StreamSubscription<StepCount>? _stepCountStream;
+  StreamSubscription<PedestrianStatus>? _pedestrianStatusStream;
   String _status = '?', _steps = '?';
   bool _completed = false;
 
@@ -64,19 +64,18 @@ class _RingScreenState extends State<RingScreen> {
 
   @override
   void dispose() {
-    _stepCountStream = null;
-    _pedestrianStatusStream = null;
+    _stepCountStream?.cancel();
+    _pedestrianStatusStream?.cancel();
     super.dispose();
   }
 
   void initPlatformState() {
-    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
-    _pedestrianStatusStream
-        ?.listen(onPedestrianStatusChanged)
-        .onError(onPedestrianStatusError);
+    _pedestrianStatusStream =
+        Pedometer.pedestrianStatusStream.listen(onPedestrianStatusChanged);
+    _pedestrianStatusStream?.onError(onPedestrianStatusError);
 
-    _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream?.listen(onStepCount).onError(onStepCountError);
+    _stepCountStream = Pedometer.stepCountStream.listen(onStepCount);
+    _stepCountStream?.onError(onStepCountError);
   }
 
   @override
@@ -94,7 +93,7 @@ class _RingScreenState extends State<RingScreen> {
               ),
               const Text('🔔', style: TextStyle(fontSize: 50)),
               Text(
-                'Steps:$_steps ',
+                'Steps:$_steps',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Row(
