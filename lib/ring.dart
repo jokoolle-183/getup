@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +6,6 @@ import 'package:getup/main.dart';
 import 'package:getup/ring_screen.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 
 class RingScreen extends StatefulWidget {
   const RingScreen({required this.alarmSettings, super.key});
@@ -20,8 +17,8 @@ class RingScreen extends StatefulWidget {
 }
 
 class _RingScreenState extends State<RingScreen> {
-  late Stream<StepCount> _stepCountStream;
-  late Stream<PedestrianStatus> _pedestrianStatusStream;
+  Stream<StepCount>? _stepCountStream;
+  Stream<PedestrianStatus>? _pedestrianStatusStream;
   String _status = '?', _steps = '?';
   bool _completed = false;
 
@@ -33,7 +30,6 @@ class _RingScreenState extends State<RingScreen> {
 
   void onStepCount(StepCount event) {
     print(event);
-    showNotification('Pedometer steps counter', 'Steps count: ${event.steps}');
     setState(() {
       _steps = event.steps.toString();
     });
@@ -41,7 +37,6 @@ class _RingScreenState extends State<RingScreen> {
 
   void onPedestrianStatusChanged(PedestrianStatus event) {
     print(event);
-    showNotification('Pedometer status', event.status);
     setState(() {
       if (event.status == 'walking') {
         _completed = true;
@@ -67,14 +62,21 @@ class _RingScreenState extends State<RingScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _stepCountStream = null;
+    _pedestrianStatusStream = null;
+    super.dispose();
+  }
+
   void initPlatformState() {
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     _pedestrianStatusStream
-        .listen(onPedestrianStatusChanged)
+        ?.listen(onPedestrianStatusChanged)
         .onError(onPedestrianStatusError);
 
     _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream.listen(onStepCount).onError(onStepCountError);
+    _stepCountStream?.listen(onStepCount).onError(onStepCountError);
   }
 
   @override
