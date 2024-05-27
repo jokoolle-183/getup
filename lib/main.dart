@@ -16,8 +16,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:uuid/uuid.dart';
 
 int _id = 0;
+
+const Uuid _uuid = Uuid();
 
 /// Streams are created so that app can respond to notification-related events
 /// since the plugin is initialised in the `main` function
@@ -256,12 +259,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     int occurrences = difference.inMinutes ~/ focusDuration.duration;
     List<AlarmDetails> list = [];
 
-    for (int i = 1; i <= occurrences; i++) {
+    for (int i = 0; i < occurrences; i++) {
       DateTime newTime =
           selectedFromTime.add(Duration(minutes: focusDuration.duration * i));
       print("$newTime");
       final alarmDetails = AlarmDetails(
-        id: i,
+        id: UniqueKey().hashCode,
         dateTime: newTime,
         assetAudioPath: 'assets/perfect_alarm.mp3',
         loopAudio: true,
