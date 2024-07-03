@@ -8,16 +8,15 @@ import 'package:getup/main.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RingScreen extends StatefulWidget {
-  const RingScreen({required this.alarmSettings, super.key});
-
-  final AlarmSettings alarmSettings;
+class RingAlarmScreen extends StatefulWidget {
+  const RingAlarmScreen({super.key});
+  static const routeName = '/ring-alarm';
 
   @override
-  State<RingScreen> createState() => _RingScreenState();
+  State<RingAlarmScreen> createState() => _RingAlarmScreenState();
 }
 
-class _RingScreenState extends State<RingScreen> {
+class _RingAlarmScreenState extends State<RingAlarmScreen> {
   StreamSubscription<StepCount>? _stepCountStream;
   StreamSubscription<PedestrianStatus>? _pedestrianStatusStream;
   String _status = '?', _steps = '?';
@@ -81,6 +80,8 @@ class _RingScreenState extends State<RingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final alarmSettings =
+        ModalRoute.of(context)!.settings.arguments as AlarmSettings;
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -89,7 +90,7 @@ class _RingScreenState extends State<RingScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                'You alarm (${widget.alarmSettings.id}) is ringing...',
+                'You alarm (${alarmSettings.id}) is ringing...',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const Text('🔔', style: TextStyle(fontSize: 50)),
@@ -127,7 +128,7 @@ class _RingScreenState extends State<RingScreen> {
                           }
                         }
 
-                        await Alarm.stop(widget.alarmSettings.id)
+                        await Alarm.stop(alarmSettings.id)
                             .then((value) => Navigator.of(context).pop());
                       },
                       child: Text(
