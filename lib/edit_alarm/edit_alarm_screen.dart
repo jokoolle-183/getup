@@ -51,69 +51,38 @@ class EditAlarmScreen extends StatelessWidget {
                   },
                 ),
                 const Gap(24.0),
-                const Text('Break duration'),
-                const Gap(16.0),
-                SegmentedButton<BreakDuration>(
-                  showSelectedIcon: false,
-                  style: const ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity(horizontal: -1, vertical: -1),
-                  ),
-                  segments: [
-                    ButtonSegment(
-                        value: BreakDuration.five,
-                        label: Text('${BreakDuration.five.duration} min')),
-                    ButtonSegment(
-                        value: BreakDuration.ten,
-                        label: Text('${BreakDuration.ten.duration} min')),
-                    ButtonSegment(
-                        value: BreakDuration.fifteen,
-                        label: Text('${BreakDuration.fifteen.duration} min')),
-                  ],
-                  selected: {state.breakDuration},
-                  onSelectionChanged: (Set<BreakDuration> durations) {
-                    if (durations.firstOrNull != null) {
-                      context
-                          .read<EditAlarmCubit>()
-                          .selectBreakDuration(durations.first);
-                    }
-                  },
-                ),
-                const Gap(24.0),
                 const Text('Time frame'),
                 Row(
                   children: [
                     const Text('From: '),
                     ActionChip(
-                      label: Text(TimeOfDay.fromDateTime(state.fromDate)
-                          .format(context)),
+                      label: Text(state.fromTimeOfDay.format(context)),
                       onPressed: () async {
                         final TimeOfDay? time = await showTimePicker(
                           context: context,
-                          initialTime: TimeOfDay.fromDateTime(state.fromDate),
+                          initialTime: state.fromTimeOfDay,
                           initialEntryMode: TimePickerEntryMode.dial,
                         );
                         if (time != null && context.mounted) {
                           context
                               .read<EditAlarmCubit>()
-                              .selectFromDate(convertTimeOfDayToDateTime(time));
+                              .selectFromTimeOfDay(time);
                         }
                       },
                     ),
                     const Text(' To: '),
                     ActionChip(
-                        label: Text(TimeOfDay.fromDateTime(state.toDate)
-                            .format(context)),
+                        label: Text(state.toTimeOfDay.format(context)),
                         onPressed: () async {
                           final TimeOfDay? time = await showTimePicker(
                             context: context,
-                            initialTime: TimeOfDay.fromDateTime(state.toDate),
+                            initialTime: state.toTimeOfDay,
                             initialEntryMode: TimePickerEntryMode.dial,
                           );
                           if (time != null && context.mounted) {
                             context
                                 .read<EditAlarmCubit>()
-                                .selectToDate(convertTimeOfDayToDateTime(time));
+                                .selectToTimeOfDay(time);
                           }
                         }),
                   ],
@@ -140,10 +109,4 @@ class EditAlarmScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-DateTime convertTimeOfDayToDateTime(TimeOfDay timeOfDay, [DateTime? date]) {
-  final currentDate = date ?? DateTime.now();
-  return DateTime(currentDate.year, currentDate.month, currentDate.day,
-      timeOfDay.hour, timeOfDay.minute);
 }

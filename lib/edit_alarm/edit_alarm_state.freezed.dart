@@ -17,9 +17,8 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$EditAlarmState {
   FocusDuration get focusDuration => throw _privateConstructorUsedError;
-  BreakDuration get breakDuration => throw _privateConstructorUsedError;
-  DateTime get fromDate => throw _privateConstructorUsedError;
-  DateTime get toDate => throw _privateConstructorUsedError;
+  TimeOfDay get fromTimeOfDay => throw _privateConstructorUsedError;
+  TimeOfDay get toTimeOfDay => throw _privateConstructorUsedError;
   AlarmDetails? get nextAlarm => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -35,9 +34,8 @@ abstract class $EditAlarmStateCopyWith<$Res> {
   @useResult
   $Res call(
       {FocusDuration focusDuration,
-      BreakDuration breakDuration,
-      DateTime fromDate,
-      DateTime toDate,
+      TimeOfDay fromTimeOfDay,
+      TimeOfDay toTimeOfDay,
       AlarmDetails? nextAlarm});
 }
 
@@ -55,9 +53,8 @@ class _$EditAlarmStateCopyWithImpl<$Res, $Val extends EditAlarmState>
   @override
   $Res call({
     Object? focusDuration = null,
-    Object? breakDuration = null,
-    Object? fromDate = null,
-    Object? toDate = null,
+    Object? fromTimeOfDay = null,
+    Object? toTimeOfDay = null,
     Object? nextAlarm = freezed,
   }) {
     return _then(_value.copyWith(
@@ -65,18 +62,14 @@ class _$EditAlarmStateCopyWithImpl<$Res, $Val extends EditAlarmState>
           ? _value.focusDuration
           : focusDuration // ignore: cast_nullable_to_non_nullable
               as FocusDuration,
-      breakDuration: null == breakDuration
-          ? _value.breakDuration
-          : breakDuration // ignore: cast_nullable_to_non_nullable
-              as BreakDuration,
-      fromDate: null == fromDate
-          ? _value.fromDate
-          : fromDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      toDate: null == toDate
-          ? _value.toDate
-          : toDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+      fromTimeOfDay: null == fromTimeOfDay
+          ? _value.fromTimeOfDay
+          : fromTimeOfDay // ignore: cast_nullable_to_non_nullable
+              as TimeOfDay,
+      toTimeOfDay: null == toTimeOfDay
+          ? _value.toTimeOfDay
+          : toTimeOfDay // ignore: cast_nullable_to_non_nullable
+              as TimeOfDay,
       nextAlarm: freezed == nextAlarm
           ? _value.nextAlarm
           : nextAlarm // ignore: cast_nullable_to_non_nullable
@@ -95,9 +88,8 @@ abstract class _$$EditAlarmStateImplCopyWith<$Res>
   @useResult
   $Res call(
       {FocusDuration focusDuration,
-      BreakDuration breakDuration,
-      DateTime fromDate,
-      DateTime toDate,
+      TimeOfDay fromTimeOfDay,
+      TimeOfDay toTimeOfDay,
       AlarmDetails? nextAlarm});
 }
 
@@ -113,9 +105,8 @@ class __$$EditAlarmStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? focusDuration = null,
-    Object? breakDuration = null,
-    Object? fromDate = null,
-    Object? toDate = null,
+    Object? fromTimeOfDay = null,
+    Object? toTimeOfDay = null,
     Object? nextAlarm = freezed,
   }) {
     return _then(_$EditAlarmStateImpl(
@@ -123,18 +114,14 @@ class __$$EditAlarmStateImplCopyWithImpl<$Res>
           ? _value.focusDuration
           : focusDuration // ignore: cast_nullable_to_non_nullable
               as FocusDuration,
-      breakDuration: null == breakDuration
-          ? _value.breakDuration
-          : breakDuration // ignore: cast_nullable_to_non_nullable
-              as BreakDuration,
-      fromDate: null == fromDate
-          ? _value.fromDate
-          : fromDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      toDate: null == toDate
-          ? _value.toDate
-          : toDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+      fromTimeOfDay: null == fromTimeOfDay
+          ? _value.fromTimeOfDay
+          : fromTimeOfDay // ignore: cast_nullable_to_non_nullable
+              as TimeOfDay,
+      toTimeOfDay: null == toTimeOfDay
+          ? _value.toTimeOfDay
+          : toTimeOfDay // ignore: cast_nullable_to_non_nullable
+              as TimeOfDay,
       nextAlarm: freezed == nextAlarm
           ? _value.nextAlarm
           : nextAlarm // ignore: cast_nullable_to_non_nullable
@@ -145,42 +132,25 @@ class __$$EditAlarmStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$EditAlarmStateImpl
-    with DiagnosticableTreeMixin
-    implements _EditAlarmState {
+class _$EditAlarmStateImpl implements _EditAlarmState {
   _$EditAlarmStateImpl(
       {required this.focusDuration,
-      required this.breakDuration,
-      required this.fromDate,
-      required this.toDate,
+      required this.fromTimeOfDay,
+      required this.toTimeOfDay,
       this.nextAlarm});
 
   @override
   final FocusDuration focusDuration;
   @override
-  final BreakDuration breakDuration;
+  final TimeOfDay fromTimeOfDay;
   @override
-  final DateTime fromDate;
-  @override
-  final DateTime toDate;
+  final TimeOfDay toTimeOfDay;
   @override
   final AlarmDetails? nextAlarm;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'EditAlarmState(focusDuration: $focusDuration, breakDuration: $breakDuration, fromDate: $fromDate, toDate: $toDate, nextAlarm: $nextAlarm)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'EditAlarmState'))
-      ..add(DiagnosticsProperty('focusDuration', focusDuration))
-      ..add(DiagnosticsProperty('breakDuration', breakDuration))
-      ..add(DiagnosticsProperty('fromDate', fromDate))
-      ..add(DiagnosticsProperty('toDate', toDate))
-      ..add(DiagnosticsProperty('nextAlarm', nextAlarm));
+  String toString() {
+    return 'EditAlarmState(focusDuration: $focusDuration, fromTimeOfDay: $fromTimeOfDay, toTimeOfDay: $toTimeOfDay, nextAlarm: $nextAlarm)';
   }
 
   @override
@@ -190,18 +160,17 @@ class _$EditAlarmStateImpl
             other is _$EditAlarmStateImpl &&
             (identical(other.focusDuration, focusDuration) ||
                 other.focusDuration == focusDuration) &&
-            (identical(other.breakDuration, breakDuration) ||
-                other.breakDuration == breakDuration) &&
-            (identical(other.fromDate, fromDate) ||
-                other.fromDate == fromDate) &&
-            (identical(other.toDate, toDate) || other.toDate == toDate) &&
+            (identical(other.fromTimeOfDay, fromTimeOfDay) ||
+                other.fromTimeOfDay == fromTimeOfDay) &&
+            (identical(other.toTimeOfDay, toTimeOfDay) ||
+                other.toTimeOfDay == toTimeOfDay) &&
             (identical(other.nextAlarm, nextAlarm) ||
                 other.nextAlarm == nextAlarm));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, focusDuration, breakDuration, fromDate, toDate, nextAlarm);
+      runtimeType, focusDuration, fromTimeOfDay, toTimeOfDay, nextAlarm);
 
   @JsonKey(ignore: true)
   @override
@@ -214,19 +183,16 @@ class _$EditAlarmStateImpl
 abstract class _EditAlarmState implements EditAlarmState {
   factory _EditAlarmState(
       {required final FocusDuration focusDuration,
-      required final BreakDuration breakDuration,
-      required final DateTime fromDate,
-      required final DateTime toDate,
+      required final TimeOfDay fromTimeOfDay,
+      required final TimeOfDay toTimeOfDay,
       final AlarmDetails? nextAlarm}) = _$EditAlarmStateImpl;
 
   @override
   FocusDuration get focusDuration;
   @override
-  BreakDuration get breakDuration;
+  TimeOfDay get fromTimeOfDay;
   @override
-  DateTime get fromDate;
-  @override
-  DateTime get toDate;
+  TimeOfDay get toTimeOfDay;
   @override
   AlarmDetails? get nextAlarm;
   @override

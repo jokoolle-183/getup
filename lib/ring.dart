@@ -113,19 +113,21 @@ class _RingAlarmScreenState extends State<RingAlarmScreen> {
                           if (list.isNotEmpty) {
                             list.sort((a, b) =>
                                 a.dateTime.isBefore(b.dateTime) ? 0 : 1);
-                            var nextAlarm = list.removeAt(0);
-                            await Alarm.set(
-                                alarmSettings: AlarmSettings(
-                                    id: nextAlarm.id,
-                                    dateTime: nextAlarm.dateTime,
-                                    assetAudioPath: nextAlarm.assetAudioPath,
-                                    notificationTitle:
-                                        nextAlarm.notificationTitle,
-                                    notificationBody:
-                                        nextAlarm.notificationBody));
-
-                            String encodedList = encodeAlarmDetailsList(list);
-                            await prefs.setString(ALARMS, encodedList);
+                            list.removeAt(0);
+                            var nextAlarm = list.firstOrNull;
+                            if (nextAlarm != null) {
+                              await Alarm.set(
+                                  alarmSettings: AlarmSettings(
+                                      id: nextAlarm.id,
+                                      dateTime: nextAlarm.dateTime,
+                                      assetAudioPath: nextAlarm.assetAudioPath,
+                                      notificationTitle:
+                                          nextAlarm.notificationTitle,
+                                      notificationBody:
+                                          nextAlarm.notificationBody));
+                              String encodedList = encodeAlarmDetailsList(list);
+                              await prefs.setString(ALARMS, encodedList);
+                            }
                           }
                         }
 
