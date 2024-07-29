@@ -4,6 +4,7 @@ import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:getup/alarm_details.dart';
+import 'package:getup/constants.dart';
 import 'package:getup/main.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -4,6 +4,7 @@ import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:getup/alarm_list/alarm_list_screen.dart';
 import 'package:getup/edit_alarm/edit_alarm_screen.dart';
 import 'package:getup/ring.dart';
@@ -67,8 +68,6 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
         'notification action tapped with input: ${notificationResponse.input}');
   }
 }
-
-const ALARMS = 'alarms';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -195,4 +194,14 @@ InitializationSettings notificationInit() {
     iOS: initializationSettingsDarwin,
   );
   return initializationSettings;
+}
+
+Future<tz.TZDateTime> convertDateTimeToTZDateTime(DateTime dateTime) async {
+  tz.Location location =
+      tz.getLocation(await FlutterTimezone.getLocalTimezone());
+  return tz.TZDateTime.from(dateTime, location);
+}
+
+Future<String> getIANATimeZone() async {
+  return await FlutterTimezone.getLocalTimezone();
 }
