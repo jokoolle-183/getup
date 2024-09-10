@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:getup/alarm_details.dart';
 import 'package:getup/edit_alarm/durations.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
 
 part 'edit_alarm_state.freezed.dart';
 
 @freezed
 class EditAlarmState with _$EditAlarmState {
   factory EditAlarmState({
+    int? alarmId,
     required FocusDuration focusDuration,
     required TimeOfDay fromTimeOfDay,
     required TimeOfDay toTimeOfDay,

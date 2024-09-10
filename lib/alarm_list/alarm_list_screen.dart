@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:getup/alarm_list/alarm_item.dart';
+import 'package:getup/alarm_list/alarm_list_cubit.dart';
+import 'package:getup/alarm_list/alarm_list_state.dart';
+import 'package:getup/edit_alarm/edit_alarm_screen.dart';
 import 'package:getup/main.dart';
-import 'package:getup/ring.dart';
+import 'package:getup/ring_alarm/ring_alarm_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 StreamSubscription<AlarmSettings>? ringStream;
@@ -21,11 +25,9 @@ class AlarmListScreen extends StatefulWidget {
 }
 
 class _AlarmListScreenState extends State<AlarmListScreen> {
-  late List<AlarmSettings> alarms;
   @override
   void initState() {
     super.initState();
-    loadAlarms();
     checkAndroidNotificationPermission();
     _isAndroidPermissionGranted();
     checkAndroidScheduleExactAlarmPermission();
@@ -108,7 +110,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
       context,
       RingAlarmScreen.routeName,
       arguments: alarmSettings,
-    ).then((value) => loadAlarms());
+    );
   }
 
   Future<void> _isAndroidPermissionGranted() async {
@@ -121,21 +123,51 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
     }
   }
 
-  void loadAlarms() {
-    setState(() {
-      alarms = Alarm.getAlarms();
-      alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'Next alarm: Alarm ${alarms.firstOrNull?.id} at ${alarms.firstOrNull?.dateTime}',
+    return BlocProvider(
+      create: (_) => AlarmListCubit(),
+      child: BlocBuilder<AlarmListCubit, AlarmListState>(
+        builder: (context, state) => Scaffold(
+          body: Builder(
+            builder: (context) {
+              if (state.alarmItems.isEmpty) {
+                return const Center(
+                  child: Text('No alarms have been set.'),
+                );
+              } else {
+                return ListView.builder(
+                    itemCount: state.alarmItems.length,
+                    itemBuilder: (context, i) {
+                      return InkWell(
+                        onTap: () =>
+                            navigateToEditAlarm(alarmItem: state.alarmItems[i]),
+                        child: Card(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(state.alarmItems[i].time),
+                              Text(state.alarmItems[i].type.name),
+                            ],
+                          ),
+                        ),
+                      );
+                    });
+              }
+            },
+          ),
+          floatingActionButton:
+              FloatingActionButton(onPressed: () => navigateToEditAlarm()),
         ),
       ),
+    );
+  }
+
+  Future<void> navigateToEditAlarm({AlarmItem? alarmItem}) async {
+    await Navigator.pushNamed(
+      context,
+      EditAlarmScreen.routeName,
+      arguments: alarmItem,
     );
   }
 }

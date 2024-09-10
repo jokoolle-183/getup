@@ -10,8 +10,9 @@ import 'package:getup/edit_alarm/edit_alarm_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditAlarmCubit extends Cubit<EditAlarmState> {
-  EditAlarmCubit() : super(EditAlarmState.initial()) {
-    _loadInitial();
+  final int? alarmId;
+  EditAlarmCubit({this.alarmId}) : super(EditAlarmState.initial()) {
+    _loadInitial(alarmId: alarmId);
   }
 
   void selectFocusDuration(FocusDuration focusDuration) {
@@ -26,22 +27,23 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
     emit(state.copyWith(toTimeOfDay: toTimeOfDay));
   }
 
-  void _loadInitial() async {
+  void _loadInitial({int? alarmId}) async {
     final prefs = await SharedPreferences.getInstance();
     final focusDurationIndex =
         prefs.getInt(FOCUS_DURATION_KEY) ?? FocusDuration.sixty.index;
     final fromTimeOfDay = await _getTimeOfDayFromPrefs(FROM_TIME_OF_DAY_KEY);
     final toTimeOfDay = await _getTimeOfDayFromPrefs(TO_TIME_OF_DAY_KEY);
-    final alarmsJson = prefs.getString(ALARMS);
 
+    final alarmsJson = prefs.getString(ALARMS);
     AlarmDetails? nextAlarm;
     if (alarmsJson != null) {
-      final alarms = _decodeAlarmDetailsList(alarmsJson);
+      final alarms = decodeAlarmDetailsList(alarmsJson);
       alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
       nextAlarm = alarms.firstOrNull;
     }
 
     emit(state.copyWith(
+      alarmId: alarmId,
       focusDuration: FocusDuration.values[focusDurationIndex],
       fromTimeOfDay: fromTimeOfDay,
       toTimeOfDay: toTimeOfDay,
@@ -133,7 +135,7 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
     return '$hour:$minute';
   }
 
-  List<AlarmDetails> _decodeAlarmDetailsList(String jsonString) {
+  List<AlarmDetails> decodeAlarmDetailsList(String jsonString) {
     return (jsonDecode(jsonString) as List<dynamic>)
         .map<AlarmDetails>((item) => AlarmDetails.fromJson(item))
         .toList();

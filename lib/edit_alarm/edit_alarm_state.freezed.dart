@@ -16,6 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$EditAlarmState {
+  int? get alarmId => throw _privateConstructorUsedError;
   FocusDuration get focusDuration => throw _privateConstructorUsedError;
   TimeOfDay get fromTimeOfDay => throw _privateConstructorUsedError;
   TimeOfDay get toTimeOfDay => throw _privateConstructorUsedError;
@@ -33,7 +34,8 @@ abstract class $EditAlarmStateCopyWith<$Res> {
       _$EditAlarmStateCopyWithImpl<$Res, EditAlarmState>;
   @useResult
   $Res call(
-      {FocusDuration focusDuration,
+      {int? alarmId,
+      FocusDuration focusDuration,
       TimeOfDay fromTimeOfDay,
       TimeOfDay toTimeOfDay,
       AlarmDetails? nextAlarm});
@@ -52,12 +54,17 @@ class _$EditAlarmStateCopyWithImpl<$Res, $Val extends EditAlarmState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? alarmId = freezed,
     Object? focusDuration = null,
     Object? fromTimeOfDay = null,
     Object? toTimeOfDay = null,
     Object? nextAlarm = freezed,
   }) {
     return _then(_value.copyWith(
+      alarmId: freezed == alarmId
+          ? _value.alarmId
+          : alarmId // ignore: cast_nullable_to_non_nullable
+              as int?,
       focusDuration: null == focusDuration
           ? _value.focusDuration
           : focusDuration // ignore: cast_nullable_to_non_nullable
@@ -87,7 +94,8 @@ abstract class _$$EditAlarmStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {FocusDuration focusDuration,
+      {int? alarmId,
+      FocusDuration focusDuration,
       TimeOfDay fromTimeOfDay,
       TimeOfDay toTimeOfDay,
       AlarmDetails? nextAlarm});
@@ -104,12 +112,17 @@ class __$$EditAlarmStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? alarmId = freezed,
     Object? focusDuration = null,
     Object? fromTimeOfDay = null,
     Object? toTimeOfDay = null,
     Object? nextAlarm = freezed,
   }) {
     return _then(_$EditAlarmStateImpl(
+      alarmId: freezed == alarmId
+          ? _value.alarmId
+          : alarmId // ignore: cast_nullable_to_non_nullable
+              as int?,
       focusDuration: null == focusDuration
           ? _value.focusDuration
           : focusDuration // ignore: cast_nullable_to_non_nullable
@@ -134,11 +147,14 @@ class __$$EditAlarmStateImplCopyWithImpl<$Res>
 
 class _$EditAlarmStateImpl implements _EditAlarmState {
   _$EditAlarmStateImpl(
-      {required this.focusDuration,
+      {this.alarmId,
+      required this.focusDuration,
       required this.fromTimeOfDay,
       required this.toTimeOfDay,
       this.nextAlarm});
 
+  @override
+  final int? alarmId;
   @override
   final FocusDuration focusDuration;
   @override
@@ -150,7 +166,7 @@ class _$EditAlarmStateImpl implements _EditAlarmState {
 
   @override
   String toString() {
-    return 'EditAlarmState(focusDuration: $focusDuration, fromTimeOfDay: $fromTimeOfDay, toTimeOfDay: $toTimeOfDay, nextAlarm: $nextAlarm)';
+    return 'EditAlarmState(alarmId: $alarmId, focusDuration: $focusDuration, fromTimeOfDay: $fromTimeOfDay, toTimeOfDay: $toTimeOfDay, nextAlarm: $nextAlarm)';
   }
 
   @override
@@ -158,6 +174,7 @@ class _$EditAlarmStateImpl implements _EditAlarmState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$EditAlarmStateImpl &&
+            (identical(other.alarmId, alarmId) || other.alarmId == alarmId) &&
             (identical(other.focusDuration, focusDuration) ||
                 other.focusDuration == focusDuration) &&
             (identical(other.fromTimeOfDay, fromTimeOfDay) ||
@@ -169,8 +186,8 @@ class _$EditAlarmStateImpl implements _EditAlarmState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, focusDuration, fromTimeOfDay, toTimeOfDay, nextAlarm);
+  int get hashCode => Object.hash(runtimeType, alarmId, focusDuration,
+      fromTimeOfDay, toTimeOfDay, nextAlarm);
 
   @JsonKey(ignore: true)
   @override
@@ -182,11 +199,14 @@ class _$EditAlarmStateImpl implements _EditAlarmState {
 
 abstract class _EditAlarmState implements EditAlarmState {
   factory _EditAlarmState(
-      {required final FocusDuration focusDuration,
+      {final int? alarmId,
+      required final FocusDuration focusDuration,
       required final TimeOfDay fromTimeOfDay,
       required final TimeOfDay toTimeOfDay,
       final AlarmDetails? nextAlarm}) = _$EditAlarmStateImpl;
 
+  @override
+  int? get alarmId;
   @override
   FocusDuration get focusDuration;
   @override

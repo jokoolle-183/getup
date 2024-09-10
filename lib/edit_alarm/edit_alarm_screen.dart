@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:getup/alarm_list/alarm_item.dart';
 import 'package:getup/edit_alarm/durations.dart';
 import 'package:getup/edit_alarm/edit_alarm_cubit.dart';
 import 'package:getup/edit_alarm/edit_alarm_state.dart';
@@ -11,8 +12,12 @@ class EditAlarmScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AlarmItem? alarmItem =
+        ModalRoute.of(context)!.settings.arguments as AlarmItem?;
     return BlocProvider(
-      create: (_) => EditAlarmCubit(),
+      create: (_) => EditAlarmCubit(
+        alarmId: alarmItem?.id,
+      ),
       child: BlocBuilder<EditAlarmCubit, EditAlarmState>(
         builder: (context, state) => Scaffold(
           body: Padding(
@@ -26,6 +31,8 @@ class EditAlarmScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Gap(24.0),
+                Text("Alarm id: ${state.alarmId}"),
+                const Gap(16.0),
                 const Text('Focus duration'),
                 const Gap(16.0),
                 SegmentedButton<FocusDuration>(
