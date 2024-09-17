@@ -1,19 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-
 import 'package:intl/intl.dart';
 import 'package:walk_it_up/alarm_list/alarm_item.dart';
 import 'package:walk_it_up/alarm_list/alarm_list_state.dart';
-import 'package:walk_it_up/database/alarm_database.dart';
+import 'package:walk_it_up/data/repository/alarm_repository.dart';
 
 class AlarmListCubit extends Cubit<AlarmListState> {
-  final AlarmDatabase _db = GetIt.instance<AlarmDatabase>();
-  AlarmListCubit() : super(AlarmListState.initial()) {
+  final AlarmRepository _alarmRepository;
+
+  AlarmListCubit(this._alarmRepository) : super(AlarmListState.initial()) {
     _loadAlarms();
   }
 
   void _loadAlarms() async {
-    final alarms = await _db.allAlarms;
+    final alarms = await _alarmRepository.getAlarms();
 
     final alarmItemList = alarms
         .map(

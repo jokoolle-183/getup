@@ -22,6 +22,12 @@ class $AlarmsTable extends Alarms with TableInfo<$AlarmsTable, DbAlarm> {
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _audioPathMeta =
+      const VerificationMeta('audioPath');
+  @override
+  late final GeneratedColumn<String> audioPath = GeneratedColumn<String>(
+      'audio_path', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _timeMeta = const VerificationMeta('time');
   @override
   late final GeneratedColumn<DateTime> time = GeneratedColumn<DateTime>(
@@ -41,7 +47,7 @@ class $AlarmsTable extends Alarms with TableInfo<$AlarmsTable, DbAlarm> {
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, time, snoozeDuration, daysOfWeek];
+      [id, name, audioPath, time, snoozeDuration, daysOfWeek];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -58,6 +64,12 @@ class $AlarmsTable extends Alarms with TableInfo<$AlarmsTable, DbAlarm> {
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
+    if (data.containsKey('audio_path')) {
+      context.handle(_audioPathMeta,
+          audioPath.isAcceptableOrUnknown(data['audio_path']!, _audioPathMeta));
+    } else if (isInserting) {
+      context.missing(_audioPathMeta);
     }
     if (data.containsKey('time')) {
       context.handle(
@@ -94,6 +106,8 @@ class $AlarmsTable extends Alarms with TableInfo<$AlarmsTable, DbAlarm> {
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name']),
+      audioPath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}audio_path'])!,
       time: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
       snoozeDuration: attachedDatabase.typeMapping
@@ -112,12 +126,14 @@ class $AlarmsTable extends Alarms with TableInfo<$AlarmsTable, DbAlarm> {
 class DbAlarm extends DataClass implements Insertable<DbAlarm> {
   final int id;
   final String? name;
+  final String audioPath;
   final DateTime time;
   final int snoozeDuration;
   final String daysOfWeek;
   const DbAlarm(
       {required this.id,
       this.name,
+      required this.audioPath,
       required this.time,
       required this.snoozeDuration,
       required this.daysOfWeek});
@@ -128,6 +144,7 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
     }
+    map['audio_path'] = Variable<String>(audioPath);
     map['time'] = Variable<DateTime>(time);
     map['snooze_duration'] = Variable<int>(snoozeDuration);
     map['days_of_week'] = Variable<String>(daysOfWeek);
@@ -138,6 +155,7 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
     return AlarmsCompanion(
       id: Value(id),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      audioPath: Value(audioPath),
       time: Value(time),
       snoozeDuration: Value(snoozeDuration),
       daysOfWeek: Value(daysOfWeek),
@@ -150,6 +168,7 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
     return DbAlarm(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String?>(json['name']),
+      audioPath: serializer.fromJson<String>(json['audioPath']),
       time: serializer.fromJson<DateTime>(json['time']),
       snoozeDuration: serializer.fromJson<int>(json['snoozeDuration']),
       daysOfWeek: serializer.fromJson<String>(json['daysOfWeek']),
@@ -161,6 +180,7 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String?>(name),
+      'audioPath': serializer.toJson<String>(audioPath),
       'time': serializer.toJson<DateTime>(time),
       'snoozeDuration': serializer.toJson<int>(snoozeDuration),
       'daysOfWeek': serializer.toJson<String>(daysOfWeek),
@@ -170,12 +190,14 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
   DbAlarm copyWith(
           {int? id,
           Value<String?> name = const Value.absent(),
+          String? audioPath,
           DateTime? time,
           int? snoozeDuration,
           String? daysOfWeek}) =>
       DbAlarm(
         id: id ?? this.id,
         name: name.present ? name.value : this.name,
+        audioPath: audioPath ?? this.audioPath,
         time: time ?? this.time,
         snoozeDuration: snoozeDuration ?? this.snoozeDuration,
         daysOfWeek: daysOfWeek ?? this.daysOfWeek,
@@ -184,6 +206,7 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
     return DbAlarm(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      audioPath: data.audioPath.present ? data.audioPath.value : this.audioPath,
       time: data.time.present ? data.time.value : this.time,
       snoozeDuration: data.snoozeDuration.present
           ? data.snoozeDuration.value
@@ -198,6 +221,7 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
     return (StringBuffer('DbAlarm(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('audioPath: $audioPath, ')
           ..write('time: $time, ')
           ..write('snoozeDuration: $snoozeDuration, ')
           ..write('daysOfWeek: $daysOfWeek')
@@ -206,13 +230,15 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, time, snoozeDuration, daysOfWeek);
+  int get hashCode =>
+      Object.hash(id, name, audioPath, time, snoozeDuration, daysOfWeek);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DbAlarm &&
           other.id == this.id &&
           other.name == this.name &&
+          other.audioPath == this.audioPath &&
           other.time == this.time &&
           other.snoozeDuration == this.snoozeDuration &&
           other.daysOfWeek == this.daysOfWeek);
@@ -221,12 +247,14 @@ class DbAlarm extends DataClass implements Insertable<DbAlarm> {
 class AlarmsCompanion extends UpdateCompanion<DbAlarm> {
   final Value<int> id;
   final Value<String?> name;
+  final Value<String> audioPath;
   final Value<DateTime> time;
   final Value<int> snoozeDuration;
   final Value<String> daysOfWeek;
   const AlarmsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.audioPath = const Value.absent(),
     this.time = const Value.absent(),
     this.snoozeDuration = const Value.absent(),
     this.daysOfWeek = const Value.absent(),
@@ -234,15 +262,18 @@ class AlarmsCompanion extends UpdateCompanion<DbAlarm> {
   AlarmsCompanion.insert({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    required String audioPath,
     required DateTime time,
     required int snoozeDuration,
     required String daysOfWeek,
-  })  : time = Value(time),
+  })  : audioPath = Value(audioPath),
+        time = Value(time),
         snoozeDuration = Value(snoozeDuration),
         daysOfWeek = Value(daysOfWeek);
   static Insertable<DbAlarm> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<String>? audioPath,
     Expression<DateTime>? time,
     Expression<int>? snoozeDuration,
     Expression<String>? daysOfWeek,
@@ -250,6 +281,7 @@ class AlarmsCompanion extends UpdateCompanion<DbAlarm> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (audioPath != null) 'audio_path': audioPath,
       if (time != null) 'time': time,
       if (snoozeDuration != null) 'snooze_duration': snoozeDuration,
       if (daysOfWeek != null) 'days_of_week': daysOfWeek,
@@ -259,12 +291,14 @@ class AlarmsCompanion extends UpdateCompanion<DbAlarm> {
   AlarmsCompanion copyWith(
       {Value<int>? id,
       Value<String?>? name,
+      Value<String>? audioPath,
       Value<DateTime>? time,
       Value<int>? snoozeDuration,
       Value<String>? daysOfWeek}) {
     return AlarmsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      audioPath: audioPath ?? this.audioPath,
       time: time ?? this.time,
       snoozeDuration: snoozeDuration ?? this.snoozeDuration,
       daysOfWeek: daysOfWeek ?? this.daysOfWeek,
@@ -279,6 +313,9 @@ class AlarmsCompanion extends UpdateCompanion<DbAlarm> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (audioPath.present) {
+      map['audio_path'] = Variable<String>(audioPath.value);
     }
     if (time.present) {
       map['time'] = Variable<DateTime>(time.value);
@@ -297,6 +334,7 @@ class AlarmsCompanion extends UpdateCompanion<DbAlarm> {
     return (StringBuffer('AlarmsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('audioPath: $audioPath, ')
           ..write('time: $time, ')
           ..write('snoozeDuration: $snoozeDuration, ')
           ..write('daysOfWeek: $daysOfWeek')
@@ -939,6 +977,7 @@ abstract class _$AlarmDatabase extends GeneratedDatabase {
 typedef $$AlarmsTableCreateCompanionBuilder = AlarmsCompanion Function({
   Value<int> id,
   Value<String?> name,
+  required String audioPath,
   required DateTime time,
   required int snoozeDuration,
   required String daysOfWeek,
@@ -946,6 +985,7 @@ typedef $$AlarmsTableCreateCompanionBuilder = AlarmsCompanion Function({
 typedef $$AlarmsTableUpdateCompanionBuilder = AlarmsCompanion Function({
   Value<int> id,
   Value<String?> name,
+  Value<String> audioPath,
   Value<DateTime> time,
   Value<int> snoozeDuration,
   Value<String> daysOfWeek,
@@ -981,6 +1021,11 @@ class $$AlarmsTableFilterComposer
 
   ColumnFilters<String> get name => $state.composableBuilder(
       column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get audioPath => $state.composableBuilder(
+      column: $state.table.audioPath,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1026,6 +1071,11 @@ class $$AlarmsTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<String> get audioPath => $state.composableBuilder(
+      column: $state.table.audioPath,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   ColumnOrderings<DateTime> get time => $state.composableBuilder(
       column: $state.table.time,
       builder: (column, joinBuilders) =>
@@ -1064,6 +1114,7 @@ class $$AlarmsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
+            Value<String> audioPath = const Value.absent(),
             Value<DateTime> time = const Value.absent(),
             Value<int> snoozeDuration = const Value.absent(),
             Value<String> daysOfWeek = const Value.absent(),
@@ -1071,6 +1122,7 @@ class $$AlarmsTableTableManager extends RootTableManager<
               AlarmsCompanion(
             id: id,
             name: name,
+            audioPath: audioPath,
             time: time,
             snoozeDuration: snoozeDuration,
             daysOfWeek: daysOfWeek,
@@ -1078,6 +1130,7 @@ class $$AlarmsTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
+            required String audioPath,
             required DateTime time,
             required int snoozeDuration,
             required String daysOfWeek,
@@ -1085,6 +1138,7 @@ class $$AlarmsTableTableManager extends RootTableManager<
               AlarmsCompanion.insert(
             id: id,
             name: name,
+            audioPath: audioPath,
             time: time,
             snoozeDuration: snoozeDuration,
             daysOfWeek: daysOfWeek,

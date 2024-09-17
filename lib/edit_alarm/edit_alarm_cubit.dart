@@ -6,12 +6,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:walk_it_up/alarm_details.dart';
 import 'package:walk_it_up/constants.dart';
+import 'package:walk_it_up/data/repository/alarm_repository.dart';
 import 'package:walk_it_up/edit_alarm/durations.dart';
 import 'package:walk_it_up/edit_alarm/edit_alarm_state.dart';
 
 class EditAlarmCubit extends Cubit<EditAlarmState> {
   final int? alarmId;
-  EditAlarmCubit({this.alarmId}) : super(EditAlarmState.initial()) {
+  final AlarmRepository _alarmRepository;
+
+  EditAlarmCubit(
+    this._alarmRepository,
+    this.alarmId,
+  ) : super(EditAlarmState.initial()) {
     _loadInitial(alarmId: alarmId);
   }
 

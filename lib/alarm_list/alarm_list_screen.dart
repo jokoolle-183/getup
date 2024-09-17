@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:walk_it_up/alarm_list/alarm_item.dart';
 import 'package:walk_it_up/alarm_list/alarm_list_cubit.dart';
 import 'package:walk_it_up/alarm_list/alarm_list_state.dart';
+import 'package:walk_it_up/data/repository/alarm_repository.dart';
 import 'package:walk_it_up/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/main.dart';
 import 'package:walk_it_up/ring_alarm/ring_alarm_screen.dart';
@@ -127,7 +128,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AlarmListCubit(),
+      create: (_) => AlarmListCubit(getIt.get<AlarmRepository>()),
       child: BlocBuilder<AlarmListCubit, AlarmListState>(
         builder: (context, state) => Scaffold(
           body: Builder(
@@ -157,8 +158,9 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
               }
             },
           ),
-          floatingActionButton:
-              FloatingActionButton(onPressed: () => navigateToEditAlarm()),
+          floatingActionButton: FloatingActionButton(
+              child: const Icon(Icons.add),
+              onPressed: () => navigateToEditAlarm()),
         ),
       ),
     );
