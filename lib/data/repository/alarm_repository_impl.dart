@@ -3,10 +3,10 @@ import 'package:walk_it_up/data/dto/alarm_dto.dart';
 import 'package:walk_it_up/data/dto/alarm_set_dto.dart';
 import 'package:walk_it_up/data/repository/alarm_repository.dart';
 
-class DefaultAlarmRepository extends AlarmRepository {
+class AlarmRepositoryImpl extends AlarmRepository {
   final AlarmDatabase _database;
 
-  DefaultAlarmRepository(this._database);
+  AlarmRepositoryImpl(this._database);
 
   @override
   Future<List<AlarmSetDto>> getAlarmSets() async {
@@ -18,7 +18,7 @@ class DefaultAlarmRepository extends AlarmRepository {
 
   @override
   Future<List<AlarmDto>> getAlarms() async {
-    var alarms = await _database.allAlarms;
+    var alarms = await _database.allRegularAlarms;
     return alarms.map((alarm) => AlarmDto.fromDbAlarm(alarm)).toList();
   }
 }

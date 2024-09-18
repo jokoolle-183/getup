@@ -1,4 +1,6 @@
 import 'package:walk_it_up/data/database/alarm_database.dart';
+import 'package:walk_it_up/data/dto/alarm_dto.dart';
+import 'package:walk_it_up/data/dto/weekdays.dart';
 
 class AlarmSetDto {
   final int id;
@@ -7,7 +9,7 @@ class AlarmSetDto {
   final DateTime endTime;
   final int intervalBetweenAlarms;
   final int? pauseDuration;
-  final String daysOfWeek;
+  final List<Weekday> daysOfWeek;
 
   AlarmSetDto._({
     required this.id,
@@ -24,7 +26,7 @@ class AlarmSetDto {
         startTime: alarmSet.startTime,
         endTime: alarmSet.endTime,
         intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
-        daysOfWeek: alarmSet.daysOfWeek,
+        daysOfWeek: tryCast(alarmSet.daysOfWeek),
         name: alarmSet.name,
         pauseDuration: alarmSet.pauseDuration,
       );

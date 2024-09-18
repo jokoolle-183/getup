@@ -13,7 +13,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:walk_it_up/alarm_list/alarm_list_screen.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/repository/alarm_repository.dart';
-import 'package:walk_it_up/data/repository/default_alarm_repository.dart';
+import 'package:walk_it_up/data/repository/alarm_repository_impl.dart';
 import 'package:walk_it_up/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/ring_alarm/ring_alarm_screen.dart';
 
@@ -21,7 +21,7 @@ final getIt = GetIt.instance;
 void setup() {
   getIt.registerSingleton<AlarmDatabase>(AlarmDatabase());
   getIt.registerLazySingleton<AlarmRepository>(
-    () => DefaultAlarmRepository(getIt<AlarmDatabase>()),
+    () => AlarmRepositoryImpl(getIt<AlarmDatabase>()),
   );
 }
 

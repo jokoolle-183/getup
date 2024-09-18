@@ -1,15 +1,18 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
+import 'package:walk_it_up/data/dto/weekdays.dart';
 
+@immutable
 class AlarmDto extends Equatable {
   final int id;
   final String? name;
   final String audioPath;
   final DateTime time;
-  final int snoozeDuration;
-  final String daysOfWeek;
+  final int? snoozeDuration;
+  final List<Weekday>? daysOfWeek;
 
-  AlarmDto._({
+  const AlarmDto._({
     required this.id,
     required this.time,
     required this.daysOfWeek,
@@ -18,23 +21,23 @@ class AlarmDto extends Equatable {
     this.name,
   });
 
-  factory AlarmDto.fromDbAlarm(DbAlarm dbAlarm) => AlarmDto._(
-        id: dbAlarm.id,
-        name: dbAlarm.name,
-        audioPath: dbAlarm.audioPath,
-        time: dbAlarm.time,
-        snoozeDuration: dbAlarm.snoozeDuration,
-        daysOfWeek: dbAlarm.daysOfWeek,
+  factory AlarmDto.fromDbAlarm(RegularAlarm alarm) => AlarmDto._(
+        id: alarm.id,
+        name: alarm.name,
+        audioPath: alarm.audioPath,
+        time: alarm.time,
+        snoozeDuration: alarm.snoozeDuration,
+        daysOfWeek: tryCast(alarm.daysOfWeek),
       );
 
-  factory AlarmDto.fromAlarmCompanion(AlarmsCompanion alarmCompanion) =>
+  factory AlarmDto.fromAlarmCompanion(RegularAlarmsCompanion alarmCompanion) =>
       AlarmDto._(
         id: alarmCompanion.id.value,
         name: alarmCompanion.name.value,
         audioPath: alarmCompanion.audioPath.value,
         time: alarmCompanion.time.value,
         snoozeDuration: alarmCompanion.snoozeDuration.value,
-        daysOfWeek: alarmCompanion.daysOfWeek.value,
+        daysOfWeek: tryCast(alarmCompanion.daysOfWeek.value),
       );
 
   @override
@@ -47,3 +50,5 @@ class AlarmDto extends Equatable {
         daysOfWeek,
       ];
 }
+
+T? tryCast<T>(dynamic object) => object is T ? object : null;
