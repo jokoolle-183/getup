@@ -77,12 +77,15 @@ class RecurringAlarms extends Table with EquatableMixin {
 
 @DriftDatabase(tables: [RegularAlarms, AlarmSets, RecurringAlarms])
 class AlarmDatabase extends _$AlarmDatabase {
+  bool isUnderTest = false;
+
   AlarmDatabase() : super(_openConnection());
-  AlarmDatabase.test(QueryExecutor executor) : super(executor);
+
+  AlarmDatabase.test(QueryExecutor executor) : super(executor) {
+    isUnderTest = true;
+  }
 
   static QueryExecutor _openConnection() {
-    // `driftDatabase` from `package:drift_flutter` stores the database in
-    // `getApplicationDocumentsDirectory()`.
     return driftDatabase(name: ALARM_DATABASE);
   }
 
@@ -114,7 +117,7 @@ class AlarmDatabase extends _$AlarmDatabase {
     List<RecurringAlarmsCompanion> alarmList,
   ) {
     return transaction(() async {
-      final updateSuccess = await update(alarmSets).replace(alarmSet);
+      await update(alarmSets).replace(alarmSet);
 
       // Update existing alarms under this alarm set
       for (RecurringAlarmsCompanion alarm in alarmList) {
@@ -125,12 +128,21 @@ class AlarmDatabase extends _$AlarmDatabase {
     });
   }
 
+  Future<int> deleteAlarmSet(int id) {
+    return (delete(alarmSets)..where((alarmSet) => alarmSet.id.equals(id)))
+        .go();
+  }
+
   Future<int> saveAlarm(RegularAlarmsCompanion entry) {
     return into(regularAlarms).insert(entry);
   }
 
   Future<bool> updateAlarm(RegularAlarmsCompanion entry) {
     return update(regularAlarms).replace(entry);
+  }
+
+  Future<int> deleteAlarm(int id) {
+    return (delete(regularAlarms)..where((alarm) => alarm.id.equals(id))).go();
   }
 
   Stream<RegularAlarm> watchAlarmById(int id) {
@@ -149,12 +161,16 @@ class AlarmDatabase extends _$AlarmDatabase {
   @override
   MigrationStrategy get migration =>
       MigrationStrategy(beforeOpen: (details) async {
-        if (details.wasCreated) {
+        // Prepopulate the db on first creation and in case it's not
+        // for testing
+        if (details.wasCreated && !isUnderTest) {
           final date = DateTime.now();
           saveAlarm(RegularAlarmsCompanion.insert(
             audioPath: 'assets/perfect_alarm.mp3',
             time: DateTime(date.year, date.month, date.day, 10, 0),
           ));
         }
+        // Turned off by default in sqlite 3, needs to be manually activated
+        await customStatement('PRAGMA foreign_keys = ON');
       });
 }

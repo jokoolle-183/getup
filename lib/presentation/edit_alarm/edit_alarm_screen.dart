@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:walk_it_up/alarm_list/alarm_item.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
 import 'package:walk_it_up/data/repository/alarm_repository.dart';
-import 'package:walk_it_up/edit_alarm/durations.dart';
-import 'package:walk_it_up/edit_alarm/edit_alarm_cubit.dart';
-import 'package:walk_it_up/edit_alarm/edit_alarm_state.dart';
+import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
+import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_cubit.dart';
+import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_state.dart';
 import 'package:walk_it_up/main.dart';
 
 class EditAlarmScreen extends StatelessWidget {

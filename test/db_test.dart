@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:test/test.dart';
@@ -70,12 +73,12 @@ void main() {
     RecurringAlarmsCompanion.insert(
       id: const Value(2),
       alarmSetId: alarmSetCompanion.id.value,
-      time: DateTime(2024, 9, 16, 9, 0),
+      time: DateTime(2024, 9, 16, 10, 0),
     ),
     RecurringAlarmsCompanion.insert(
       id: const Value(3),
       alarmSetId: alarmSetCompanion.id.value,
-      time: DateTime(2024, 9, 16, 9, 0),
+      time: DateTime(2024, 9, 16, 11, 0),
     ),
   ];
 
@@ -125,6 +128,7 @@ void main() {
       final containsId =
           alarms.every((a) => a.alarmSetId == alarmSetCompanion.id.value);
 
+      expect(alarms.length, equals(recurringAlarms.length));
       expect(containsId, true);
     });
   });
@@ -285,6 +289,17 @@ void main() {
             [alarmSetCompanion.audioPath.value, 'assets/some_other_sound.mp3']),
       );
 
+      //TODO: Add a test case for changing start and end time and how that affects
+      // the quantity of recurring alarms
+
+      // In order to implement this, an additional factory class for creating
+      // recurring alarms is needed, which will be additionally tested
+
+      final updatedAlarms = recurringAlarms.indexed
+          .map((entry) => entry.$2
+              .copyWith(time: Value(DateTime(2024, 9, 16, 16 + entry.$1, 0))))
+          .toList();
+
       await database.updateAlarmSet(
         alarmSetCompanion.copyWith(
             name: const Value('Alarm Set 2'),
@@ -301,9 +316,18 @@ void main() {
               Weekday.friday,
               Weekday.saturday
             ])),
-        recurringAlarms,
+        updatedAlarms,
       );
 
+      // Check for updated recurring alarms equality
+      final updatedDbAlarms = await database.allRecurringAlarms
+          .then((value) => value.sortedBy((a) => a.time));
+
+      expect(updatedDbAlarms[0].time, updatedAlarms[0].time.value);
+      expect(updatedDbAlarms[1].time, updatedAlarms[1].time.value);
+      expect(updatedDbAlarms[2].time, updatedAlarms[2].time.value);
+
+      // Wait for alarm set property expectations
       Future.wait([
         startTimeExpectation,
         endTimeExpectation,
@@ -313,6 +337,70 @@ void main() {
         pauseDurationExpectation,
         intervalBetweenAlarmsExpectation,
       ]);
+    });
+  });
+
+  group('Database item deletion tests', () {
+    test('Deleting a RegularAlarm', () async {
+      var regularAlarmsCompanion = RegularAlarmsCompanion.insert(
+        time: DateTime(2024, 9, 16, 8, 0),
+        audioPath: 'assets/some_sound.mp3',
+        snoozeDuration: const Value.absentIfNull(5),
+        daysOfWeek: const Value([
+          Weekday.monday,
+          Weekday.tuesday,
+          Weekday.wednesday,
+          Weekday.thursday,
+          Weekday.friday
+        ]),
+      );
+
+      final id = await database.saveAlarm(regularAlarmsCompanion).then((value) {
+        regularAlarmsCompanion =
+            regularAlarmsCompanion.copyWith(id: Value(value));
+        return value;
+      });
+      final allAlarms = await database.allRegularAlarms;
+      final instertedAlarm = allAlarms.first;
+
+      expect(regularAlarmsCompanion.id.value, instertedAlarm.id);
+      expect(regularAlarmsCompanion.name.value, instertedAlarm.name);
+      expect(regularAlarmsCompanion.time.value, instertedAlarm.time);
+      expect(regularAlarmsCompanion.snoozeDuration.value,
+          instertedAlarm.snoozeDuration);
+      expect(regularAlarmsCompanion.audioPath.value, instertedAlarm.audioPath);
+      expect(
+          regularAlarmsCompanion.daysOfWeek.value, instertedAlarm.daysOfWeek);
+
+      await database.deleteAlarm(id);
+      final remainingAlarms = await database.allRegularAlarms;
+      expect(remainingAlarms, isEmpty);
+    });
+
+    test('Deleting an AlarmSet deletes RecurringAlarms also', () async {
+      await database.saveAlarmSet(alarmSetCompanion, recurringAlarms);
+
+      final allAlarmSets = await database.allAlarmSets;
+      final allRecurringAlarms = await database.allRecurringAlarms;
+      final instertedAlarmSet = allAlarmSets.first;
+      final containsId = allRecurringAlarms
+          .every((a) => a.alarmSetId == alarmSetCompanion.id.value);
+
+      expect(containsId, true);
+      expect(allRecurringAlarms.length, recurringAlarms.length);
+      expect(alarmSetCompanion.id.value, instertedAlarmSet.id);
+      expect(alarmSetCompanion.name.value, instertedAlarmSet.name);
+      expect(alarmSetCompanion.startTime.value, instertedAlarmSet.startTime);
+      expect(alarmSetCompanion.endTime.value, instertedAlarmSet.endTime);
+      expect(alarmSetCompanion.audioPath.value, instertedAlarmSet.audioPath);
+      expect(alarmSetCompanion.daysOfWeek.value, instertedAlarmSet.daysOfWeek);
+
+      await database.deleteAlarmSet(alarmSetCompanion.id.value);
+      final remainingAlarmSets = await database.allAlarmSets;
+      final remainingRecurringAlarms = await database.allRecurringAlarms;
+
+      expect(remainingAlarmSets, isEmpty);
+      expect(remainingRecurringAlarms, isEmpty);
     });
   });
 }

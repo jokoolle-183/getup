@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:walk_it_up/alarm_list/alarm_item.dart';
-import 'package:walk_it_up/alarm_list/alarm_list_cubit.dart';
-import 'package:walk_it_up/alarm_list/alarm_list_state.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_list_cubit.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_list_state.dart';
 import 'package:walk_it_up/data/repository/alarm_repository.dart';
-import 'package:walk_it_up/edit_alarm/edit_alarm_screen.dart';
+import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/main.dart';
-import 'package:walk_it_up/ring_alarm/ring_alarm_screen.dart';
+import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_screen.dart';
 
 StreamSubscription<AlarmSettings>? ringStream;
 
