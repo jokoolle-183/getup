@@ -1,4 +1,4 @@
-import 'package:walk_it_up/data/database/alarm_mapper.dart';
+import 'package:walk_it_up/data/model/alarm_mapper.dart';
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_set_dao.dart';
 import 'package:walk_it_up/data/model/dto/alarm_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/recurring_alarm_dto.dart';

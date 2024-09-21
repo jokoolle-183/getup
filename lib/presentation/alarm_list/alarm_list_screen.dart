@@ -10,6 +10,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_item_card.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_cubit.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_state.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
@@ -34,8 +35,9 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
     checkAndroidNotificationPermission();
     _isAndroidPermissionGranted();
     checkAndroidScheduleExactAlarmPermission();
-    ignoreBatteryOptimizationsPermission();
-    openBatteryOptimizationSettings();
+    _requestPermissions();
+    // ignoreBatteryOptimizationsPermission();
+    // openBatteryOptimizationSettings();
     ringStream ??= Alarm.ringStream.stream.listen((AlarmSettings data) {
       navigateToRingScreen(data);
     });
@@ -144,21 +146,10 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
               } else {
                 return ListView.builder(
                     itemCount: state.alarmItems.length,
-                    itemBuilder: (context, i) {
-                      return InkWell(
-                        onTap: () =>
-                            navigateToEditAlarm(alarmItem: state.alarmItems[i]),
-                        child: Card(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(state.alarmItems[i].time),
-                              Text(state.alarmItems[i].type.name),
-                            ],
-                          ),
-                        ),
-                      );
-                    });
+                    itemBuilder: (context, i) => AlarmItemCard(
+                          alarmItem: state.alarmItems[i],
+                          navigateToEditAlarm: navigateToEditAlarm,
+                        ));
               }
             },
           ),

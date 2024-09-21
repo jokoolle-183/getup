@@ -35,10 +35,45 @@ class AlarmDatabase extends _$AlarmDatabase {
         // for testing
         if (details.wasCreated && !isUnderTest) {
           final date = DateTime.now();
-          into(regularAlarms).insert((RegularAlarmsCompanion.insert(
-            audioPath: 'assets/perfect_alarm.mp3',
-            time: DateTime(date.year, date.month, date.day, 10, 0),
-          )));
+          into(regularAlarms).insert(
+            RegularAlarmsCompanion.insert(
+              audioPath: 'assets/perfect_alarm.mp3',
+              time: DateTime(date.year, date.month, date.day, 10, 0),
+            ),
+          );
+
+          final alarmSetId = await into(alarmSets).insert(
+            AlarmSetsCompanion.insert(
+              audioPath: 'assets/perfect_alarm.mp3',
+              startTime: DateTime(date.year, date.month, date.day, 9, 0),
+              endTime: DateTime(date.year, date.month, date.day, 12, 0),
+              daysOfWeek: const Value([
+                Weekday.monday,
+                Weekday.tuesday,
+                Weekday.wednesday,
+              ]),
+              intervalBetweenAlarms: 60,
+            ),
+          );
+
+          final recurringAlarmList = [
+            RecurringAlarmsCompanion.insert(
+              alarmSetId: alarmSetId,
+              time: DateTime(date.year, date.month, date.day, 10, 0),
+            ),
+            RecurringAlarmsCompanion.insert(
+              alarmSetId: alarmSetId,
+              time: DateTime(date.year, date.month, date.day, 11, 0),
+            ),
+            RecurringAlarmsCompanion.insert(
+              alarmSetId: alarmSetId,
+              time: DateTime(date.year, date.month, date.day, 12, 0),
+            ),
+          ];
+
+          batch((batch) {
+            batch.insertAll(recurringAlarms, recurringAlarmList);
+          });
         }
         // Turned off by default in sqlite 3, needs to be manually activated
         await customStatement('PRAGMA foreign_keys = ON');

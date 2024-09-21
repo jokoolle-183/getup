@@ -14,7 +14,7 @@ class AlarmSetDto extends Equatable {
   final DateTime endTime;
   final int intervalBetweenAlarms;
   final int? pauseDuration;
-  final List<Weekday> daysOfWeek;
+  final List<Weekday>? daysOfWeek;
   final List<RecurringAlarmDto> recurringAlarms;
   final bool isEnabled;
 
