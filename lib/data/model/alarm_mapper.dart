@@ -38,9 +38,4 @@ class AlarmMapper {
       isEnabled: Value(recurringAlarm.isEnabled),
     );
   }
-
-  static RegularAlarmDto mapCompanionToAlarm(
-      RegularAlarmsCompanion alarmCompanion) {
-    return RegularAlarmDto.fromAlarmCompanion(alarmCompanion);
-  }
 }
