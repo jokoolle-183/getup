@@ -11,7 +11,7 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
 
   @override
   Future<List<AlarmSetDto>> getAlarmSets() async {
-    return _alarmSetDao.getAlarmSets();
+    return _alarmSetDao.getSetsWithAlarms();
   }
 
   @override

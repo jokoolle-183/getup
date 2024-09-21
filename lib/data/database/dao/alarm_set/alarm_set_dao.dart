@@ -12,7 +12,12 @@ class AlarmSetDao extends DatabaseAccessor<AlarmDatabase>
     with _$AlarmSetDaoMixin {
   AlarmSetDao(AlarmDatabase db) : super(db);
 
-  Future<List<AlarmSetDto>> getAlarmSets() async {
+  Future<List<RecurringAlarm>> get allRecurringAlarms =>
+      select(recurringAlarms).get();
+
+  Future<List<AlarmSet>> get allAlarmSets => select(alarmSets).get();
+
+  Future<List<AlarmSetDto>> getSetsWithAlarms() async {
     final query = select(alarmSets).join([
       leftOuterJoin(
           recurringAlarms, recurringAlarms.alarmSetId.equalsExp(alarmSets.id)),
