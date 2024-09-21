@@ -1140,6 +1140,9 @@ abstract class _$AlarmDatabase extends GeneratedDatabase {
   late final $AlarmSetsTable alarmSets = $AlarmSetsTable(this);
   late final $RecurringAlarmsTable recurringAlarms =
       $RecurringAlarmsTable(this);
+  late final RegularAlarmsDao regularAlarmsDao =
+      RegularAlarmsDao(this as AlarmDatabase);
+  late final AlarmSetDao alarmSetDao = AlarmSetDao(this as AlarmDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

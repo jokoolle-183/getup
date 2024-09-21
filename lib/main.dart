@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -10,18 +8,35 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get_it/get_it.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:walk_it_up/data/database/dao/alarm_set/alarm_set_dao.dart';
+import 'package:walk_it_up/data/database/dao/regular_alarm/regular_alarms_dao.dart';
+import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
+import 'package:walk_it_up/data/repository/regular_alarm_repository_impl.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_screen.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
-import 'package:walk_it_up/data/repository/alarm_repository.dart';
-import 'package:walk_it_up/data/repository/alarm_repository_impl.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository_impl.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_screen.dart';
 
 final getIt = GetIt.instance;
 void setup() {
   getIt.registerSingleton<AlarmDatabase>(AlarmDatabase());
-  getIt.registerLazySingleton<AlarmRepository>(
-    () => AlarmRepositoryImpl(getIt<AlarmDatabase>()),
+
+  getIt.registerFactory<RegularAlarmsDao>(
+    () => RegularAlarmsDao(getIt<AlarmDatabase>()),
+  );
+
+  getIt.registerFactory<AlarmSetDao>(
+    () => AlarmSetDao(getIt<AlarmDatabase>()),
+  );
+
+  getIt.registerLazySingleton<RegularAlarmRepository>(
+    () => RegularAlarmRepositoryImpl(getIt<RegularAlarmsDao>()),
+  );
+
+  getIt.registerLazySingleton<AlarmSetRepository>(
+    () => AlarmSetRepositoryImpl(getIt<AlarmSetDao>()),
   );
 }
 

@@ -8,10 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_cubit.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_state.dart';
-import 'package:walk_it_up/data/repository/alarm_repository.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/main.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_screen.dart';
@@ -128,7 +129,10 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AlarmListCubit(getIt.get<AlarmRepository>()),
+      create: (_) => AlarmListCubit(
+        getIt.get<AlarmSetRepository>(),
+        getIt.get<RegularAlarmRepository>(),
+      ),
       child: BlocBuilder<AlarmListCubit, AlarmListState>(
         builder: (context, state) => Scaffold(
           body: Builder(

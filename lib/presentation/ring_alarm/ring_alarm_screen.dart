@@ -5,7 +5,7 @@ import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walk_it_up/data/alarm_details_model.dart';
+import 'package:walk_it_up/data/model/alarm_details_model.dart';
 import 'package:walk_it_up/constants.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_state.dart';
