@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:walk_it_up/alarm_list/alarm_item.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
 
 part 'alarm_list_state.freezed.dart';
 

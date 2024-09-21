@@ -4,14 +4,20 @@ import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:walk_it_up/alarm_details.dart';
+import 'package:walk_it_up/data/model/alarm_details_model.dart';
 import 'package:walk_it_up/constants.dart';
-import 'package:walk_it_up/edit_alarm/durations.dart';
-import 'package:walk_it_up/edit_alarm/edit_alarm_state.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
+import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
+import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_state.dart';
 
 class EditAlarmCubit extends Cubit<EditAlarmState> {
   final int? alarmId;
-  EditAlarmCubit({this.alarmId}) : super(EditAlarmState.initial()) {
+  final AlarmSetRepository _alarmSetRepository;
+
+  EditAlarmCubit(
+    this._alarmSetRepository,
+    this.alarmId,
+  ) : super(EditAlarmState.initial()) {
     _loadInitial(alarmId: alarmId);
   }
 

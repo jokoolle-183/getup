@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:walk_it_up/alarm_list/alarm_item.dart';
-import 'package:walk_it_up/edit_alarm/durations.dart';
-import 'package:walk_it_up/edit_alarm/edit_alarm_cubit.dart';
-import 'package:walk_it_up/edit_alarm/edit_alarm_state.dart';
+import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
+import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
+import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_cubit.dart';
+import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_state.dart';
+import 'package:walk_it_up/main.dart';
 
 class EditAlarmScreen extends StatelessWidget {
   const EditAlarmScreen({super.key});
@@ -16,7 +18,8 @@ class EditAlarmScreen extends StatelessWidget {
         ModalRoute.of(context)!.settings.arguments as AlarmItem?;
     return BlocProvider(
       create: (_) => EditAlarmCubit(
-        alarmId: alarmItem?.id,
+        getIt.get<AlarmSetRepository>(),
+        alarmItem?.id,
       ),
       child: BlocBuilder<EditAlarmCubit, EditAlarmState>(
         builder: (context, state) => Scaffold(

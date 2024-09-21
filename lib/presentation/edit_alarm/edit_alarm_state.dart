@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:walk_it_up/alarm_details.dart';
-import 'package:walk_it_up/edit_alarm/durations.dart';
+import 'package:walk_it_up/data/model/alarm_details_model.dart';
+import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
 
 part 'edit_alarm_state.freezed.dart';
 
