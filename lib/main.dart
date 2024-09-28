@@ -16,6 +16,7 @@ import 'package:walk_it_up/presentation/alarm_list/alarm_list_screen.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository_impl.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_screen.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_screen.dart';
 
@@ -128,6 +129,7 @@ class MyApp extends StatelessWidget {
       routes: {
         EditAlarmScreen.routeName: (context) => const EditAlarmScreen(),
         RingAlarmScreen.routeName: (context) => const RingAlarmScreen(),
+        CreateNewAlarmScreen.route: (context) => CreateNewAlarmScreen(),
       },
       home: const AlarmListScreen(),
     );
