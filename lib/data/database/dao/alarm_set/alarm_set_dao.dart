@@ -22,9 +22,14 @@ class AlarmSetDao extends DatabaseAccessor<AlarmDatabase>
       leftOuterJoin(
           recurringAlarms, recurringAlarms.alarmSetId.equalsExp(alarmSets.id)),
     ]);
+
     return query
         .get()
-        .then((rows) => groupBy(rows, (row) => row.readTable(alarmSets)))
+        .then((rows) => groupBy(rows, (row) {
+              var alarmSet = row.readTable(alarmSets);
+              print("Alarm set hash: ${alarmSet.hashCode}");
+              return alarmSet;
+            }))
         .then((map) {
       return map.entries.map((entry) {
         final alarmSet = entry.key;

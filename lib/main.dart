@@ -127,9 +127,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: AlarmListScreen.routeName,
       routes: {
+        AlarmListScreen.routeName: (context) => const AlarmListScreen(),
         EditAlarmScreen.routeName: (context) => const EditAlarmScreen(),
         RingAlarmScreen.routeName: (context) => const RingAlarmScreen(),
-        CreateNewAlarmScreen.route: (context) => CreateNewAlarmScreen(),
+        CreateNewAlarmScreen.route: (context) => const CreateNewAlarmScreen(),
       },
       home: const AlarmListScreen(),
     );

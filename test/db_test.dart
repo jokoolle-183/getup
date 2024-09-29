@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_set_dao.dart';
 import 'package:walk_it_up/data/database/dao/regular_alarm/regular_alarms_dao.dart';
+import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 
 void main() {
@@ -20,11 +21,11 @@ void main() {
     endTime: DateTime(2024, 9, 16, 18, 0),
     intervalBetweenAlarms: 60,
     pauseDuration: const Value.absentIfNull(5),
-    daysOfWeek: const Value([
+    daysOfWeek: Value(EqualList([
       Weekday.monday,
       Weekday.tuesday,
       Weekday.wednesday,
-    ]),
+    ])),
   );
 
   final recurringAlarms = [
@@ -63,11 +64,11 @@ void main() {
           audioPath: 'assets/some_sound.mp3',
           time: DateTime.now(),
           snoozeDuration: const Value(10),
-          daysOfWeek: const Value([
+          daysOfWeek: Value(EqualList([
             Weekday.monday,
             Weekday.tuesday,
             Weekday.wednesday,
-          ]),
+          ])),
         ),
       );
       final alarm = await regularAlarmsDao.watchAlarmById(id).first;
@@ -104,13 +105,13 @@ void main() {
         time: DateTime(2024, 9, 16, 8, 0),
         audioPath: 'assets/some_sound.mp3',
         snoozeDuration: const Value.absentIfNull(5),
-        daysOfWeek: const Value([
+        daysOfWeek: Value(EqualList([
           Weekday.monday,
           Weekday.tuesday,
           Weekday.wednesday,
           Weekday.thursday,
-          Weekday.friday
-        ]),
+          Weekday.friday,
+        ])),
       );
       final id = await regularAlarmsDao.saveAlarm(alarm);
 
@@ -161,14 +162,14 @@ void main() {
           DateTime(2024, 9, 16, 16, 0),
         ),
         name: const Value('Alarm'),
-        daysOfWeek: const Value([
+        daysOfWeek: Value(EqualList([
           Weekday.monday,
           Weekday.tuesday,
           Weekday.wednesday,
           Weekday.thursday,
           Weekday.friday,
-          Weekday.saturday
-        ]),
+          Weekday.saturday,
+        ])),
         audioPath: const Value('assets/some_other_sound.mp3'),
       ));
 
@@ -275,14 +276,14 @@ void main() {
             audioPath: const Value('assets/some_other_sound.mp3'),
             intervalBetweenAlarms: const Value(120),
             pauseDuration: const Value(10),
-            daysOfWeek: const Value([
+            daysOfWeek: Value(EqualList([
               Weekday.monday,
               Weekday.tuesday,
               Weekday.wednesday,
               Weekday.thursday,
               Weekday.friday,
-              Weekday.saturday
-            ])),
+              Weekday.saturday,
+            ]))),
         updatedAlarms,
       );
 
@@ -313,13 +314,13 @@ void main() {
         time: DateTime(2024, 9, 16, 8, 0),
         audioPath: 'assets/some_sound.mp3',
         snoozeDuration: const Value.absentIfNull(5),
-        daysOfWeek: const Value([
+        daysOfWeek: Value(EqualList([
           Weekday.monday,
           Weekday.tuesday,
           Weekday.wednesday,
           Weekday.thursday,
           Weekday.friday
-        ]),
+        ])),
       );
 
       final id = await regularAlarmsDao

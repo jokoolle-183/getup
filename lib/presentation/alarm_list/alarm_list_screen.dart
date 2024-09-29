@@ -33,15 +33,17 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
   @override
   void initState() {
     super.initState();
-    checkAndroidNotificationPermission();
-    _isAndroidPermissionGranted();
-    checkAndroidScheduleExactAlarmPermission();
-    _requestPermissions();
-    // ignoreBatteryOptimizationsPermission();
-    // openBatteryOptimizationSettings();
+
     ringStream ??= Alarm.ringStream.stream.listen((AlarmSettings data) {
       navigateToRingScreen(data);
     });
+  }
+
+  Future<void> checkAllPermissions() async {
+    await checkAndroidNotificationPermission();
+    await _isAndroidPermissionGranted();
+    await checkAndroidScheduleExactAlarmPermission();
+    await _requestPermissions();
   }
 
   @override
@@ -61,7 +63,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
     }
   }
 
-  void _requestPermissions() async {
+  Future<void> _requestPermissions() async {
     PermissionStatus status = await Permission.activityRecognition.request();
 
     if (status.isGranted) {

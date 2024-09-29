@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
+import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
 import 'package:walk_it_up/data/model/dto/alarm_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/recurring_alarm_dto.dart';
 import 'package:walk_it_up/data/model/dto/regular_alarm_dto.dart';
@@ -12,7 +13,7 @@ class AlarmMapper {
       audioPath: regularAlarm.audioPath,
       time: regularAlarm.time,
       snoozeDuration: Value.absentIfNull(regularAlarm.snoozeDuration),
-      daysOfWeek: Value.absentIfNull(regularAlarm.daysOfWeek),
+      daysOfWeek: Value.absentIfNull(EqualList(regularAlarm.daysOfWeek ?? [])),
     );
   }
 
@@ -24,7 +25,7 @@ class AlarmMapper {
       endTime: alarmSet.endTime,
       intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
       pauseDuration: Value.absentIfNull(alarmSet.pauseDuration),
-      daysOfWeek: Value.absentIfNull(alarmSet.daysOfWeek),
+      daysOfWeek: Value.absentIfNull(EqualList(alarmSet.daysOfWeek ?? [])),
     );
   }
 

@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 
-class CreateNewAlarmScreen extends StatefulWidget {
-  CreateNewAlarmScreen({super.key});
+class CreateNewAlarmScreen extends StatelessWidget {
+  const CreateNewAlarmScreen({super.key});
 
   static const route = '/create-new-alarm';
-
-  @override
-  State<CreateNewAlarmScreen> createState() => _CreateNewAlarmScreenState();
-}
-
-class _CreateNewAlarmScreenState extends State<CreateNewAlarmScreen> {
-  final scrollController = FixedExtentScrollController();
 
   @override
   Widget build(BuildContext context) {

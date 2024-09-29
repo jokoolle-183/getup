@@ -43,10 +43,10 @@ class $RegularAlarmsTable extends RegularAlarms
   static const VerificationMeta _daysOfWeekMeta =
       const VerificationMeta('daysOfWeek');
   @override
-  late final GeneratedColumnWithTypeConverter<List<Weekday>?, String>
+  late final GeneratedColumnWithTypeConverter<EqualList<Weekday>?, String>
       daysOfWeek = GeneratedColumn<String>('days_of_week', aliasedName, true,
               type: DriftSqlType.string, requiredDuringInsert: false)
-          .withConverter<List<Weekday>?>(
+          .withConverter<EqualList<Weekday>?>(
               $RegularAlarmsTable.$converterdaysOfWeekn);
   static const VerificationMeta _isEnabledMeta =
       const VerificationMeta('isEnabled');
@@ -133,9 +133,9 @@ class $RegularAlarmsTable extends RegularAlarms
     return $RegularAlarmsTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<Weekday>, String> $converterdaysOfWeek =
-      const EnumListConverter(Weekday.values);
-  static TypeConverter<List<Weekday>?, String?> $converterdaysOfWeekn =
+  static TypeConverter<EqualList<Weekday>, String> $converterdaysOfWeek =
+      EnumListConverter(EqualList(Weekday.values));
+  static TypeConverter<EqualList<Weekday>?, String?> $converterdaysOfWeekn =
       NullAwareTypeConverter.wrap($converterdaysOfWeek);
 }
 
@@ -145,7 +145,7 @@ class RegularAlarm extends DataClass implements Insertable<RegularAlarm> {
   final String audioPath;
   final DateTime time;
   final int? snoozeDuration;
-  final List<Weekday>? daysOfWeek;
+  final EqualList<Weekday>? daysOfWeek;
   final bool isEnabled;
   const RegularAlarm(
       {required this.id,
@@ -200,7 +200,7 @@ class RegularAlarm extends DataClass implements Insertable<RegularAlarm> {
       audioPath: serializer.fromJson<String>(json['audioPath']),
       time: serializer.fromJson<DateTime>(json['time']),
       snoozeDuration: serializer.fromJson<int?>(json['snoozeDuration']),
-      daysOfWeek: serializer.fromJson<List<Weekday>?>(json['daysOfWeek']),
+      daysOfWeek: serializer.fromJson<EqualList<Weekday>?>(json['daysOfWeek']),
       isEnabled: serializer.fromJson<bool>(json['isEnabled']),
     );
   }
@@ -213,7 +213,7 @@ class RegularAlarm extends DataClass implements Insertable<RegularAlarm> {
       'audioPath': serializer.toJson<String>(audioPath),
       'time': serializer.toJson<DateTime>(time),
       'snoozeDuration': serializer.toJson<int?>(snoozeDuration),
-      'daysOfWeek': serializer.toJson<List<Weekday>?>(daysOfWeek),
+      'daysOfWeek': serializer.toJson<EqualList<Weekday>?>(daysOfWeek),
       'isEnabled': serializer.toJson<bool>(isEnabled),
     };
   }
@@ -224,7 +224,7 @@ class RegularAlarm extends DataClass implements Insertable<RegularAlarm> {
           String? audioPath,
           DateTime? time,
           Value<int?> snoozeDuration = const Value.absent(),
-          Value<List<Weekday>?> daysOfWeek = const Value.absent(),
+          Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
           bool? isEnabled}) =>
       RegularAlarm(
         id: id ?? this.id,
@@ -287,7 +287,7 @@ class RegularAlarmsCompanion extends UpdateCompanion<RegularAlarm> {
   final Value<String> audioPath;
   final Value<DateTime> time;
   final Value<int?> snoozeDuration;
-  final Value<List<Weekday>?> daysOfWeek;
+  final Value<EqualList<Weekday>?> daysOfWeek;
   final Value<bool> isEnabled;
   const RegularAlarmsCompanion({
     this.id = const Value.absent(),
@@ -334,7 +334,7 @@ class RegularAlarmsCompanion extends UpdateCompanion<RegularAlarm> {
       Value<String>? audioPath,
       Value<DateTime>? time,
       Value<int?>? snoozeDuration,
-      Value<List<Weekday>?>? daysOfWeek,
+      Value<EqualList<Weekday>?>? daysOfWeek,
       Value<bool>? isEnabled}) {
     return RegularAlarmsCompanion(
       id: id ?? this.id,
@@ -443,10 +443,11 @@ class $AlarmSetsTable extends AlarmSets
   static const VerificationMeta _daysOfWeekMeta =
       const VerificationMeta('daysOfWeek');
   @override
-  late final GeneratedColumnWithTypeConverter<List<Weekday>?, String>
+  late final GeneratedColumnWithTypeConverter<EqualList<Weekday>?, String>
       daysOfWeek = GeneratedColumn<String>('days_of_week', aliasedName, true,
               type: DriftSqlType.string, requiredDuringInsert: false)
-          .withConverter<List<Weekday>?>($AlarmSetsTable.$converterdaysOfWeekn);
+          .withConverter<EqualList<Weekday>?>(
+              $AlarmSetsTable.$converterdaysOfWeekn);
   static const VerificationMeta _isEnabledMeta =
       const VerificationMeta('isEnabled');
   @override
@@ -559,9 +560,9 @@ class $AlarmSetsTable extends AlarmSets
     return $AlarmSetsTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<Weekday>, String> $converterdaysOfWeek =
-      const EnumListConverter(Weekday.values);
-  static TypeConverter<List<Weekday>?, String?> $converterdaysOfWeekn =
+  static TypeConverter<EqualList<Weekday>, String> $converterdaysOfWeek =
+      EnumListConverter(EqualList(Weekday.values));
+  static TypeConverter<EqualList<Weekday>?, String?> $converterdaysOfWeekn =
       NullAwareTypeConverter.wrap($converterdaysOfWeek);
 }
 
@@ -573,7 +574,7 @@ class AlarmSet extends DataClass implements Insertable<AlarmSet> {
   final DateTime endTime;
   final int intervalBetweenAlarms;
   final int? pauseDuration;
-  final List<Weekday>? daysOfWeek;
+  final EqualList<Weekday>? daysOfWeek;
   final bool isEnabled;
   const AlarmSet(
       {required this.id,
@@ -637,7 +638,7 @@ class AlarmSet extends DataClass implements Insertable<AlarmSet> {
       intervalBetweenAlarms:
           serializer.fromJson<int>(json['intervalBetweenAlarms']),
       pauseDuration: serializer.fromJson<int?>(json['pauseDuration']),
-      daysOfWeek: serializer.fromJson<List<Weekday>?>(json['daysOfWeek']),
+      daysOfWeek: serializer.fromJson<EqualList<Weekday>?>(json['daysOfWeek']),
       isEnabled: serializer.fromJson<bool>(json['isEnabled']),
     );
   }
@@ -652,7 +653,7 @@ class AlarmSet extends DataClass implements Insertable<AlarmSet> {
       'endTime': serializer.toJson<DateTime>(endTime),
       'intervalBetweenAlarms': serializer.toJson<int>(intervalBetweenAlarms),
       'pauseDuration': serializer.toJson<int?>(pauseDuration),
-      'daysOfWeek': serializer.toJson<List<Weekday>?>(daysOfWeek),
+      'daysOfWeek': serializer.toJson<EqualList<Weekday>?>(daysOfWeek),
       'isEnabled': serializer.toJson<bool>(isEnabled),
     };
   }
@@ -665,7 +666,7 @@ class AlarmSet extends DataClass implements Insertable<AlarmSet> {
           DateTime? endTime,
           int? intervalBetweenAlarms,
           Value<int?> pauseDuration = const Value.absent(),
-          Value<List<Weekday>?> daysOfWeek = const Value.absent(),
+          Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
           bool? isEnabled}) =>
       AlarmSet(
         id: id ?? this.id,
@@ -741,7 +742,7 @@ class AlarmSetsCompanion extends UpdateCompanion<AlarmSet> {
   final Value<DateTime> endTime;
   final Value<int> intervalBetweenAlarms;
   final Value<int?> pauseDuration;
-  final Value<List<Weekday>?> daysOfWeek;
+  final Value<EqualList<Weekday>?> daysOfWeek;
   final Value<bool> isEnabled;
   const AlarmSetsCompanion({
     this.id = const Value.absent(),
@@ -801,7 +802,7 @@ class AlarmSetsCompanion extends UpdateCompanion<AlarmSet> {
       Value<DateTime>? endTime,
       Value<int>? intervalBetweenAlarms,
       Value<int?>? pauseDuration,
-      Value<List<Weekday>?>? daysOfWeek,
+      Value<EqualList<Weekday>?>? daysOfWeek,
       Value<bool>? isEnabled}) {
     return AlarmSetsCompanion(
       id: id ?? this.id,
@@ -1170,7 +1171,7 @@ typedef $$RegularAlarmsTableCreateCompanionBuilder = RegularAlarmsCompanion
   required String audioPath,
   required DateTime time,
   Value<int?> snoozeDuration,
-  Value<List<Weekday>?> daysOfWeek,
+  Value<EqualList<Weekday>?> daysOfWeek,
   Value<bool> isEnabled,
 });
 typedef $$RegularAlarmsTableUpdateCompanionBuilder = RegularAlarmsCompanion
@@ -1180,7 +1181,7 @@ typedef $$RegularAlarmsTableUpdateCompanionBuilder = RegularAlarmsCompanion
   Value<String> audioPath,
   Value<DateTime> time,
   Value<int?> snoozeDuration,
-  Value<List<Weekday>?> daysOfWeek,
+  Value<EqualList<Weekday>?> daysOfWeek,
   Value<bool> isEnabled,
 });
 
@@ -1212,7 +1213,8 @@ class $$RegularAlarmsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnWithTypeConverterFilters<List<Weekday>?, List<Weekday>, String>
+  ColumnWithTypeConverterFilters<EqualList<Weekday>?, EqualList<Weekday>,
+          String>
       get daysOfWeek => $state.composableBuilder(
           column: $state.table.daysOfWeek,
           builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
@@ -1293,7 +1295,7 @@ class $$RegularAlarmsTableTableManager extends RootTableManager<
             Value<String> audioPath = const Value.absent(),
             Value<DateTime> time = const Value.absent(),
             Value<int?> snoozeDuration = const Value.absent(),
-            Value<List<Weekday>?> daysOfWeek = const Value.absent(),
+            Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
           }) =>
               RegularAlarmsCompanion(
@@ -1311,7 +1313,7 @@ class $$RegularAlarmsTableTableManager extends RootTableManager<
             required String audioPath,
             required DateTime time,
             Value<int?> snoozeDuration = const Value.absent(),
-            Value<List<Weekday>?> daysOfWeek = const Value.absent(),
+            Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
           }) =>
               RegularAlarmsCompanion.insert(
@@ -1352,7 +1354,7 @@ typedef $$AlarmSetsTableCreateCompanionBuilder = AlarmSetsCompanion Function({
   required DateTime endTime,
   required int intervalBetweenAlarms,
   Value<int?> pauseDuration,
-  Value<List<Weekday>?> daysOfWeek,
+  Value<EqualList<Weekday>?> daysOfWeek,
   Value<bool> isEnabled,
 });
 typedef $$AlarmSetsTableUpdateCompanionBuilder = AlarmSetsCompanion Function({
@@ -1363,7 +1365,7 @@ typedef $$AlarmSetsTableUpdateCompanionBuilder = AlarmSetsCompanion Function({
   Value<DateTime> endTime,
   Value<int> intervalBetweenAlarms,
   Value<int?> pauseDuration,
-  Value<List<Weekday>?> daysOfWeek,
+  Value<EqualList<Weekday>?> daysOfWeek,
   Value<bool> isEnabled,
 });
 
@@ -1427,7 +1429,8 @@ class $$AlarmSetsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnWithTypeConverterFilters<List<Weekday>?, List<Weekday>, String>
+  ColumnWithTypeConverterFilters<EqualList<Weekday>?, EqualList<Weekday>,
+          String>
       get daysOfWeek => $state.composableBuilder(
           column: $state.table.daysOfWeek,
           builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
@@ -1530,7 +1533,7 @@ class $$AlarmSetsTableTableManager extends RootTableManager<
             Value<DateTime> endTime = const Value.absent(),
             Value<int> intervalBetweenAlarms = const Value.absent(),
             Value<int?> pauseDuration = const Value.absent(),
-            Value<List<Weekday>?> daysOfWeek = const Value.absent(),
+            Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
           }) =>
               AlarmSetsCompanion(
@@ -1552,7 +1555,7 @@ class $$AlarmSetsTableTableManager extends RootTableManager<
             required DateTime endTime,
             required int intervalBetweenAlarms,
             Value<int?> pauseDuration = const Value.absent(),
-            Value<List<Weekday>?> daysOfWeek = const Value.absent(),
+            Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
           }) =>
               AlarmSetsCompanion.insert(
