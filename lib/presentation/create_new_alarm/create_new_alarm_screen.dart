@@ -37,13 +37,14 @@ class CreateNewAlarmScreen extends StatelessWidget {
                           child: ListWheelScrollView(
                             physics: const FixedExtentScrollPhysics(),
                             itemExtent: 40,
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
                             overAndUnderCenterOpacity: 0.5,
                             children: [
                               ...getHourStrings().map((e) => Align(
                                     alignment: Alignment.center,
                                     child: Text(
                                       e,
-                                      style: TextStyle(fontSize: 28),
+                                      style: const TextStyle(fontSize: 28),
                                     ),
                                   ))
                             ],
@@ -62,7 +63,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                                     alignment: Alignment.center,
                                     child: Text(
                                       e,
-                                      style: TextStyle(fontSize: 28),
+                                      style: const TextStyle(fontSize: 28),
                                     ),
                                   ))
                             ],

@@ -25,11 +25,7 @@ class AlarmSetDao extends DatabaseAccessor<AlarmDatabase>
 
     return query
         .get()
-        .then((rows) => groupBy(rows, (row) {
-              var alarmSet = row.readTable(alarmSets);
-              print("Alarm set hash: ${alarmSet.hashCode}");
-              return alarmSet;
-            }))
+        .then((rows) => groupBy(rows, (row) => row.readTable(alarmSets)))
         .then((map) {
       return map.entries.map((entry) {
         final alarmSet = entry.key;
