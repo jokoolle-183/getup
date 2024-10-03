@@ -4,4 +4,7 @@ enum AlarmType {
 
   final String typeName;
   const AlarmType(this.typeName);
+
+  @override
+  String toString() => typeName;
 }
