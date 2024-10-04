@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/recurring_picker.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/time_wheel_picker.dart';
@@ -12,7 +13,9 @@ abstract class TimePicker {
 }
 
 class RegularAlarmPicker implements TimePicker {
-  RegularAlarmPicker(this.callback);
+  RegularAlarmPicker(
+    this.callback,
+  );
 
   @override
   TimePickerCallback callback;
@@ -40,7 +43,10 @@ class RecurringAlarmPicker implements TimePicker {
 }
 
 class TimePickerFactory {
-  static TimePicker getPicker(AlarmType type, TimePickerCallback callback) {
+  static TimePicker getPicker(
+    AlarmType type,
+    TimePickerCallback callback,
+  ) {
     switch (type) {
       case AlarmType.regular:
         return RegularAlarmPicker(callback);

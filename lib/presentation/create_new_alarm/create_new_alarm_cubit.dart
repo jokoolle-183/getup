@@ -4,7 +4,6 @@ import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
 
 class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
   CreateNewAlarmCubit({
@@ -34,7 +33,6 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
 
   void onTimeSelected(String time) {
     print("Testis $time");
-    // Bla
   }
 
   void onEndTimeSelected(String time) {

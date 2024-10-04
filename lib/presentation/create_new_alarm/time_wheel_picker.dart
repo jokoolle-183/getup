@@ -1,11 +1,32 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
 
-class TimeWheelPicker extends StatelessWidget {
+class TimeWheelPicker extends StatefulWidget {
   const TimeWheelPicker({
     required this.onTimeSelected,
     super.key,
   });
   final Function(String) onTimeSelected;
+
+  @override
+  State<TimeWheelPicker> createState() => _TimeWheelPickerState();
+}
+
+class _TimeWheelPickerState extends State<TimeWheelPicker> {
+  late FixedExtentScrollController _hoursController;
+  late FixedExtentScrollController _minutesController;
+
+  String _hourString = '';
+  String _minuteString = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _hoursController = FixedExtentScrollController();
+    _minutesController = FixedExtentScrollController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +62,10 @@ class TimeWheelPicker extends StatelessWidget {
                     itemExtent: 50,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
-                    onSelectedItemChanged: (index) =>
-                        onTimeSelected(getHourStrings()[index]),
+                    onSelectedItemChanged: (index) {
+                      _hourString = getHourStrings()[index];
+                      widget.onTimeSelected('$_hourString:$_minuteString');
+                    },
                     children: [
                       ...getHourStrings().map((e) => Align(
                             alignment: Alignment.center,
@@ -62,8 +85,10 @@ class TimeWheelPicker extends StatelessWidget {
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
                     physics: const FixedExtentScrollPhysics(),
-                    onSelectedItemChanged: (index) =>
-                        onTimeSelected(getMinuteStrings()[index]),
+                    onSelectedItemChanged: (index) {
+                      _minuteString = getMinuteStrings()[index];
+                      widget.onTimeSelected('$_hourString:$_minuteString');
+                    },
                     children: [
                       ...getMinuteStrings().map((e) => Align(
                             alignment: Alignment.center,
