@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class TimeWheelPicker extends StatelessWidget {
-  const TimeWheelPicker({super.key});
+  const TimeWheelPicker({
+    required this.onTimeSelected,
+    super.key,
+  });
+  final Function(String) onTimeSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +15,16 @@ class TimeWheelPicker extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.center,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 42,
-              color: const Color.fromARGB(255, 173, 184, 190),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 36.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Color.fromARGB(255, 211, 222, 227),
+                ),
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+              ),
             ),
           ),
           Align(
@@ -25,18 +35,20 @@ class TimeWheelPicker extends StatelessWidget {
               children: [
                 SizedBox(
                   width: 50,
-                  height: 200,
+                  height: 220,
                   child: ListWheelScrollView(
                     physics: const FixedExtentScrollPhysics(),
-                    itemExtent: 42,
+                    itemExtent: 50,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
+                    onSelectedItemChanged: (index) =>
+                        onTimeSelected(getHourStrings()[index]),
                     children: [
                       ...getHourStrings().map((e) => Align(
                             alignment: Alignment.center,
                             child: Text(
                               e,
-                              style: const TextStyle(fontSize: 28),
+                              style: const TextStyle(fontSize: 30),
                             ),
                           ))
                     ],
@@ -44,18 +56,20 @@ class TimeWheelPicker extends StatelessWidget {
                 ),
                 SizedBox(
                   width: 50,
-                  height: 200,
+                  height: 220,
                   child: ListWheelScrollView(
-                    itemExtent: 42,
+                    itemExtent: 50,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
                     physics: const FixedExtentScrollPhysics(),
+                    onSelectedItemChanged: (index) =>
+                        onTimeSelected(getMinuteStrings()[index]),
                     children: [
                       ...getMinuteStrings().map((e) => Align(
                             alignment: Alignment.center,
                             child: Text(
                               e,
-                              style: const TextStyle(fontSize: 28),
+                              style: const TextStyle(fontSize: 30),
                             ),
                           ))
                     ],

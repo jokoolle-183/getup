@@ -21,6 +21,7 @@ mixin _$CreateNewAlarmState {
   String get soundPath => throw _privateConstructorUsedError;
   bool get isVibrate => throw _privateConstructorUsedError;
   List<Weekday> get daysOfWeek => throw _privateConstructorUsedError;
+  String? get selectedDaysText => throw _privateConstructorUsedError;
   int? get snoozeDuration => throw _privateConstructorUsedError;
   String? get label => throw _privateConstructorUsedError;
 
@@ -41,6 +42,7 @@ abstract class $CreateNewAlarmStateCopyWith<$Res> {
       String soundPath,
       bool isVibrate,
       List<Weekday> daysOfWeek,
+      String? selectedDaysText,
       int? snoozeDuration,
       String? label});
 }
@@ -63,6 +65,7 @@ class _$CreateNewAlarmStateCopyWithImpl<$Res, $Val extends CreateNewAlarmState>
     Object? soundPath = null,
     Object? isVibrate = null,
     Object? daysOfWeek = null,
+    Object? selectedDaysText = freezed,
     Object? snoozeDuration = freezed,
     Object? label = freezed,
   }) {
@@ -87,6 +90,10 @@ class _$CreateNewAlarmStateCopyWithImpl<$Res, $Val extends CreateNewAlarmState>
           ? _value.daysOfWeek
           : daysOfWeek // ignore: cast_nullable_to_non_nullable
               as List<Weekday>,
+      selectedDaysText: freezed == selectedDaysText
+          ? _value.selectedDaysText
+          : selectedDaysText // ignore: cast_nullable_to_non_nullable
+              as String?,
       snoozeDuration: freezed == snoozeDuration
           ? _value.snoozeDuration
           : snoozeDuration // ignore: cast_nullable_to_non_nullable
@@ -113,6 +120,7 @@ abstract class _$$CreateNewAlarmStateImplCopyWith<$Res>
       String soundPath,
       bool isVibrate,
       List<Weekday> daysOfWeek,
+      String? selectedDaysText,
       int? snoozeDuration,
       String? label});
 }
@@ -133,6 +141,7 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
     Object? soundPath = null,
     Object? isVibrate = null,
     Object? daysOfWeek = null,
+    Object? selectedDaysText = freezed,
     Object? snoozeDuration = freezed,
     Object? label = freezed,
   }) {
@@ -157,6 +166,10 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
           ? _value._daysOfWeek
           : daysOfWeek // ignore: cast_nullable_to_non_nullable
               as List<Weekday>,
+      selectedDaysText: freezed == selectedDaysText
+          ? _value.selectedDaysText
+          : selectedDaysText // ignore: cast_nullable_to_non_nullable
+              as String?,
       snoozeDuration: freezed == snoozeDuration
           ? _value.snoozeDuration
           : snoozeDuration // ignore: cast_nullable_to_non_nullable
@@ -178,6 +191,7 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
       required this.soundPath,
       required this.isVibrate,
       required final List<Weekday> daysOfWeek,
+      this.selectedDaysText,
       this.snoozeDuration,
       this.label})
       : _selectedTime = selectedTime,
@@ -206,13 +220,15 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
   }
 
   @override
+  final String? selectedDaysText;
+  @override
   final int? snoozeDuration;
   @override
   final String? label;
 
   @override
   String toString() {
-    return 'CreateNewAlarmState(selectedTime: $selectedTime, type: $type, soundPath: $soundPath, isVibrate: $isVibrate, daysOfWeek: $daysOfWeek, snoozeDuration: $snoozeDuration, label: $label)';
+    return 'CreateNewAlarmState(selectedTime: $selectedTime, type: $type, soundPath: $soundPath, isVibrate: $isVibrate, daysOfWeek: $daysOfWeek, selectedDaysText: $selectedDaysText, snoozeDuration: $snoozeDuration, label: $label)';
   }
 
   @override
@@ -229,6 +245,8 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
                 other.isVibrate == isVibrate) &&
             const DeepCollectionEquality()
                 .equals(other._daysOfWeek, _daysOfWeek) &&
+            (identical(other.selectedDaysText, selectedDaysText) ||
+                other.selectedDaysText == selectedDaysText) &&
             (identical(other.snoozeDuration, snoozeDuration) ||
                 other.snoozeDuration == snoozeDuration) &&
             (identical(other.label, label) || other.label == label));
@@ -242,6 +260,7 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
       soundPath,
       isVibrate,
       const DeepCollectionEquality().hash(_daysOfWeek),
+      selectedDaysText,
       snoozeDuration,
       label);
 
@@ -260,6 +279,7 @@ abstract class _CreateNewAlarmState implements CreateNewAlarmState {
       required final String soundPath,
       required final bool isVibrate,
       required final List<Weekday> daysOfWeek,
+      final String? selectedDaysText,
       final int? snoozeDuration,
       final String? label}) = _$CreateNewAlarmStateImpl;
 
@@ -273,6 +293,8 @@ abstract class _CreateNewAlarmState implements CreateNewAlarmState {
   bool get isVibrate;
   @override
   List<Weekday> get daysOfWeek;
+  @override
+  String? get selectedDaysText;
   @override
   int? get snoozeDuration;
   @override

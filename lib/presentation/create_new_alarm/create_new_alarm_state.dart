@@ -12,6 +12,7 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
     required String soundPath,
     required bool isVibrate,
     required List<Weekday> daysOfWeek,
+    String? selectedDaysText,
     int? snoozeDuration,
     String? label,
   }) = _CreateNewAlarmState;

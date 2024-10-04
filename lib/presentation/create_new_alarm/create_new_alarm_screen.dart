@@ -6,9 +6,9 @@ import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/alarm_type_dialog.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/recurring_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/day_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/time_picker.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/time_wheel_picker.dart';
 
 class CreateNewAlarmScreen extends StatelessWidget {
   const CreateNewAlarmScreen({super.key});
@@ -24,11 +24,22 @@ class CreateNewAlarmScreen extends StatelessWidget {
       ),
       child: BlocBuilder<CreateNewAlarmCubit, CreateNewAlarmState>(
         builder: (context, state) => Scaffold(
+          backgroundColor: Colors.white,
           body: LayoutBuilder(builder: (context, constraints) {
             return Column(
               children: [
                 const Gap(50),
-                TimePickerFactory.getPicker(state.type).buildPicker(),
+                TimePickerFactory.getPicker(
+                  state.type,
+                  Pair(
+                    context.read<CreateNewAlarmCubit>().onTimeSelected,
+                    context.read<CreateNewAlarmCubit>().onEndTimeSelected,
+                  ),
+                ).buildPicker(),
+                DayPicker(
+                  selectedDays: state.daysOfWeek,
+                  onSelected: context.read<CreateNewAlarmCubit>().onDaySelected,
+                ),
                 InkWell(
                   onTap: () => openDialog(
                     context,
