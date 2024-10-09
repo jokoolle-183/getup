@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:walk_it_up/main.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/alarm_type_dialog.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_cubit.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/day_picker.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_cubit.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/time_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type_dialog.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_cubit.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_state.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/day_picker/day_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_cubit.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_factory.dart';
 
 class CreateNewAlarmScreen extends StatelessWidget {
   const CreateNewAlarmScreen({super.key});

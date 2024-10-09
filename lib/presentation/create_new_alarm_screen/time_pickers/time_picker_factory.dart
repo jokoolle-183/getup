@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/recurring_picker.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_cubit.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_state.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/time_wheel_picker_component.dart';
-
-typedef TimePickerCallback = Pair<Function(String), Function(String)>;
+import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/recurring_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_cubit.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_state.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_wheel_picker.dart';
 
 abstract class TimePicker {
   abstract TimePickerCubit timePickerCubit;
@@ -23,7 +20,7 @@ class RegularAlarmPicker implements TimePicker {
   @override
   Widget buildPicker() {
     return BlocBuilder<TimePickerCubit, TimePickerState>(
-      builder: (context, state) => TimeWheelPickerComponent(
+      builder: (context, state) => TimeWheelPicker(
         onTimeSelected: timePickerCubit.onTimeSelected,
         selectedHour: state.baseTimeHoursIndex,
         selectedMinute: state.baseTimeMinutesIndex,

@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_state.dart';
 
 class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
   CreateNewAlarmCubit({

@@ -22,7 +22,7 @@ class DayPicker extends StatelessWidget {
               child: Text("Every ${joinDays()}"),
             )),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

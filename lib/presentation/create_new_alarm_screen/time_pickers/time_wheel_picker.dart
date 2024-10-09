@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
 
 class TimeWheelPicker extends StatelessWidget {
   TimeWheelPicker({

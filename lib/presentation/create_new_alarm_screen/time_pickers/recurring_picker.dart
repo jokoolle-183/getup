@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_cubit.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_state.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/time_wheel_picker_component.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_cubit.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_state.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_wheel_picker.dart';
 
 class RecurringPicker extends StatelessWidget {
   const RecurringPicker({
@@ -27,7 +27,7 @@ class RecurringPicker extends StatelessWidget {
                   'Start time',
                   style: TextStyle(fontSize: 20),
                 ),
-                TimeWheelPickerComponent(
+                TimeWheelPicker(
                   onTimeSelected: onStartTimeSelected,
                   selectedHour: state.baseTimeHoursIndex,
                   selectedMinute: state.baseTimeMinutesIndex,
@@ -42,7 +42,7 @@ class RecurringPicker extends StatelessWidget {
                   'End time',
                   style: TextStyle(fontSize: 20),
                 ),
-                TimeWheelPickerComponent(
+                TimeWheelPicker(
                   onTimeSelected: onEndTimeSelected,
                   selectedHour: state.endTimeHoursIndex,
                   selectedMinute: state.endTimeMinutesIndex,

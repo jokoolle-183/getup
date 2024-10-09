@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
 
 part 'create_new_alarm_state.freezed.dart';
 
@@ -22,10 +22,10 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
     final now = DateTime.now();
 
     return CreateNewAlarmState(
-      selectedTime: Pair('',''),
+      selectedTime: Pair('', ''),
       type: AlarmType.regular,
       soundPath: '',
-      isVibrate: false, 
+      isVibrate: false,
       daysOfWeek: [],
     );
   }
