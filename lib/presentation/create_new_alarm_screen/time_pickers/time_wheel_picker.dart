@@ -9,9 +9,15 @@ class TimeWheelPicker extends StatelessWidget {
     super.key,
   }) {
     hoursController = FixedExtentScrollController(
-        initialItem: selectedHour != null ? selectedHour! : 0);
+        initialItem: selectedHour != null
+            ? selectedHour!
+            : getHourStrings()
+                .indexOf(getHourStringFromInt(DateTime.now().hour)));
     minutesController = FixedExtentScrollController(
-        initialItem: selectedMinute != null ? selectedMinute! : 0);
+        initialItem: selectedMinute != null
+            ? selectedMinute!
+            : getMinuteStrings()
+                .indexOf(getMinuteStringFromInt(DateTime.now().minute)));
   }
 
   late FixedExtentScrollController hoursController;
@@ -102,6 +108,22 @@ class TimeWheelPicker extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+String getHourStringFromInt(int hour) {
+  if (hour < 10) {
+    return "0$hour";
+  } else {
+    return hour.toString();
+  }
+}
+
+String getMinuteStringFromInt(int minute) {
+  if (minute < 10) {
+    return "0$minute";
+  } else {
+    return minute.toString();
   }
 }
 

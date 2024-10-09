@@ -21,27 +21,32 @@ class CreateNewAlarmScreen extends StatelessWidget {
       providers: [
         BlocProvider<CreateNewAlarmCubit>(
           create: (BuildContext context) => CreateNewAlarmCubit(
+            timeStore: getIt.get(),
             alarmSetRepository: getIt.get(),
             regularAlarmRepository: getIt.get(),
           ),
         ),
-        BlocProvider(create: (context) => TimePickerCubit()),
+        BlocProvider(create: (context) => TimePickerCubit(getIt.get())),
       ],
       child: BlocBuilder<CreateNewAlarmCubit, CreateNewAlarmState>(
         builder: (context, state) => Scaffold(
           backgroundColor: Colors.white,
           body: LayoutBuilder(builder: (context, constraints) {
             return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Gap(50),
                 TimePickerFactory.getPicker(
                   state.type,
                   context.read<TimePickerCubit>(),
                 ).buildPicker(),
+                const Gap(24),
                 DayPicker(
                   selectedDays: state.daysOfWeek,
+                  selectedTime: state.selectedTime,
                   onSelected: context.read<CreateNewAlarmCubit>().onDaySelected,
                 ),
+                const Gap(16),
                 InkWell(
                   onTap: () => openDialog(
                     context,

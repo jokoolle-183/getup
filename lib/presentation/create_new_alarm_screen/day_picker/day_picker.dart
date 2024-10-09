@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
 
 class DayPicker extends StatelessWidget {
   const DayPicker({
     required this.selectedDays,
     required this.onSelected,
+    required this.selectedTime,
     super.key,
   });
 
   final List<Weekday> selectedDays;
+  final Pair<String, String> selectedTime;
   final Function(Weekday weekday) onSelected;
 
   @override
@@ -19,7 +22,7 @@ class DayPicker extends StatelessWidget {
             alignment: Alignment.topLeft,
             child: Padding(
               padding: const EdgeInsets.only(left: 24.0, bottom: 8.0),
-              child: Text("Every ${joinDays()}"),
+              child: Text(determineDate(selectedDays, selectedTime.left)),
             )),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -66,11 +69,59 @@ class DayPicker extends StatelessWidget {
     );
   }
 
-  String joinDays() {
-    if (selectedDays.length == Weekday.values.length) {
-      return 'day';
-    } else {
-      return selectedDays.map((day) => day.abbreviation).join(', ');
+  String determineDate(List<Weekday> selectedDays, String selectedTime) {
+    var text = '';
+    final selectedDateTime = convertStringToDate(selectedTime);
+
+    final selected = {...selectedDays};
+    final weekdays = {
+      Weekday.monday,
+      Weekday.tuesday,
+      Weekday.wednesday,
+      Weekday.thursday,
+      Weekday.friday
+    };
+    final weekends = {Weekday.saturday, Weekday.sunday};
+
+    if (selectedDays.isEmpty) {
+      final now = DateTime.now();
+      if (selectedDateTime.isAfter(now)) {
+        text = 'Today';
+      } else {
+        text = 'Tomorrow';
+      }
+      return text;
     }
+
+    if (selected.containsAll(weekends) && selected.containsAll(weekdays)) {
+      text = 'Every day';
+    } else if (selectedDays.toSet().difference(weekdays).isEmpty &&
+        selectedDays.length == weekdays.length) {
+      text = 'Weekdays';
+    }
+    // Check if the selected days are only weekends
+    else if (selectedDays.toSet().difference(weekends).isEmpty &&
+        selectedDays.length == weekends.length) {
+      text = 'Weekends';
+    } else {
+      text = 'Every ${selectedDays.map((day) => day.abbreviation).join(', ')}';
+    }
+
+    return text;
+  }
+
+  DateTime convertStringToDate(String selectedTime) {
+    // Determine if selected time is before now or after
+    final now = DateTime.now();
+    final hoursAndMinutes = selectedTime.split(':');
+    final selectedDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(hoursAndMinutes[0]),
+      int.parse(hoursAndMinutes[1]),
+    );
+
+    return selectedDateTime;
   }
 }

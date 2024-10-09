@@ -19,8 +19,6 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
   }) = _CreateNewAlarmState;
 
   factory CreateNewAlarmState.initial() {
-    final now = DateTime.now();
-
     return CreateNewAlarmState(
       selectedTime: Pair('', ''),
       type: AlarmType.regular,
