@@ -1,43 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/alarm_type.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/recurring_picker.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/time_wheel_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_cubit.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_state.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/time_wheel_picker_component.dart';
 
 typedef TimePickerCallback = Pair<Function(String), Function(String)>;
 
 abstract class TimePicker {
-  abstract TimePickerCallback callback;
+  abstract TimePickerCubit timePickerCubit;
   Widget buildPicker();
 }
 
 class RegularAlarmPicker implements TimePicker {
-  RegularAlarmPicker(
-    this.callback,
-  );
+  RegularAlarmPicker(this.timePickerCubit);
 
   @override
-  TimePickerCallback callback;
+  TimePickerCubit timePickerCubit;
 
   @override
   Widget buildPicker() {
-    return TimeWheelPicker(
-      onTimeSelected: callback.left,
+    return BlocBuilder<TimePickerCubit, TimePickerState>(
+      builder: (context, state) => TimeWheelPickerComponent(
+        onTimeSelected: timePickerCubit.onTimeSelected,
+        selectedHour: state.baseTimeHoursIndex,
+        selectedMinute: state.baseTimeMinutesIndex,
+      ),
     );
   }
 }
 
 class RecurringAlarmPicker implements TimePicker {
-  RecurringAlarmPicker(this.callback);
+  RecurringAlarmPicker(this.timePickerCubit);
 
   @override
-  TimePickerCallback callback;
-
+  TimePickerCubit timePickerCubit;
   @override
   Widget buildPicker() {
     return RecurringPicker(
-      onTimeSelected: callback,
+      onStartTimeSelected: timePickerCubit.onTimeSelected,
+      onEndTimeSelected: timePickerCubit.onEndTimeSelected,
     );
   }
 }
@@ -45,13 +49,13 @@ class RecurringAlarmPicker implements TimePicker {
 class TimePickerFactory {
   static TimePicker getPicker(
     AlarmType type,
-    TimePickerCallback callback,
+    TimePickerCubit cubit,
   ) {
     switch (type) {
       case AlarmType.regular:
-        return RegularAlarmPicker(callback);
+        return RegularAlarmPicker(cubit);
       case AlarmType.recurringDaily:
-        return RecurringAlarmPicker(callback);
+        return RecurringAlarmPicker(cubit);
       default:
         throw Exception("Unknown alarm type");
     }

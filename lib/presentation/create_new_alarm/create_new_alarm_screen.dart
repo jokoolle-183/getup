@@ -7,7 +7,7 @@ import 'package:walk_it_up/presentation/create_new_alarm/alarm_type_dialog.dart'
 import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/day_picker.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/regular_alarm_picker/time_picker_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm/time_picker.dart';
 
 class CreateNewAlarmScreen extends StatelessWidget {
@@ -17,11 +17,16 @@ class CreateNewAlarmScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CreateNewAlarmCubit(
-        alarmSetRepository: getIt.get(),
-        regularAlarmRepository: getIt.get(),
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CreateNewAlarmCubit>(
+          create: (BuildContext context) => CreateNewAlarmCubit(
+            alarmSetRepository: getIt.get(),
+            regularAlarmRepository: getIt.get(),
+          ),
+        ),
+        BlocProvider(create: (context) => TimePickerCubit()),
+      ],
       child: BlocBuilder<CreateNewAlarmCubit, CreateNewAlarmState>(
         builder: (context, state) => Scaffold(
           backgroundColor: Colors.white,
@@ -31,10 +36,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                 const Gap(50),
                 TimePickerFactory.getPicker(
                   state.type,
-                  Pair(
-                    context.read<CreateNewAlarmCubit>().onTimeSelected,
-                    context.read<CreateNewAlarmCubit>().onEndTimeSelected,
-                  ),
+                  context.read<TimePickerCubit>(),
                 ).buildPicker(),
                 DayPicker(
                   selectedDays: state.daysOfWeek,

@@ -1,32 +1,24 @@
-import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:walk_it_up/presentation/create_new_alarm/create_new_alarm_state.dart';
+import 'package:walk_it_up/presentation/create_new_alarm/pair.dart';
 
-class TimeWheelPicker extends StatefulWidget {
-  const TimeWheelPicker({
+class TimeWheelPicker extends StatelessWidget {
+  TimeWheelPicker({
     required this.onTimeSelected,
+    this.selectedHour,
+    this.selectedMinute,
     super.key,
-  });
-  final Function(String) onTimeSelected;
-
-  @override
-  State<TimeWheelPicker> createState() => _TimeWheelPickerState();
-}
-
-class _TimeWheelPickerState extends State<TimeWheelPicker> {
-  late FixedExtentScrollController _hoursController;
-  late FixedExtentScrollController _minutesController;
-
-  String _hourString = '';
-  String _minuteString = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _hoursController = FixedExtentScrollController();
-    _minutesController = FixedExtentScrollController();
+  }) {
+    hoursController = FixedExtentScrollController(
+        initialItem: selectedHour != null ? selectedHour! : 0);
+    minutesController = FixedExtentScrollController(
+        initialItem: selectedMinute != null ? selectedMinute! : 0);
   }
+
+  late FixedExtentScrollController hoursController;
+  late FixedExtentScrollController minutesController;
+  final int? selectedHour;
+  final int? selectedMinute;
+  final Function(String, Pair<int, int>) onTimeSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +52,13 @@ class _TimeWheelPickerState extends State<TimeWheelPicker> {
                   child: ListWheelScrollView(
                     physics: const FixedExtentScrollPhysics(),
                     itemExtent: 50,
+                    controller: hoursController,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
                     onSelectedItemChanged: (index) {
-                      _hourString = getHourStrings()[index];
-                      widget.onTimeSelected('$_hourString:$_minuteString');
+                      onTimeSelected(
+                          '${getHourStrings()[hoursController.selectedItem]}:${getMinuteStrings()[minutesController.selectedItem]}',
+                          Pair(index, minutesController.selectedItem));
                     },
                     children: [
                       ...getHourStrings().map((e) => Align(
@@ -85,9 +79,11 @@ class _TimeWheelPickerState extends State<TimeWheelPicker> {
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
                     physics: const FixedExtentScrollPhysics(),
+                    controller: minutesController,
                     onSelectedItemChanged: (index) {
-                      _minuteString = getMinuteStrings()[index];
-                      widget.onTimeSelected('$_hourString:$_minuteString');
+                      onTimeSelected(
+                          '${getHourStrings()[hoursController.selectedItem]}:${getMinuteStrings()[minutesController.selectedItem]}',
+                          Pair(hoursController.selectedItem, index));
                     },
                     children: [
                       ...getMinuteStrings().map((e) => Align(

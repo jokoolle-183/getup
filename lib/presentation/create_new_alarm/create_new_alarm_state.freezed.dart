@@ -16,7 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$CreateNewAlarmState {
-  List<DateTime> get selectedTime => throw _privateConstructorUsedError;
+  Pair<String, String> get selectedTime => throw _privateConstructorUsedError;
   AlarmType get type => throw _privateConstructorUsedError;
   String get soundPath => throw _privateConstructorUsedError;
   bool get isVibrate => throw _privateConstructorUsedError;
@@ -37,7 +37,7 @@ abstract class $CreateNewAlarmStateCopyWith<$Res> {
       _$CreateNewAlarmStateCopyWithImpl<$Res, CreateNewAlarmState>;
   @useResult
   $Res call(
-      {List<DateTime> selectedTime,
+      {Pair<String, String> selectedTime,
       AlarmType type,
       String soundPath,
       bool isVibrate,
@@ -73,7 +73,7 @@ class _$CreateNewAlarmStateCopyWithImpl<$Res, $Val extends CreateNewAlarmState>
       selectedTime: null == selectedTime
           ? _value.selectedTime
           : selectedTime // ignore: cast_nullable_to_non_nullable
-              as List<DateTime>,
+              as Pair<String, String>,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -115,7 +115,7 @@ abstract class _$$CreateNewAlarmStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {List<DateTime> selectedTime,
+      {Pair<String, String> selectedTime,
       AlarmType type,
       String soundPath,
       bool isVibrate,
@@ -147,9 +147,9 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
   }) {
     return _then(_$CreateNewAlarmStateImpl(
       selectedTime: null == selectedTime
-          ? _value._selectedTime
+          ? _value.selectedTime
           : selectedTime // ignore: cast_nullable_to_non_nullable
-              as List<DateTime>,
+              as Pair<String, String>,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -186,7 +186,7 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
 
 class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
   _$CreateNewAlarmStateImpl(
-      {required final List<DateTime> selectedTime,
+      {required this.selectedTime,
       required this.type,
       required this.soundPath,
       required this.isVibrate,
@@ -194,17 +194,10 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
       this.selectedDaysText,
       this.snoozeDuration,
       this.label})
-      : _selectedTime = selectedTime,
-        _daysOfWeek = daysOfWeek;
+      : _daysOfWeek = daysOfWeek;
 
-  final List<DateTime> _selectedTime;
   @override
-  List<DateTime> get selectedTime {
-    if (_selectedTime is EqualUnmodifiableListView) return _selectedTime;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_selectedTime);
-  }
-
+  final Pair<String, String> selectedTime;
   @override
   final AlarmType type;
   @override
@@ -236,8 +229,8 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CreateNewAlarmStateImpl &&
-            const DeepCollectionEquality()
-                .equals(other._selectedTime, _selectedTime) &&
+            (identical(other.selectedTime, selectedTime) ||
+                other.selectedTime == selectedTime) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.soundPath, soundPath) ||
                 other.soundPath == soundPath) &&
@@ -255,7 +248,7 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(_selectedTime),
+      selectedTime,
       type,
       soundPath,
       isVibrate,
@@ -274,7 +267,7 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
 
 abstract class _CreateNewAlarmState implements CreateNewAlarmState {
   factory _CreateNewAlarmState(
-      {required final List<DateTime> selectedTime,
+      {required final Pair<String, String> selectedTime,
       required final AlarmType type,
       required final String soundPath,
       required final bool isVibrate,
@@ -284,7 +277,7 @@ abstract class _CreateNewAlarmState implements CreateNewAlarmState {
       final String? label}) = _$CreateNewAlarmStateImpl;
 
   @override
-  List<DateTime> get selectedTime;
+  Pair<String, String> get selectedTime;
   @override
   AlarmType get type;
   @override
