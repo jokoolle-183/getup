@@ -1,30 +1,50 @@
 import 'package:flutter/widgets.dart';
+import 'package:walk_it_up/debouncer.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
 
-class TimeWheelPicker extends StatelessWidget {
-  TimeWheelPicker({
+class TimeWheelPicker extends StatefulWidget {
+  const TimeWheelPicker({
     required this.onTimeSelected,
     this.selectedHour,
     this.selectedMinute,
     super.key,
-  }) {
-    hoursController = FixedExtentScrollController(
-        initialItem: selectedHour != null
-            ? selectedHour!
+  });
+
+  final int? selectedHour;
+  final int? selectedMinute;
+  final Function(String, Pair<int, int>) onTimeSelected;
+
+  @override
+  State<TimeWheelPicker> createState() => _TimeWheelPickerState();
+}
+
+class _TimeWheelPickerState extends State<TimeWheelPicker> {
+  final Debouncer _debouncer =
+      Debouncer(delay: const Duration(milliseconds: 300));
+  late FixedExtentScrollController _hoursController;
+  late FixedExtentScrollController _minutesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _hoursController = _hoursController = FixedExtentScrollController(
+        initialItem: widget.selectedHour != null
+            ? widget.selectedHour!
             : getHourStrings()
                 .indexOf(getHourStringFromInt(DateTime.now().hour)));
-    minutesController = FixedExtentScrollController(
-        initialItem: selectedMinute != null
-            ? selectedMinute!
+    _minutesController = FixedExtentScrollController(
+        initialItem: widget.selectedMinute != null
+            ? widget.selectedMinute!
             : getMinuteStrings()
                 .indexOf(getMinuteStringFromInt(DateTime.now().minute)));
   }
 
-  late FixedExtentScrollController hoursController;
-  late FixedExtentScrollController minutesController;
-  final int? selectedHour;
-  final int? selectedMinute;
-  final Function(String, Pair<int, int>) onTimeSelected;
+  @override
+  void dispose() {
+    super.dispose();
+    _hoursController.dispose();
+    _minutesController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +78,13 @@ class TimeWheelPicker extends StatelessWidget {
                   child: ListWheelScrollView(
                     physics: const FixedExtentScrollPhysics(),
                     itemExtent: 50,
-                    controller: hoursController,
+                    controller: _hoursController,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
                     onSelectedItemChanged: (index) {
-                      onTimeSelected(
-                          '${getHourStrings()[hoursController.selectedItem]}:${getMinuteStrings()[minutesController.selectedItem]}',
-                          Pair(index, minutesController.selectedItem));
+                      _debouncer.call(() => widget.onTimeSelected(
+                          '${getHourStrings()[_hoursController.selectedItem]}:${getMinuteStrings()[_minutesController.selectedItem]}',
+                          Pair(index, _minutesController.selectedItem)));
                     },
                     children: [
                       ...getHourStrings().map((e) => Align(
@@ -85,11 +105,11 @@ class TimeWheelPicker extends StatelessWidget {
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     overAndUnderCenterOpacity: 0.5,
                     physics: const FixedExtentScrollPhysics(),
-                    controller: minutesController,
+                    controller: _minutesController,
                     onSelectedItemChanged: (index) {
-                      onTimeSelected(
-                          '${getHourStrings()[hoursController.selectedItem]}:${getMinuteStrings()[minutesController.selectedItem]}',
-                          Pair(hoursController.selectedItem, index));
+                      _debouncer.call(() => widget.onTimeSelected(
+                          '${getHourStrings()[_hoursController.selectedItem]}:${getMinuteStrings()[_minutesController.selectedItem]}',
+                          Pair(_hoursController.selectedItem, index)));
                     },
                     children: [
                       ...getMinuteStrings().map((e) => Align(

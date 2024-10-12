@@ -69,6 +69,7 @@ class DayPicker extends StatelessWidget {
     );
   }
 
+  //TODO: Move this to the Cubit and just propagate the text as part of state
   String determineDate(List<Weekday> selectedDays, String selectedTime) {
     var text = '';
     final selectedDateTime = convertStringToDate(selectedTime);
@@ -112,6 +113,7 @@ class DayPicker extends StatelessWidget {
 
   DateTime convertStringToDate(String selectedTime) {
     // Determine if selected time is before now or after
+    print("Convert string to date, selectedTime: $selectedTime");
     final now = DateTime.now();
     final hoursAndMinutes = selectedTime.split(':');
     final selectedDateTime = DateTime(

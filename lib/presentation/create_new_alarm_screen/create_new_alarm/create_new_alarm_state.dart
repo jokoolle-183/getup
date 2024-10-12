@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:intl/intl.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
@@ -20,7 +21,7 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
 
   factory CreateNewAlarmState.initial() {
     return CreateNewAlarmState(
-      selectedTime: Pair('', ''),
+      selectedTime: Pair(DateFormat('HH:mm').format(DateTime.now()), ''),
       type: AlarmType.regular,
       soundPath: '',
       isVibrate: false,

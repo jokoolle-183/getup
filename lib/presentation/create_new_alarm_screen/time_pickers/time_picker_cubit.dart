@@ -9,6 +9,7 @@ class TimePickerCubit extends Cubit<TimePickerState> {
   final TimeStore timeStore;
 
   void onTimeSelected(String time, Pair<int, int> hoursMinutes) {
+    print("Time selected called");
     timeStore.onTimeSelected(time);
     emit(state.copyWith(
       baseTime: time,
@@ -18,6 +19,7 @@ class TimePickerCubit extends Cubit<TimePickerState> {
   }
 
   void onEndTimeSelected(String endTime, Pair<int, int> hoursMinutes) {
+    print("EndTime selected called");
     timeStore.onEndTimeSelected(endTime);
     emit(state.copyWith(
       endTime: endTime,
