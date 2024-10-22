@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -32,53 +33,125 @@ class CreateNewAlarmScreen extends StatelessWidget {
         builder: (context, state) => Scaffold(
           backgroundColor: Colors.white,
           body: LayoutBuilder(builder: (context, constraints) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Gap(50),
-                TimePickerFactory.getPicker(
-                  state.type,
-                  context.read<TimePickerCubit>(),
-                ).buildPicker(),
-                const Gap(24),
-                DayPicker(
-                  selectedDays: state.daysOfWeek,
-                  selectedTime: state.selectedTime,
-                  onSelected: context.read<CreateNewAlarmCubit>().onDaySelected,
-                ),
-                const Gap(16),
-                InkWell(
-                  onTap: () => openDialog(
-                    context,
-                    state,
-                    context.read<CreateNewAlarmCubit>().onTypeChanged,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        const Gap(16.0),
-                        const Expanded(
-                            child: Text(
-                          'Type',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        )),
-                        Text(state.type.typeName,
-                            style: const TextStyle(
-                              fontSize: 16,
+            return Stack(children: [
+              SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Gap(50),
+                    TimePickerFactory.getPicker(
+                      state.type,
+                      context.read<TimePickerCubit>(),
+                    ).buildPicker(),
+                    const Gap(24),
+                    DayPicker(
+                      selectedDays: state.daysOfWeek,
+                      selectedTime: state.selectedTime,
+                      onSelected:
+                          context.read<CreateNewAlarmCubit>().onDaySelected,
+                    ),
+                    const Gap(16),
+                    InkWell(
+                      onTap: () => openDialog(
+                        context,
+                        state,
+                        context.read<CreateNewAlarmCubit>().onTypeChanged,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Gap(16.0),
+                            const Expanded(
+                                child: Text(
+                              'Type',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             )),
-                        const Gap(4.0),
-                        const Icon(Icons.chevron_right_outlined),
-                        const Gap(16.0),
-                      ],
+                            Text(state.type.typeName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                )),
+                            const Gap(4.0),
+                            const Icon(Icons.chevron_right_outlined),
+                            const Gap(16.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (state.type == AlarmType.recurringDaily)
+                      InkWell(
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              const Gap(16.0),
+                              const Expanded(
+                                  child: Text(
+                                'Interval',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )),
+                              Text(
+                                  state.intervalBetweenAlarms?.toString() ??
+                                      'N/A',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  )),
+                              const Gap(4.0),
+                              const Icon(Icons.chevron_right_outlined),
+                              const Gap(16.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    TextButton(
+                      onPressed: () async {
+                        Alarm.stopAll();
+                      },
+                      child: const Text('Stop all'),
+                    ),
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 24.0),
+                  child: FilledButton(
+                    style: ButtonStyle(
+                      fixedSize: WidgetStatePropertyAll(
+                        Size(
+                          constraints.maxWidth,
+                          50,
+                        ),
+                      ),
+                      backgroundColor:
+                          const WidgetStatePropertyAll(Colors.black),
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await context.read<CreateNewAlarmCubit>().setAlarm();
+                      if (context.mounted) Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'OK',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                )
-              ],
-            );
+                ),
+              ),
+            ]);
           }),
         ),
       ),

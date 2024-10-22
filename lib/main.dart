@@ -8,8 +8,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get_it/get_it.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:walk_it_up/data/database/dao/alarm_set/alarm_set_dao.dart';
-import 'package:walk_it_up/data/database/dao/regular_alarm/regular_alarms_dao.dart';
+import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
+import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository_impl.dart';
 import 'package:walk_it_up/domain/time_store.dart';
@@ -26,20 +26,20 @@ final getIt = GetIt.instance;
 void setup() {
   getIt.registerSingleton<AlarmDatabase>(AlarmDatabase());
 
-  getIt.registerFactory<RegularAlarmsDao>(
-    () => RegularAlarmsDao(getIt<AlarmDatabase>()),
+  getIt.registerFactory<DbAlarmDao>(
+    () => DbAlarmDao(getIt<AlarmDatabase>()),
   );
 
-  getIt.registerFactory<AlarmSetDao>(
-    () => AlarmSetDao(getIt<AlarmDatabase>()),
+  getIt.registerFactory<AlarmInstanceSetDao>(
+    () => AlarmInstanceSetDao(getIt<AlarmDatabase>()),
   );
 
   getIt.registerLazySingleton<RegularAlarmRepository>(
-    () => RegularAlarmRepositoryImpl(getIt<RegularAlarmsDao>()),
+    () => RegularAlarmRepositoryImpl(getIt<DbAlarmDao>()),
   );
 
   getIt.registerLazySingleton<AlarmSetRepository>(
-    () => AlarmSetRepositoryImpl(getIt<AlarmSetDao>()),
+    () => AlarmSetRepositoryImpl(getIt<AlarmInstanceSetDao>()),
   );
 
   getIt.registerLazySingleton<TimeStore>(() => TimeStoreImpl());

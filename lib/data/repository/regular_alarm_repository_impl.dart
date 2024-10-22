@@ -1,39 +1,40 @@
 import 'package:walk_it_up/data/model/alarm_mapper.dart';
-import 'package:walk_it_up/data/database/dao/regular_alarm/regular_alarms_dao.dart';
-import 'package:walk_it_up/data/model/dto/regular_alarm_dto.dart';
+import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
+import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
+import 'package:walk_it_up/data/model/regular_alarm_model.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 
 class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
-  final RegularAlarmsDao _regularAlarmsDao;
+  final DbAlarmDao _regularAlarmsDao;
   RegularAlarmRepositoryImpl(this._regularAlarmsDao);
 
   @override
-  Future<int> deleteAlarm(RegularAlarmDto regularAlarm) {
+  Future<int> deleteAlarm(DbAlarmDto regularAlarm) {
     return _regularAlarmsDao.deleteAlarm(regularAlarm.id);
   }
 
   @override
-  Future<List<RegularAlarmDto>> getRegularAlarms() async {
+  Future<List<DbAlarmDto>> getRegularAlarms() async {
     final dbAlarms = await _regularAlarmsDao.allRegularAlarms;
-    return dbAlarms.map((alarm) => RegularAlarmDto.fromDbAlarm(alarm)).toList();
+    return dbAlarms.map((alarm) => DbAlarmDto.fromDbAlarm(alarm)).toList();
   }
 
   @override
-  Future<int> saveAlarm(RegularAlarmDto regularAlarm) {
+  Future<int> saveAlarm(RegularAlarmModel regularAlarm) {
     return _regularAlarmsDao
-        .saveAlarm(AlarmMapper.mapRegularAlarmToCompanion(regularAlarm));
+        .saveAlarm(AlarmMapper.mapModelToCompanion(regularAlarm));
   }
 
   @override
-  Future<bool> updateAlarm(RegularAlarmDto regularAlarm) {
+  Future<bool> updateAlarm(DbAlarmDto regularAlarm) {
     return _regularAlarmsDao
-        .updateAlarm(AlarmMapper.mapRegularAlarmToCompanion(regularAlarm));
+        .updateAlarm(AlarmMapper.mapDTOToCompanion(regularAlarm));
   }
 
   @override
-  Stream<RegularAlarmDto> watchAlarmById(int id) {
+  Stream<DbAlarmDto> watchAlarmById(int id) {
     return _regularAlarmsDao
         .watchAlarmById(id)
-        .map((alarm) => RegularAlarmDto.fromDbAlarm(alarm));
+        .map((alarm) => DbAlarmDto.fromDbAlarm(alarm));
   }
 }

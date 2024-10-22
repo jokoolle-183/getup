@@ -4,7 +4,7 @@ import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 
 @immutable
-class RegularAlarmDto extends Equatable {
+class DbAlarmDto extends Equatable {
   final int id;
   final String? name;
   final String audioPath;
@@ -12,7 +12,7 @@ class RegularAlarmDto extends Equatable {
   final int? snoozeDuration;
   final List<Weekday>? daysOfWeek;
 
-  const RegularAlarmDto._({
+  const DbAlarmDto._({
     required this.id,
     required this.time,
     required this.daysOfWeek,
@@ -21,7 +21,7 @@ class RegularAlarmDto extends Equatable {
     this.name,
   });
 
-  factory RegularAlarmDto.fromDbAlarm(RegularAlarm alarm) => RegularAlarmDto._(
+  factory DbAlarmDto.fromDbAlarm(DbAlarm alarm) => DbAlarmDto._(
         id: alarm.id,
         name: alarm.name,
         audioPath: alarm.audioPath,
@@ -30,9 +30,8 @@ class RegularAlarmDto extends Equatable {
         daysOfWeek: tryCast(alarm.daysOfWeek),
       );
 
-  factory RegularAlarmDto.fromAlarmCompanion(
-          RegularAlarmsCompanion alarmCompanion) =>
-      RegularAlarmDto._(
+  factory DbAlarmDto.fromAlarmCompanion(DbAlarmsCompanion alarmCompanion) =>
+      DbAlarmDto._(
         id: alarmCompanion.id.value,
         name: alarmCompanion.name.value,
         audioPath: alarmCompanion.audioPath.value,

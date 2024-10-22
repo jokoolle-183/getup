@@ -8,6 +8,9 @@ class EnumListConverter<T> extends TypeConverter<EqualList<T>, String> {
 
   @override
   EqualList<T> fromSql(String fromDb) {
+    if (fromDb.isEmpty) {
+      return EqualList(List.empty());
+    }
     final indices = fromDb.split(',');
     return EqualList(
         indices.map((index) => allValues[int.parse(index)]).toList());

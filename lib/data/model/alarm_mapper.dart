@@ -1,40 +1,55 @@
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
-import 'package:walk_it_up/data/model/dto/alarm_set_dto.dart';
-import 'package:walk_it_up/data/model/dto/recurring_alarm_dto.dart';
-import 'package:walk_it_up/data/model/dto/regular_alarm_dto.dart';
+import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
+import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
+import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
+import 'package:walk_it_up/data/model/regular_alarm_model.dart';
 
 class AlarmMapper {
-  static RegularAlarmsCompanion mapRegularAlarmToCompanion(
-      RegularAlarmDto regularAlarm) {
-    return RegularAlarmsCompanion.insert(
-      name: Value.absentIfNull(regularAlarm.name),
-      audioPath: regularAlarm.audioPath,
-      time: regularAlarm.time,
-      snoozeDuration: Value.absentIfNull(regularAlarm.snoozeDuration),
-      daysOfWeek: Value.absentIfNull(EqualList(regularAlarm.daysOfWeek ?? [])),
+  static DbAlarmsCompanion mapDTOToCompanion(DbAlarmDto regularAlarmDto) {
+    return DbAlarmsCompanion.insert(
+      name: Value.absentIfNull(regularAlarmDto.name),
+      audioPath: regularAlarmDto.audioPath,
+      time: regularAlarmDto.time,
+      snoozeDuration: Value.absentIfNull(regularAlarmDto.snoozeDuration),
+      daysOfWeek:
+          Value.absentIfNull(EqualList(regularAlarmDto.daysOfWeek ?? [])),
     );
   }
 
-  static AlarmSetsCompanion mapAlarmSetToCompanion(AlarmSetDto alarmSet) {
-    return AlarmSetsCompanion.insert(
+  static DbAlarmsCompanion mapModelToCompanion(
+      RegularAlarmModel regularAlarmModel) {
+    return DbAlarmsCompanion.insert(
+      name: Value.absentIfNull(regularAlarmModel.name),
+      audioPath: regularAlarmModel.audioPath,
+      time: regularAlarmModel.time,
+      snoozeDuration: Value.absentIfNull(regularAlarmModel.snoozeDuration),
+      daysOfWeek:
+          Value.absentIfNull(EqualList(regularAlarmModel.daysOfWeek ?? [])),
+    );
+  }
+
+  static AlarmInstanceSetsCompanion mapAlarmInstanceSetToCompanion(
+      int alarmId, AlarmSetDto alarmSet) {
+    return AlarmInstanceSetsCompanion.insert(
+      alarmId: alarmId,
       name: Value.absentIfNull(alarmSet.name),
-      audioPath: alarmSet.audioPath,
       startTime: alarmSet.startTime,
       endTime: alarmSet.endTime,
       intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
       pauseDuration: Value.absentIfNull(alarmSet.pauseDuration),
-      daysOfWeek: Value.absentIfNull(EqualList(alarmSet.daysOfWeek ?? [])),
     );
   }
 
-  static RecurringAlarmsCompanion mapRecurringAlarmToCompanion(
-    int alarmSetId,
-    RecurringAlarmDto recurringAlarm,
-  ) {
-    return RecurringAlarmsCompanion.insert(
-      alarmSetId: alarmSetId,
+  static AlarmInstancesCompanion mapAlarmInstanceToCompanion({
+    int? alarmId,
+    int? alarmInstanceSetId,
+    required AlarmInstanceDto recurringAlarm,
+  }) {
+    return AlarmInstancesCompanion.insert(
+      alarmId: Value(alarmId),
+      alarmInstanceSetId: Value(alarmInstanceSetId),
       time: recurringAlarm.time,
       isEnabled: Value(recurringAlarm.isEnabled),
     );

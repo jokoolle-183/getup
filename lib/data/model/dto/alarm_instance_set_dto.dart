@@ -4,7 +4,7 @@ import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 
 @immutable
-class AlarmInstanceSetDto extends Equatable {
+class AlarmSetDto extends Equatable {
   final int id;
   final String? name;
   final DateTime startTime;
@@ -14,7 +14,7 @@ class AlarmInstanceSetDto extends Equatable {
   final List<AlarmInstanceDto> recurringAlarms;
   final bool isEnabled;
 
-  const AlarmInstanceSetDto._({
+  const AlarmSetDto._({
     required this.id,
     required this.startTime,
     required this.endTime,
@@ -25,11 +25,11 @@ class AlarmInstanceSetDto extends Equatable {
     this.pauseDuration,
   });
 
-  factory AlarmInstanceSetDto.fromDbAlarmSet(
+  factory AlarmSetDto.fromDbAlarmSet(
     AlarmInstanceSet alarmSet,
     List<AlarmInstanceDto> recurringAlarms,
   ) =>
-      AlarmInstanceSetDto._(
+      AlarmSetDto._(
         id: alarmSet.id,
         startTime: alarmSet.startTime,
         endTime: alarmSet.endTime,

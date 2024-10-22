@@ -44,6 +44,7 @@ class _TimeWheelPickerState extends State<TimeWheelPicker> {
     super.dispose();
     _hoursController.dispose();
     _minutesController.dispose();
+    _debouncer.dispose();
   }
 
   @override

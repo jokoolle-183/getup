@@ -3,23 +3,26 @@ import 'package:flutter/foundation.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 
 @immutable
-class RecurringAlarmDto extends Equatable {
+class AlarmInstanceDto extends Equatable {
   final int id;
-  final int parentId;
+  final int? alarmId;
+  final int? alarmInstanceSetId;
   final DateTime time;
   final bool isEnabled;
 
-  const RecurringAlarmDto._({
+  const AlarmInstanceDto._({
     required this.id,
-    required this.parentId,
     required this.time,
     required this.isEnabled,
+    this.alarmId,
+    this.alarmInstanceSetId,
   });
 
-  factory RecurringAlarmDto.fromDbRecurringAlarm(RecurringAlarm alarm) =>
-      RecurringAlarmDto._(
+  factory AlarmInstanceDto.fromDbRecurringAlarm(AlarmInstance alarm) =>
+      AlarmInstanceDto._(
         id: alarm.id,
-        parentId: alarm.alarmSetId,
+        alarmId: alarm.alarmId,
+        alarmInstanceSetId: alarm.alarmInstanceSetId,
         time: alarm.time,
         isEnabled: alarm.isEnabled,
       );
@@ -27,7 +30,8 @@ class RecurringAlarmDto extends Equatable {
   @override
   List<Object?> get props => [
         id,
-        parentId,
+        alarmId,
+        alarmInstanceSetId,
         time,
         isEnabled,
       ];

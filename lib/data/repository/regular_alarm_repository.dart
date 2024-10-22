@@ -1,9 +1,10 @@
-import 'package:walk_it_up/data/model/dto/regular_alarm_dto.dart';
+import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
+import 'package:walk_it_up/data/model/regular_alarm_model.dart';
 
 abstract class RegularAlarmRepository {
-  Future<List<RegularAlarmDto>> getRegularAlarms();
-  Future<int> saveAlarm(RegularAlarmDto regularAlarm);
-  Future<bool> updateAlarm(RegularAlarmDto regularAlarm);
-  Future<int> deleteAlarm(RegularAlarmDto regularAlarm);
-  Stream<RegularAlarmDto> watchAlarmById(int id);
+  Future<List<DbAlarmDto>> getRegularAlarms();
+  Future<int> saveAlarm(RegularAlarmModel regularAlarm);
+  Future<bool> updateAlarm(DbAlarmDto regularAlarm);
+  Future<int> deleteAlarm(DbAlarmDto regularAlarm);
+  Stream<DbAlarmDto> watchAlarmById(int id);
 }

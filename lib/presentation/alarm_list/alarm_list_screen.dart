@@ -160,7 +160,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
           ),
           floatingActionButton: FloatingActionButton(
               child: const Icon(Icons.add),
-              onPressed: () => navigateToCreateNewAlarm()),
+              onPressed: () => navigateToCreateNewAlarm(context)),
         ),
       ),
     );
@@ -174,7 +174,10 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
     );
   }
 
-  Future<void> navigateToCreateNewAlarm() async {
-    await Navigator.pushNamed(context, CreateNewAlarmScreen.route);
+  Future<void> navigateToCreateNewAlarm(BuildContext context) async {
+    await Navigator.pushNamed(context, CreateNewAlarmScreen.route)
+        .then((shouldRefresh) {
+      context.read<AlarmListCubit>().loadAlarms();
+    });
   }
 }
