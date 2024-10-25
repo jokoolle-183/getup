@@ -11,20 +11,21 @@ class AlarmMapper {
     return DbAlarmsCompanion.insert(
       name: Value.absentIfNull(regularAlarmDto.name),
       audioPath: regularAlarmDto.audioPath,
-      time: regularAlarmDto.time,
       snoozeDuration: Value.absentIfNull(regularAlarmDto.snoozeDuration),
       daysOfWeek:
           Value.absentIfNull(EqualList(regularAlarmDto.daysOfWeek ?? [])),
     );
   }
 
-  static DbAlarmsCompanion mapModelToCompanion(AlarmArgs alarmArgs) {
+  static DbAlarmsCompanion mapArgsToCompanion(AlarmArgs alarmArgs) {
     return DbAlarmsCompanion.insert(
       name: Value.absentIfNull(alarmArgs.name),
       audioPath: alarmArgs.audioPath,
-      time: alarmArgs.time,
+      isEnabled: Value(alarmArgs.enabled),
       snoozeDuration: Value.absentIfNull(alarmArgs.snoozeDuration),
-      daysOfWeek: Value.absentIfNull(EqualList(alarmArgs.daysOfWeek ?? [])),
+      daysOfWeek: Value.absentIfNull(
+        EqualList(alarmArgs.daysOfWeek ?? []),
+      ),
     );
   }
 
@@ -32,7 +33,6 @@ class AlarmMapper {
       int alarmId, AlarmSetDto alarmSet) {
     return AlarmInstanceSetsCompanion.insert(
       alarmId: alarmId,
-      name: Value.absentIfNull(alarmSet.name),
       startTime: alarmSet.startTime,
       endTime: alarmSet.endTime,
       intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,

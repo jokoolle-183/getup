@@ -28,9 +28,9 @@ class AlarmScheduler {
   Future<bool> scheduleAlarm(DateTime? alarmDate) async {
     if (alarmDate != null) {
       final alarmArgs = AlarmArgs(
-        time: alarmDate,
-        audioPath: 'assets/perfect_alarm.mp3',
-      );
+          time: alarmDate,
+          audioPath: 'assets/perfect_alarm.mp3',
+          enabled: true);
 
       final alarmId = await _regularAlarmRepository.saveAlarm(alarmArgs);
 

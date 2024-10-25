@@ -8,36 +8,30 @@ class DbAlarmDto extends Equatable {
   final int id;
   final String? name;
   final String audioPath;
-  final DateTime time;
   final int? snoozeDuration;
   final List<Weekday>? daysOfWeek;
+  final bool isEnabled;
+  final AlarmInstance instance;
 
   const DbAlarmDto._({
     required this.id,
-    required this.time,
     required this.daysOfWeek,
     required this.snoozeDuration,
     required this.audioPath,
+    required this.isEnabled,
+    required this.instance,
     this.name,
   });
 
-  factory DbAlarmDto.fromDbAlarm(DbAlarm alarm) => DbAlarmDto._(
+  factory DbAlarmDto.from(DbAlarm alarm, AlarmInstance instance) =>
+      DbAlarmDto._(
         id: alarm.id,
         name: alarm.name,
         audioPath: alarm.audioPath,
-        time: alarm.time,
         snoozeDuration: alarm.snoozeDuration,
         daysOfWeek: tryCast(alarm.daysOfWeek),
-      );
-
-  factory DbAlarmDto.fromAlarmCompanion(DbAlarmsCompanion alarmCompanion) =>
-      DbAlarmDto._(
-        id: alarmCompanion.id.value,
-        name: alarmCompanion.name.value,
-        audioPath: alarmCompanion.audioPath.value,
-        time: alarmCompanion.time.value,
-        snoozeDuration: alarmCompanion.snoozeDuration.value,
-        daysOfWeek: tryCast(alarmCompanion.daysOfWeek.value),
+        isEnabled: alarm.isEnabled,
+        instance: instance,
       );
 
   @override
@@ -45,9 +39,9 @@ class DbAlarmDto extends Equatable {
         id,
         name,
         audioPath,
-        time,
         snoozeDuration,
         daysOfWeek,
+        isEnabled,
       ];
 }
 

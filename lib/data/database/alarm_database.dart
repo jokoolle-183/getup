@@ -15,7 +15,6 @@ class DbAlarms extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().nullable()();
   TextColumn get audioPath => text()();
-  DateTimeColumn get time => dateTime()();
   IntColumn get snoozeDuration => integer().nullable()();
   TextColumn get daysOfWeek =>
       text().map(EnumListConverter(EqualList(Weekday.values))).nullable()();
@@ -31,7 +30,6 @@ class AlarmInstanceSets extends Table {
         onDelete: KeyAction
             .cascade, // If the set is deleted, this will set alarmSetId to null
       )();
-  TextColumn get name => text().nullable()();
   DateTimeColumn get startTime => dateTime()();
   DateTimeColumn get endTime => dateTime()();
   IntColumn get intervalBetweenAlarms => integer()();
@@ -64,7 +62,7 @@ class AlarmInstances extends Table {
 
 @DriftDatabase(
   tables: [DbAlarms, AlarmInstanceSets, AlarmInstances],
-  daos: [DbAlarmDao, AlarmInstanceSetDao, AlarmInstancesDao],
+  daos: [AlarmInstanceSetDao, AlarmInstancesDao],
 )
 class AlarmDatabase extends _$AlarmDatabase {
   bool isUnderTest = false;

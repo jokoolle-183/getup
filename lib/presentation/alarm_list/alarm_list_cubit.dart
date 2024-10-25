@@ -25,7 +25,7 @@ class AlarmListCubit extends Cubit<AlarmListState> {
           (alarm) => AlarmItem.regular(
             alarm.id,
             'Regular Alarm',
-            DateFormat('HH:mm').format(alarm.time),
+            DateFormat('HH:mm').format(alarm.instance.time),
           ),
         )
         .toList();

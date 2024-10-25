@@ -7,10 +7,12 @@ class AlarmArgs {
   final DateTime time;
   final int? snoozeDuration;
   final List<Weekday>? daysOfWeek;
+  final bool enabled;
 
   const AlarmArgs({
     required this.time,
     required this.audioPath,
+    required this.enabled,
     this.id,
     this.daysOfWeek,
     this.snoozeDuration,
@@ -24,14 +26,15 @@ class AlarmArgs {
     List<Weekday>? daysOfWeek,
     int? snoozeDuration,
     String? name,
+    bool? enabled,
   }) {
     return AlarmArgs(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      time: time ?? this.time,
-      audioPath: audioPath ?? this.audioPath,
-      daysOfWeek: daysOfWeek ?? this.daysOfWeek,
-      snoozeDuration: snoozeDuration ?? this.snoozeDuration,
-    );
+        id: id ?? this.id,
+        name: name ?? this.name,
+        time: time ?? this.time,
+        audioPath: audioPath ?? this.audioPath,
+        daysOfWeek: daysOfWeek ?? this.daysOfWeek,
+        snoozeDuration: snoozeDuration ?? this.snoozeDuration,
+        enabled: enabled ?? this.enabled);
   }
 }

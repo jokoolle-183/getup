@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
-import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/domain/alarm_scheduler.dart';
 import 'package:walk_it_up/domain/calculation_args.dart';
 import 'package:walk_it_up/domain/time_selection_handler.dart';

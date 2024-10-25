@@ -19,14 +19,13 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
 
   @override
   Future<List<DbAlarmDto>> getRegularAlarms() async {
-    final dbAlarms = await _alarmDao.allRegularAlarms;
-    return dbAlarms.map((alarm) => DbAlarmDto.fromDbAlarm(alarm)).toList();
+    return _alarmDao.getAlarms();
   }
 
   @override
   Future<int> saveAlarm(AlarmArgs alarmArgs) async {
     final alarmId =
-        await _alarmDao.saveAlarm(AlarmMapper.mapModelToCompanion(alarmArgs));
+        await _alarmDao.saveAlarm(AlarmMapper.mapArgsToCompanion(alarmArgs));
     final entry = AlarmInstancesCompanion.insert(
       alarmId: Value(alarmId),
       time: alarmArgs.time,
@@ -41,8 +40,6 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
 
   @override
   Stream<DbAlarmDto> watchAlarmById(int id) {
-    return _alarmDao
-        .watchAlarmById(id)
-        .map((alarm) => DbAlarmDto.fromDbAlarm(alarm));
+    return _alarmDao.watchAlarmById(id);
   }
 }

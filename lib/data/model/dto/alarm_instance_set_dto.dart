@@ -34,7 +34,6 @@ class AlarmSetDto extends Equatable {
         startTime: alarmSet.startTime,
         endTime: alarmSet.endTime,
         intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
-        name: alarmSet.name,
         pauseDuration: alarmSet.pauseDuration,
         recurringAlarms: recurringAlarms,
         isEnabled: alarmSet.isEnabled,
