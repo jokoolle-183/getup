@@ -1,39 +1,47 @@
+import 'package:drift/drift.dart';
+import 'package:walk_it_up/data/database/alarm_database.dart';
+import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
 import 'package:walk_it_up/data/model/alarm_mapper.dart';
 import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
 import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
-import 'package:walk_it_up/data/model/regular_alarm_model.dart';
+import 'package:walk_it_up/data/model/alarm_args.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 
 class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
-  final DbAlarmDao _regularAlarmsDao;
-  RegularAlarmRepositoryImpl(this._regularAlarmsDao);
+  final DbAlarmDao _alarmDao;
+  final AlarmInstancesDao _alarmInstancesDao;
+  RegularAlarmRepositoryImpl(this._alarmDao, this._alarmInstancesDao);
 
   @override
   Future<int> deleteAlarm(DbAlarmDto regularAlarm) {
-    return _regularAlarmsDao.deleteAlarm(regularAlarm.id);
+    return _alarmDao.deleteAlarm(regularAlarm.id);
   }
 
   @override
   Future<List<DbAlarmDto>> getRegularAlarms() async {
-    final dbAlarms = await _regularAlarmsDao.allRegularAlarms;
+    final dbAlarms = await _alarmDao.allRegularAlarms;
     return dbAlarms.map((alarm) => DbAlarmDto.fromDbAlarm(alarm)).toList();
   }
 
   @override
-  Future<int> saveAlarm(RegularAlarmModel regularAlarm) {
-    return _regularAlarmsDao
-        .saveAlarm(AlarmMapper.mapModelToCompanion(regularAlarm));
+  Future<int> saveAlarm(AlarmArgs alarmArgs) async {
+    final alarmId =
+        await _alarmDao.saveAlarm(AlarmMapper.mapModelToCompanion(alarmArgs));
+    final entry = AlarmInstancesCompanion.insert(
+      alarmId: Value(alarmId),
+      time: alarmArgs.time,
+    );
+    return _alarmInstancesDao.saveAlarmInstance(entry);
   }
 
   @override
   Future<bool> updateAlarm(DbAlarmDto regularAlarm) {
-    return _regularAlarmsDao
-        .updateAlarm(AlarmMapper.mapDTOToCompanion(regularAlarm));
+    return _alarmDao.updateAlarm(AlarmMapper.mapDTOToCompanion(regularAlarm));
   }
 
   @override
   Stream<DbAlarmDto> watchAlarmById(int id) {
-    return _regularAlarmsDao
+    return _alarmDao
         .watchAlarmById(id)
         .map((alarm) => DbAlarmDto.fromDbAlarm(alarm));
   }

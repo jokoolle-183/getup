@@ -1,14 +1,12 @@
 import 'dart:async';
 
-import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
-import 'package:walk_it_up/data/model/regular_alarm_model.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
-import 'package:walk_it_up/domain/time_store.dart';
+import 'package:walk_it_up/domain/alarm_scheduler.dart';
+import 'package:walk_it_up/domain/calculation_args.dart';
+import 'package:walk_it_up/domain/time_selection_handler.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_state.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
@@ -17,7 +15,7 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
   CreateNewAlarmCubit({
     required this.timeStore,
     required this.alarmSetRepository,
-    required this.regularAlarmRepository,
+    required this.alarmScheduler,
   }) : super(CreateNewAlarmState.initial()) {
     _timeSubscription = timeStore.timeStream.listen((timePair) {
       emit(state.copyWith(
@@ -26,8 +24,8 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
   }
 
   final AlarmSetRepository alarmSetRepository;
-  final RegularAlarmRepository regularAlarmRepository;
-  final TimeStore timeStore;
+  final TimeSelectionHandler timeStore;
+  final AlarmScheduler alarmScheduler;
   late StreamSubscription<Pair<String, String>> _timeSubscription;
 
   void onTypeChanged(AlarmType selectedType) {
@@ -47,36 +45,22 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
     emit(state.copyWith(daysOfWeek: newList));
   }
 
-  Future<void> setAlarm() async {
+  Future<void> scheduleAlarm() async {
     if (state.type == AlarmType.regular) {
-      final now = DateTime.now();
-      DateTime selectedTime = convertStringToDate(state.selectedTime.left);
-
-      if (selectedTime.isBefore(now)) {
-        selectedTime = selectedTime.copyWith(day: selectedTime.day + 1);
-      }
-
-      final alarmId = await regularAlarmRepository.saveAlarm(
-        RegularAlarmModel(
-          time: selectedTime,
-          audioPath: 'assets/perfect_alarm.mp3',
-        ),
+      final args = CalculationArgs(
+        selectedTime: state.selectedTime.left,
+        daysOfWeek: state.daysOfWeek,
       );
+      final selectedDateTime = await alarmScheduler.scheduleRegularAlarm(args);
 
-      Alarm.set(
-          alarmSettings: AlarmSettings(
-              id: alarmId,
-              dateTime: selectedTime,
-              assetAudioPath: 'assets/perfect_alarm.mp3',
-              notificationTitle: 'Get up',
-              notificationBody: 'Walk it up! '));
+      print('Alarm date: $selectedDateTime');
     } else {}
   }
 
   @override
   Future<void> close() {
-    _timeSubscription
-        .cancel(); // Cancel the subscription when the Cubit is closed
+    // Cancel the subscription when the Cubit is closed
+    _timeSubscription.cancel();
     return super.close();
   }
 

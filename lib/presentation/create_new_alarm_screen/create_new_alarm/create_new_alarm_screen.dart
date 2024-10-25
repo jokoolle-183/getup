@@ -24,7 +24,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
           create: (BuildContext context) => CreateNewAlarmCubit(
             timeStore: getIt.get(),
             alarmSetRepository: getIt.get(),
-            regularAlarmRepository: getIt.get(),
+            alarmScheduler: getIt.get(),
           ),
         ),
         BlocProvider(create: (context) => TimePickerCubit(getIt.get())),
@@ -141,7 +141,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () async {
-                      await context.read<CreateNewAlarmCubit>().setAlarm();
+                      await context.read<CreateNewAlarmCubit>().scheduleAlarm();
                       if (context.mounted) Navigator.of(context).pop();
                     },
                     child: const Text(

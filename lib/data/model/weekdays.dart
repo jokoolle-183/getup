@@ -1,14 +1,17 @@
 enum Weekday {
-  monday("Mon"),
-  tuesday("Tue"),
-  wednesday("Wed"),
-  thursday("Thu"),
-  friday("Fri"),
-  saturday("Sat"),
-  sunday("Sun");
+  monday("Mon", DateTime.monday),
+  tuesday("Tue", DateTime.tuesday),
+  wednesday("Wed", DateTime.wednesday),
+  thursday("Thu", DateTime.thursday),
+  friday("Fri", DateTime.friday),
+  saturday("Sat", DateTime.saturday),
+  sunday("Sun", DateTime.sunday);
+
+  static Weekday today(int day) => values.firstWhere((d) => d.position == day);
 
   final String abbreviation;
-  const Weekday(this.abbreviation);
+  final int position;
+  const Weekday(this.abbreviation, this.position);
 }
 
 sealed class Day {

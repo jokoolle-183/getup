@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:walk_it_up/domain/time_store.dart';
+import 'package:walk_it_up/domain/time_selection_handler.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_state.dart';
 
 class TimePickerCubit extends Cubit<TimePickerState> {
   TimePickerCubit(this.timeStore) : super(TimePickerState.initial());
 
-  final TimeStore timeStore;
+  final TimeSelectionHandler timeStore;
 
   void onTimeSelected(String time, Pair<int, int> hoursMinutes) {
     print("Time selected called");

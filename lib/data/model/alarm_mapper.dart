@@ -4,7 +4,7 @@ import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
-import 'package:walk_it_up/data/model/regular_alarm_model.dart';
+import 'package:walk_it_up/data/model/alarm_args.dart';
 
 class AlarmMapper {
   static DbAlarmsCompanion mapDTOToCompanion(DbAlarmDto regularAlarmDto) {
@@ -18,15 +18,13 @@ class AlarmMapper {
     );
   }
 
-  static DbAlarmsCompanion mapModelToCompanion(
-      RegularAlarmModel regularAlarmModel) {
+  static DbAlarmsCompanion mapModelToCompanion(AlarmArgs alarmArgs) {
     return DbAlarmsCompanion.insert(
-      name: Value.absentIfNull(regularAlarmModel.name),
-      audioPath: regularAlarmModel.audioPath,
-      time: regularAlarmModel.time,
-      snoozeDuration: Value.absentIfNull(regularAlarmModel.snoozeDuration),
-      daysOfWeek:
-          Value.absentIfNull(EqualList(regularAlarmModel.daysOfWeek ?? [])),
+      name: Value.absentIfNull(alarmArgs.name),
+      audioPath: alarmArgs.audioPath,
+      time: alarmArgs.time,
+      snoozeDuration: Value.absentIfNull(alarmArgs.snoozeDuration),
+      daysOfWeek: Value.absentIfNull(EqualList(alarmArgs.daysOfWeek ?? [])),
     );
   }
 
