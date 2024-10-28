@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
-import 'package:walk_it_up/data/model/dto/alarm_set_dto.dart';
+import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 
 part 'alarm_instances_set_dao.g.dart';
 
@@ -33,9 +33,9 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
         final alarms = entry.value
             .map((row) => row.readTableOrNull(alarmInstances))
             .whereType<AlarmInstance>()
-            .map(AlarmInstanceDto.fromDbRecurringAlarm)
+            .map(AlarmInstanceDto.from)
             .toList();
-        return AlarmInstanceSetDto.fromDbAlarmSet(alarmSet, alarms);
+        return AlarmInstanceSetDto.from(alarmSet, alarms);
       }).toList();
     });
   }

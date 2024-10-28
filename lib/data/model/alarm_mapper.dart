@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
-import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
+import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
 import 'package:walk_it_up/data/model/alarm_args.dart';
 
@@ -30,7 +30,7 @@ class AlarmMapper {
   }
 
   static AlarmInstanceSetsCompanion mapAlarmInstanceSetToCompanion(
-      int alarmId, AlarmSetDto alarmSet) {
+      int alarmId, AlarmInstanceSetDto alarmSet) {
     return AlarmInstanceSetsCompanion.insert(
       alarmId: alarmId,
       startTime: alarmSet.startTime,
@@ -41,12 +41,12 @@ class AlarmMapper {
   }
 
   static AlarmInstancesCompanion mapAlarmInstanceToCompanion({
-    int? alarmId,
+    required int alarmId,
     int? alarmInstanceSetId,
     required AlarmInstanceDto recurringAlarm,
   }) {
     return AlarmInstancesCompanion.insert(
-      alarmId: Value(alarmId),
+      alarmId: alarmId,
       alarmInstanceSetId: Value(alarmInstanceSetId),
       time: recurringAlarm.time,
       isEnabled: Value(recurringAlarm.isEnabled),

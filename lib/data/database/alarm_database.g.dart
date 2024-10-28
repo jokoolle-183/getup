@@ -773,9 +773,9 @@ class $AlarmInstancesTable extends AlarmInstances
       const VerificationMeta('alarmId');
   @override
   late final GeneratedColumn<int> alarmId = GeneratedColumn<int>(
-      'alarm_id', aliasedName, true,
+      'alarm_id', aliasedName, false,
       type: DriftSqlType.int,
-      requiredDuringInsert: false,
+      requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES db_alarms (id) ON DELETE CASCADE'));
   static const VerificationMeta _alarmInstanceSetIdMeta =
@@ -821,6 +821,8 @@ class $AlarmInstancesTable extends AlarmInstances
     if (data.containsKey('alarm_id')) {
       context.handle(_alarmIdMeta,
           alarmId.isAcceptableOrUnknown(data['alarm_id']!, _alarmIdMeta));
+    } else if (isInserting) {
+      context.missing(_alarmIdMeta);
     }
     if (data.containsKey('alarm_instance_set_id')) {
       context.handle(
@@ -850,7 +852,7 @@ class $AlarmInstancesTable extends AlarmInstances
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       alarmId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}alarm_id']),
+          .read(DriftSqlType.int, data['${effectivePrefix}alarm_id'])!,
       alarmInstanceSetId: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}alarm_instance_set_id']),
       time: attachedDatabase.typeMapping
@@ -868,13 +870,13 @@ class $AlarmInstancesTable extends AlarmInstances
 
 class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
   final int id;
-  final int? alarmId;
+  final int alarmId;
   final int? alarmInstanceSetId;
   final DateTime time;
   final bool isEnabled;
   const AlarmInstance(
       {required this.id,
-      this.alarmId,
+      required this.alarmId,
       this.alarmInstanceSetId,
       required this.time,
       required this.isEnabled});
@@ -882,9 +884,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    if (!nullToAbsent || alarmId != null) {
-      map['alarm_id'] = Variable<int>(alarmId);
-    }
+    map['alarm_id'] = Variable<int>(alarmId);
     if (!nullToAbsent || alarmInstanceSetId != null) {
       map['alarm_instance_set_id'] = Variable<int>(alarmInstanceSetId);
     }
@@ -896,9 +896,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
   AlarmInstancesCompanion toCompanion(bool nullToAbsent) {
     return AlarmInstancesCompanion(
       id: Value(id),
-      alarmId: alarmId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(alarmId),
+      alarmId: Value(alarmId),
       alarmInstanceSetId: alarmInstanceSetId == null && nullToAbsent
           ? const Value.absent()
           : Value(alarmInstanceSetId),
@@ -912,7 +910,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AlarmInstance(
       id: serializer.fromJson<int>(json['id']),
-      alarmId: serializer.fromJson<int?>(json['alarmId']),
+      alarmId: serializer.fromJson<int>(json['alarmId']),
       alarmInstanceSetId: serializer.fromJson<int?>(json['alarmInstanceSetId']),
       time: serializer.fromJson<DateTime>(json['time']),
       isEnabled: serializer.fromJson<bool>(json['isEnabled']),
@@ -923,7 +921,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'alarmId': serializer.toJson<int?>(alarmId),
+      'alarmId': serializer.toJson<int>(alarmId),
       'alarmInstanceSetId': serializer.toJson<int?>(alarmInstanceSetId),
       'time': serializer.toJson<DateTime>(time),
       'isEnabled': serializer.toJson<bool>(isEnabled),
@@ -932,13 +930,13 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
 
   AlarmInstance copyWith(
           {int? id,
-          Value<int?> alarmId = const Value.absent(),
+          int? alarmId,
           Value<int?> alarmInstanceSetId = const Value.absent(),
           DateTime? time,
           bool? isEnabled}) =>
       AlarmInstance(
         id: id ?? this.id,
-        alarmId: alarmId.present ? alarmId.value : this.alarmId,
+        alarmId: alarmId ?? this.alarmId,
         alarmInstanceSetId: alarmInstanceSetId.present
             ? alarmInstanceSetId.value
             : this.alarmInstanceSetId,
@@ -985,7 +983,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
 
 class AlarmInstancesCompanion extends UpdateCompanion<AlarmInstance> {
   final Value<int> id;
-  final Value<int?> alarmId;
+  final Value<int> alarmId;
   final Value<int?> alarmInstanceSetId;
   final Value<DateTime> time;
   final Value<bool> isEnabled;
@@ -998,11 +996,12 @@ class AlarmInstancesCompanion extends UpdateCompanion<AlarmInstance> {
   });
   AlarmInstancesCompanion.insert({
     this.id = const Value.absent(),
-    this.alarmId = const Value.absent(),
+    required int alarmId,
     this.alarmInstanceSetId = const Value.absent(),
     required DateTime time,
     this.isEnabled = const Value.absent(),
-  }) : time = Value(time);
+  })  : alarmId = Value(alarmId),
+        time = Value(time);
   static Insertable<AlarmInstance> custom({
     Expression<int>? id,
     Expression<int>? alarmId,
@@ -1022,7 +1021,7 @@ class AlarmInstancesCompanion extends UpdateCompanion<AlarmInstance> {
 
   AlarmInstancesCompanion copyWith(
       {Value<int>? id,
-      Value<int?>? alarmId,
+      Value<int>? alarmId,
       Value<int?>? alarmInstanceSetId,
       Value<DateTime>? time,
       Value<bool>? isEnabled}) {
@@ -1669,7 +1668,7 @@ typedef $$AlarmInstanceSetsTableProcessedTableManager = ProcessedTableManager<
 typedef $$AlarmInstancesTableCreateCompanionBuilder = AlarmInstancesCompanion
     Function({
   Value<int> id,
-  Value<int?> alarmId,
+  required int alarmId,
   Value<int?> alarmInstanceSetId,
   required DateTime time,
   Value<bool> isEnabled,
@@ -1677,7 +1676,7 @@ typedef $$AlarmInstancesTableCreateCompanionBuilder = AlarmInstancesCompanion
 typedef $$AlarmInstancesTableUpdateCompanionBuilder = AlarmInstancesCompanion
     Function({
   Value<int> id,
-  Value<int?> alarmId,
+  Value<int> alarmId,
   Value<int?> alarmInstanceSetId,
   Value<DateTime> time,
   Value<bool> isEnabled,
@@ -1834,7 +1833,7 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
               $$AlarmInstancesTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int?> alarmId = const Value.absent(),
+            Value<int> alarmId = const Value.absent(),
             Value<int?> alarmInstanceSetId = const Value.absent(),
             Value<DateTime> time = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
@@ -1848,7 +1847,7 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int?> alarmId = const Value.absent(),
+            required int alarmId,
             Value<int?> alarmInstanceSetId = const Value.absent(),
             required DateTime time,
             Value<bool> isEnabled = const Value.absent(),

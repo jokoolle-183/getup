@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:test/test.dart';
@@ -33,16 +32,19 @@ void main() {
   final alarmSetInstances = [
     AlarmInstancesCompanion.insert(
       id: const Value(1),
+      alarmId: dbAlarmCompanion.id.value,
       alarmInstanceSetId: alarmSetCompanion.id,
       time: DateTime(2024, 9, 16, 9, 0),
     ),
     AlarmInstancesCompanion.insert(
       id: const Value(2),
+      alarmId: dbAlarmCompanion.id.value,
       alarmInstanceSetId: alarmSetCompanion.id,
       time: DateTime(2024, 9, 16, 10, 0),
     ),
     AlarmInstancesCompanion.insert(
       id: const Value(3),
+      alarmId: dbAlarmCompanion.id.value,
       alarmInstanceSetId: alarmSetCompanion.id,
       time: DateTime(2024, 9, 16, 11, 0),
     ),
@@ -73,8 +75,15 @@ void main() {
           ])),
         ),
       );
-      final alarm = await alarmsDao.watchAlarmById(id).first;
-      expect(alarm.instance.id, id);
+      // Save alarm instance as well, without it we can't get the alarm by id
+      await alarmInstancesDao.saveAlarmInstance(
+        AlarmInstancesCompanion.insert(
+          alarmId: id,
+          time: DateTime.now(),
+        ),
+      );
+      final alarm = await alarmsDao.getAlarmById(id);
+      expect(alarm!.alarmInstance.id, id);
     });
 
     test('Insert a new AlarmSet', () async {

@@ -6,5 +6,5 @@ abstract class RegularAlarmRepository {
   Future<int> saveAlarm(AlarmArgs alarmArgs);
   Future<bool> updateAlarm(DbAlarmDto regularAlarm);
   Future<int> deleteAlarm(DbAlarmDto regularAlarm);
-  Stream<DbAlarmDto> watchAlarmById(int id);
+  Future<DbAlarmDto?> getAlarmById(int id);
 }

@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:walk_it_up/constants.dart';
-import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
 import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
 import 'package:walk_it_up/data/database/type_converter/enum_list_converter.dart';
@@ -40,14 +39,12 @@ class AlarmInstanceSets extends Table {
 @DataClassName('AlarmInstance')
 class AlarmInstances extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get alarmId => integer()
-      .references(
+  IntColumn get alarmId => integer().references(
         DbAlarms,
         #id,
         onDelete: KeyAction
             .cascade, // If the set is deleted, this will set alarmSetId to null
-      )
-      .nullable()();
+      )();
   IntColumn get alarmInstanceSetId => integer()
       .references(
         AlarmInstanceSets,
@@ -78,7 +75,7 @@ class AlarmDatabase extends _$AlarmDatabase {
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   // @override
   // MigrationStrategy get migration =>
