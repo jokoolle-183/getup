@@ -18,7 +18,7 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
   }
 
   @override
-  Future<List<DbAlarmDto>> getRegularAlarms() async {
+  Future<List<DbAlarmDto>> getRegularAlarms() {
     return _alarmDao.getAlarms();
   }
 
@@ -30,7 +30,7 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
       alarmId: Value(alarmId),
       time: alarmArgs.time,
     );
-    return _alarmInstancesDao.saveAlarmInstance(entry);
+    return await _alarmInstancesDao.saveAlarmInstance(entry);
   }
 
   @override

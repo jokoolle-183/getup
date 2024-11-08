@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
-import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 
 part 'alarm_instance_dao.g.dart';
 
@@ -9,7 +8,7 @@ class AlarmInstancesDao extends DatabaseAccessor<AlarmDatabase>
     with _$AlarmInstancesDaoMixin {
   AlarmInstancesDao(AlarmDatabase db) : super(db);
 
-  Future<int> saveAlarmInstance(AlarmInstancesCompanion entry) {
+  Future<int> saveAlarmInstance(AlarmInstancesCompanion entry) async {
     return into(alarmInstances).insertOnConflictUpdate(entry);
   }
 

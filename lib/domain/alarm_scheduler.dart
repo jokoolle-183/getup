@@ -11,7 +11,8 @@ class AlarmScheduler {
 
   Future<DateTime?> scheduleRegularAlarm(CalculationArgs args) async {
     final alarmDate = _calculateDateTime(args);
-    final scheduleSuccess = _scheduleAlarm(alarmDate);
+    final scheduleSuccess = await _scheduleAlarm(alarmDate, args.daysOfWeek);
+    print("Scheduled: $scheduleSuccess");
     return Future.value(alarmDate);
   }
 
@@ -36,12 +37,16 @@ class AlarmScheduler {
     return Future.value(false);
   }
 
-  Future<bool> _scheduleAlarm(DateTime? alarmDate) async {
+  Future<bool> _scheduleAlarm(
+    DateTime? alarmDate,
+    List<Weekday> daysOfWeek,
+  ) async {
     if (alarmDate != null) {
       final alarmArgs = AlarmArgs(
         time: alarmDate,
         audioPath: 'assets/perfect_alarm.mp3',
         enabled: true,
+        daysOfWeek: daysOfWeek,
       );
 
       final alarmId = await _regularAlarmRepository.saveAlarm(alarmArgs);
@@ -92,16 +97,29 @@ class AlarmScheduler {
       // If weekdays are not empty, schedule alarm for the correct day
       if (args.daysOfWeek.isNotEmpty) {
         final int today = Weekday.today(now.weekday).position;
-        final nextDay = _getNextScheduledDay(today, args.daysOfWeek);
 
-        // Calculate the difference in days to the next scheduled day
-        int daysToAdd = (nextDay - today + 7) % 7;
-        if (daysToAdd == 0 && selectedDateTime.hour <= now.hour) {
-          daysToAdd = 7;
+        // Check if today is included in the scheduled days
+        final isTodayScheduled =
+            args.daysOfWeek.any((day) => day.position == today);
+
+        // Check if the selected time is later today
+        final isTimeInFuture = selectedDateTime.hour > now.hour ||
+            (selectedDateTime.hour == now.hour &&
+                selectedDateTime.minute > now.minute);
+
+        if (isTodayScheduled && isTimeInFuture) {
+          // If today is a scheduled day and the time is in the future, set for today
+          return selectedDateTime;
+        } else {
+          // Otherwise, find the next scheduled day
+          final nextDay = _getNextScheduledDay(today, args.daysOfWeek);
+
+          // Calculate the difference in days to the next scheduled day
+          int daysToAdd = (nextDay - today + 7) % 7;
+
+          // Set the selected date to the calculated next day
+          selectedDateTime = selectedDateTime.add(Duration(days: daysToAdd));
         }
-
-        selectedDateTime =
-            selectedDateTime.copyWith(day: selectedDateTime.day + daysToAdd);
       } else {
         // No day selected, schdule alarm for today or tomorrow
         // If the selected hour is less than current hour, calculate tomorrow

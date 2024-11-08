@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
+import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
@@ -11,7 +12,7 @@ class DbAlarmDto extends Equatable {
   final String? name;
   final String audioPath;
   final int? snoozeDuration;
-  final List<Weekday>? daysOfWeek;
+  final EqualList<Weekday>? daysOfWeek;
   final bool isEnabled;
   final AlarmInstanceDto alarmInstance;
 

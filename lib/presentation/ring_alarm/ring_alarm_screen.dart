@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,21 +38,24 @@ class RingAlarmScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      if (state.completed)
-                        RawMaterialButton(
-                          onPressed: () async {
-                            context
-                                .read<RingAlarmCubit>()
-                                .scheduleNextAlarm(alarmSettings)
-                                .then((scheduleSuccess) {
+                      // if (state.completed)
+                      RawMaterialButton(
+                        onPressed: () async {
+                          context
+                              .read<RingAlarmCubit>()
+                              .scheduleNextAlarm(alarmSettings)
+                              .then((scheduleSuccess) async {
+                            await Alarm.stop(alarmSettings.id);
+                            if (context.mounted) {
                               Navigator.of(context).pop();
-                            });
-                          },
-                          child: Text(
-                            'Stop',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
+                            }
+                          });
+                        },
+                        child: Text(
+                          'Stop',
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
+                      ),
                     ],
                   ),
                 ],
