@@ -368,15 +368,17 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _alarmIdMeta =
-      const VerificationMeta('alarmId');
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<int> alarmId = GeneratedColumn<int>(
-      'alarm_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES db_alarms (id) ON DELETE CASCADE'));
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _audioPathMeta =
+      const VerificationMeta('audioPath');
+  @override
+  late final GeneratedColumn<String> audioPath = GeneratedColumn<String>(
+      'audio_path', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _startTimeMeta =
       const VerificationMeta('startTime');
   @override
@@ -389,6 +391,14 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
   late final GeneratedColumn<DateTime> endTime = GeneratedColumn<DateTime>(
       'end_time', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _daysOfWeekMeta =
+      const VerificationMeta('daysOfWeek');
+  @override
+  late final GeneratedColumnWithTypeConverter<EqualList<Weekday>?, String>
+      daysOfWeek = GeneratedColumn<String>('days_of_week', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<EqualList<Weekday>?>(
+              $AlarmInstanceSetsTable.$converterdaysOfWeekn);
   static const VerificationMeta _intervalBetweenAlarmsMeta =
       const VerificationMeta('intervalBetweenAlarms');
   @override
@@ -414,9 +424,11 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
   @override
   List<GeneratedColumn> get $columns => [
         id,
-        alarmId,
+        name,
+        audioPath,
         startTime,
         endTime,
+        daysOfWeek,
         intervalBetweenAlarms,
         pauseDuration,
         isEnabled
@@ -434,11 +446,15 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('alarm_id')) {
-      context.handle(_alarmIdMeta,
-          alarmId.isAcceptableOrUnknown(data['alarm_id']!, _alarmIdMeta));
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
+    if (data.containsKey('audio_path')) {
+      context.handle(_audioPathMeta,
+          audioPath.isAcceptableOrUnknown(data['audio_path']!, _audioPathMeta));
     } else if (isInserting) {
-      context.missing(_alarmIdMeta);
+      context.missing(_audioPathMeta);
     }
     if (data.containsKey('start_time')) {
       context.handle(_startTimeMeta,
@@ -452,6 +468,7 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
     } else if (isInserting) {
       context.missing(_endTimeMeta);
     }
+    context.handle(_daysOfWeekMeta, const VerificationResult.success());
     if (data.containsKey('interval_between_alarms')) {
       context.handle(
           _intervalBetweenAlarmsMeta,
@@ -481,12 +498,17 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
     return AlarmInstanceSet(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      alarmId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}alarm_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name']),
+      audioPath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}audio_path'])!,
       startTime: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}start_time'])!,
       endTime: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}end_time'])!,
+      daysOfWeek: $AlarmInstanceSetsTable.$converterdaysOfWeekn.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}days_of_week'])),
       intervalBetweenAlarms: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}interval_between_alarms'])!,
       pauseDuration: attachedDatabase.typeMapping
@@ -500,22 +522,31 @@ class $AlarmInstanceSetsTable extends AlarmInstanceSets
   $AlarmInstanceSetsTable createAlias(String alias) {
     return $AlarmInstanceSetsTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<EqualList<Weekday>, String> $converterdaysOfWeek =
+      EnumListConverter(EqualList(Weekday.values));
+  static TypeConverter<EqualList<Weekday>?, String?> $converterdaysOfWeekn =
+      NullAwareTypeConverter.wrap($converterdaysOfWeek);
 }
 
 class AlarmInstanceSet extends DataClass
     implements Insertable<AlarmInstanceSet> {
   final int id;
-  final int alarmId;
+  final String? name;
+  final String audioPath;
   final DateTime startTime;
   final DateTime endTime;
+  final EqualList<Weekday>? daysOfWeek;
   final int intervalBetweenAlarms;
   final int? pauseDuration;
   final bool isEnabled;
   const AlarmInstanceSet(
       {required this.id,
-      required this.alarmId,
+      this.name,
+      required this.audioPath,
       required this.startTime,
       required this.endTime,
+      this.daysOfWeek,
       required this.intervalBetweenAlarms,
       this.pauseDuration,
       required this.isEnabled});
@@ -523,9 +554,16 @@ class AlarmInstanceSet extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['alarm_id'] = Variable<int>(alarmId);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    map['audio_path'] = Variable<String>(audioPath);
     map['start_time'] = Variable<DateTime>(startTime);
     map['end_time'] = Variable<DateTime>(endTime);
+    if (!nullToAbsent || daysOfWeek != null) {
+      map['days_of_week'] = Variable<String>(
+          $AlarmInstanceSetsTable.$converterdaysOfWeekn.toSql(daysOfWeek));
+    }
     map['interval_between_alarms'] = Variable<int>(intervalBetweenAlarms);
     if (!nullToAbsent || pauseDuration != null) {
       map['pause_duration'] = Variable<int>(pauseDuration);
@@ -537,9 +575,13 @@ class AlarmInstanceSet extends DataClass
   AlarmInstanceSetsCompanion toCompanion(bool nullToAbsent) {
     return AlarmInstanceSetsCompanion(
       id: Value(id),
-      alarmId: Value(alarmId),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      audioPath: Value(audioPath),
       startTime: Value(startTime),
       endTime: Value(endTime),
+      daysOfWeek: daysOfWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(daysOfWeek),
       intervalBetweenAlarms: Value(intervalBetweenAlarms),
       pauseDuration: pauseDuration == null && nullToAbsent
           ? const Value.absent()
@@ -553,9 +595,11 @@ class AlarmInstanceSet extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AlarmInstanceSet(
       id: serializer.fromJson<int>(json['id']),
-      alarmId: serializer.fromJson<int>(json['alarmId']),
+      name: serializer.fromJson<String?>(json['name']),
+      audioPath: serializer.fromJson<String>(json['audioPath']),
       startTime: serializer.fromJson<DateTime>(json['startTime']),
       endTime: serializer.fromJson<DateTime>(json['endTime']),
+      daysOfWeek: serializer.fromJson<EqualList<Weekday>?>(json['daysOfWeek']),
       intervalBetweenAlarms:
           serializer.fromJson<int>(json['intervalBetweenAlarms']),
       pauseDuration: serializer.fromJson<int?>(json['pauseDuration']),
@@ -567,9 +611,11 @@ class AlarmInstanceSet extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'alarmId': serializer.toJson<int>(alarmId),
+      'name': serializer.toJson<String?>(name),
+      'audioPath': serializer.toJson<String>(audioPath),
       'startTime': serializer.toJson<DateTime>(startTime),
       'endTime': serializer.toJson<DateTime>(endTime),
+      'daysOfWeek': serializer.toJson<EqualList<Weekday>?>(daysOfWeek),
       'intervalBetweenAlarms': serializer.toJson<int>(intervalBetweenAlarms),
       'pauseDuration': serializer.toJson<int?>(pauseDuration),
       'isEnabled': serializer.toJson<bool>(isEnabled),
@@ -578,17 +624,21 @@ class AlarmInstanceSet extends DataClass
 
   AlarmInstanceSet copyWith(
           {int? id,
-          int? alarmId,
+          Value<String?> name = const Value.absent(),
+          String? audioPath,
           DateTime? startTime,
           DateTime? endTime,
+          Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
           int? intervalBetweenAlarms,
           Value<int?> pauseDuration = const Value.absent(),
           bool? isEnabled}) =>
       AlarmInstanceSet(
         id: id ?? this.id,
-        alarmId: alarmId ?? this.alarmId,
+        name: name.present ? name.value : this.name,
+        audioPath: audioPath ?? this.audioPath,
         startTime: startTime ?? this.startTime,
         endTime: endTime ?? this.endTime,
+        daysOfWeek: daysOfWeek.present ? daysOfWeek.value : this.daysOfWeek,
         intervalBetweenAlarms:
             intervalBetweenAlarms ?? this.intervalBetweenAlarms,
         pauseDuration:
@@ -598,9 +648,12 @@ class AlarmInstanceSet extends DataClass
   AlarmInstanceSet copyWithCompanion(AlarmInstanceSetsCompanion data) {
     return AlarmInstanceSet(
       id: data.id.present ? data.id.value : this.id,
-      alarmId: data.alarmId.present ? data.alarmId.value : this.alarmId,
+      name: data.name.present ? data.name.value : this.name,
+      audioPath: data.audioPath.present ? data.audioPath.value : this.audioPath,
       startTime: data.startTime.present ? data.startTime.value : this.startTime,
       endTime: data.endTime.present ? data.endTime.value : this.endTime,
+      daysOfWeek:
+          data.daysOfWeek.present ? data.daysOfWeek.value : this.daysOfWeek,
       intervalBetweenAlarms: data.intervalBetweenAlarms.present
           ? data.intervalBetweenAlarms.value
           : this.intervalBetweenAlarms,
@@ -615,9 +668,11 @@ class AlarmInstanceSet extends DataClass
   String toString() {
     return (StringBuffer('AlarmInstanceSet(')
           ..write('id: $id, ')
-          ..write('alarmId: $alarmId, ')
+          ..write('name: $name, ')
+          ..write('audioPath: $audioPath, ')
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
+          ..write('daysOfWeek: $daysOfWeek, ')
           ..write('intervalBetweenAlarms: $intervalBetweenAlarms, ')
           ..write('pauseDuration: $pauseDuration, ')
           ..write('isEnabled: $isEnabled')
@@ -626,16 +681,18 @@ class AlarmInstanceSet extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(id, alarmId, startTime, endTime,
-      intervalBetweenAlarms, pauseDuration, isEnabled);
+  int get hashCode => Object.hash(id, name, audioPath, startTime, endTime,
+      daysOfWeek, intervalBetweenAlarms, pauseDuration, isEnabled);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is AlarmInstanceSet &&
           other.id == this.id &&
-          other.alarmId == this.alarmId &&
+          other.name == this.name &&
+          other.audioPath == this.audioPath &&
           other.startTime == this.startTime &&
           other.endTime == this.endTime &&
+          other.daysOfWeek == this.daysOfWeek &&
           other.intervalBetweenAlarms == this.intervalBetweenAlarms &&
           other.pauseDuration == this.pauseDuration &&
           other.isEnabled == this.isEnabled);
@@ -643,47 +700,57 @@ class AlarmInstanceSet extends DataClass
 
 class AlarmInstanceSetsCompanion extends UpdateCompanion<AlarmInstanceSet> {
   final Value<int> id;
-  final Value<int> alarmId;
+  final Value<String?> name;
+  final Value<String> audioPath;
   final Value<DateTime> startTime;
   final Value<DateTime> endTime;
+  final Value<EqualList<Weekday>?> daysOfWeek;
   final Value<int> intervalBetweenAlarms;
   final Value<int?> pauseDuration;
   final Value<bool> isEnabled;
   const AlarmInstanceSetsCompanion({
     this.id = const Value.absent(),
-    this.alarmId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.audioPath = const Value.absent(),
     this.startTime = const Value.absent(),
     this.endTime = const Value.absent(),
+    this.daysOfWeek = const Value.absent(),
     this.intervalBetweenAlarms = const Value.absent(),
     this.pauseDuration = const Value.absent(),
     this.isEnabled = const Value.absent(),
   });
   AlarmInstanceSetsCompanion.insert({
     this.id = const Value.absent(),
-    required int alarmId,
+    this.name = const Value.absent(),
+    required String audioPath,
     required DateTime startTime,
     required DateTime endTime,
+    this.daysOfWeek = const Value.absent(),
     required int intervalBetweenAlarms,
     this.pauseDuration = const Value.absent(),
     this.isEnabled = const Value.absent(),
-  })  : alarmId = Value(alarmId),
+  })  : audioPath = Value(audioPath),
         startTime = Value(startTime),
         endTime = Value(endTime),
         intervalBetweenAlarms = Value(intervalBetweenAlarms);
   static Insertable<AlarmInstanceSet> custom({
     Expression<int>? id,
-    Expression<int>? alarmId,
+    Expression<String>? name,
+    Expression<String>? audioPath,
     Expression<DateTime>? startTime,
     Expression<DateTime>? endTime,
+    Expression<String>? daysOfWeek,
     Expression<int>? intervalBetweenAlarms,
     Expression<int>? pauseDuration,
     Expression<bool>? isEnabled,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (alarmId != null) 'alarm_id': alarmId,
+      if (name != null) 'name': name,
+      if (audioPath != null) 'audio_path': audioPath,
       if (startTime != null) 'start_time': startTime,
       if (endTime != null) 'end_time': endTime,
+      if (daysOfWeek != null) 'days_of_week': daysOfWeek,
       if (intervalBetweenAlarms != null)
         'interval_between_alarms': intervalBetweenAlarms,
       if (pauseDuration != null) 'pause_duration': pauseDuration,
@@ -693,17 +760,21 @@ class AlarmInstanceSetsCompanion extends UpdateCompanion<AlarmInstanceSet> {
 
   AlarmInstanceSetsCompanion copyWith(
       {Value<int>? id,
-      Value<int>? alarmId,
+      Value<String?>? name,
+      Value<String>? audioPath,
       Value<DateTime>? startTime,
       Value<DateTime>? endTime,
+      Value<EqualList<Weekday>?>? daysOfWeek,
       Value<int>? intervalBetweenAlarms,
       Value<int?>? pauseDuration,
       Value<bool>? isEnabled}) {
     return AlarmInstanceSetsCompanion(
       id: id ?? this.id,
-      alarmId: alarmId ?? this.alarmId,
+      name: name ?? this.name,
+      audioPath: audioPath ?? this.audioPath,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
+      daysOfWeek: daysOfWeek ?? this.daysOfWeek,
       intervalBetweenAlarms:
           intervalBetweenAlarms ?? this.intervalBetweenAlarms,
       pauseDuration: pauseDuration ?? this.pauseDuration,
@@ -717,14 +788,22 @@ class AlarmInstanceSetsCompanion extends UpdateCompanion<AlarmInstanceSet> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (alarmId.present) {
-      map['alarm_id'] = Variable<int>(alarmId.value);
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (audioPath.present) {
+      map['audio_path'] = Variable<String>(audioPath.value);
     }
     if (startTime.present) {
       map['start_time'] = Variable<DateTime>(startTime.value);
     }
     if (endTime.present) {
       map['end_time'] = Variable<DateTime>(endTime.value);
+    }
+    if (daysOfWeek.present) {
+      map['days_of_week'] = Variable<String>($AlarmInstanceSetsTable
+          .$converterdaysOfWeekn
+          .toSql(daysOfWeek.value));
     }
     if (intervalBetweenAlarms.present) {
       map['interval_between_alarms'] =
@@ -743,9 +822,11 @@ class AlarmInstanceSetsCompanion extends UpdateCompanion<AlarmInstanceSet> {
   String toString() {
     return (StringBuffer('AlarmInstanceSetsCompanion(')
           ..write('id: $id, ')
-          ..write('alarmId: $alarmId, ')
+          ..write('name: $name, ')
+          ..write('audioPath: $audioPath, ')
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
+          ..write('daysOfWeek: $daysOfWeek, ')
           ..write('intervalBetweenAlarms: $intervalBetweenAlarms, ')
           ..write('pauseDuration: $pauseDuration, ')
           ..write('isEnabled: $isEnabled')
@@ -773,9 +854,9 @@ class $AlarmInstancesTable extends AlarmInstances
       const VerificationMeta('alarmId');
   @override
   late final GeneratedColumn<int> alarmId = GeneratedColumn<int>(
-      'alarm_id', aliasedName, false,
+      'alarm_id', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES db_alarms (id) ON DELETE CASCADE'));
   static const VerificationMeta _alarmInstanceSetIdMeta =
@@ -821,8 +902,6 @@ class $AlarmInstancesTable extends AlarmInstances
     if (data.containsKey('alarm_id')) {
       context.handle(_alarmIdMeta,
           alarmId.isAcceptableOrUnknown(data['alarm_id']!, _alarmIdMeta));
-    } else if (isInserting) {
-      context.missing(_alarmIdMeta);
     }
     if (data.containsKey('alarm_instance_set_id')) {
       context.handle(
@@ -852,7 +931,7 @@ class $AlarmInstancesTable extends AlarmInstances
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       alarmId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}alarm_id'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}alarm_id']),
       alarmInstanceSetId: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}alarm_instance_set_id']),
       time: attachedDatabase.typeMapping
@@ -870,13 +949,13 @@ class $AlarmInstancesTable extends AlarmInstances
 
 class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
   final int id;
-  final int alarmId;
+  final int? alarmId;
   final int? alarmInstanceSetId;
   final DateTime time;
   final bool isEnabled;
   const AlarmInstance(
       {required this.id,
-      required this.alarmId,
+      this.alarmId,
       this.alarmInstanceSetId,
       required this.time,
       required this.isEnabled});
@@ -884,7 +963,9 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['alarm_id'] = Variable<int>(alarmId);
+    if (!nullToAbsent || alarmId != null) {
+      map['alarm_id'] = Variable<int>(alarmId);
+    }
     if (!nullToAbsent || alarmInstanceSetId != null) {
       map['alarm_instance_set_id'] = Variable<int>(alarmInstanceSetId);
     }
@@ -896,7 +977,9 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
   AlarmInstancesCompanion toCompanion(bool nullToAbsent) {
     return AlarmInstancesCompanion(
       id: Value(id),
-      alarmId: Value(alarmId),
+      alarmId: alarmId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(alarmId),
       alarmInstanceSetId: alarmInstanceSetId == null && nullToAbsent
           ? const Value.absent()
           : Value(alarmInstanceSetId),
@@ -910,7 +993,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AlarmInstance(
       id: serializer.fromJson<int>(json['id']),
-      alarmId: serializer.fromJson<int>(json['alarmId']),
+      alarmId: serializer.fromJson<int?>(json['alarmId']),
       alarmInstanceSetId: serializer.fromJson<int?>(json['alarmInstanceSetId']),
       time: serializer.fromJson<DateTime>(json['time']),
       isEnabled: serializer.fromJson<bool>(json['isEnabled']),
@@ -921,7 +1004,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'alarmId': serializer.toJson<int>(alarmId),
+      'alarmId': serializer.toJson<int?>(alarmId),
       'alarmInstanceSetId': serializer.toJson<int?>(alarmInstanceSetId),
       'time': serializer.toJson<DateTime>(time),
       'isEnabled': serializer.toJson<bool>(isEnabled),
@@ -930,13 +1013,13 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
 
   AlarmInstance copyWith(
           {int? id,
-          int? alarmId,
+          Value<int?> alarmId = const Value.absent(),
           Value<int?> alarmInstanceSetId = const Value.absent(),
           DateTime? time,
           bool? isEnabled}) =>
       AlarmInstance(
         id: id ?? this.id,
-        alarmId: alarmId ?? this.alarmId,
+        alarmId: alarmId.present ? alarmId.value : this.alarmId,
         alarmInstanceSetId: alarmInstanceSetId.present
             ? alarmInstanceSetId.value
             : this.alarmInstanceSetId,
@@ -983,7 +1066,7 @@ class AlarmInstance extends DataClass implements Insertable<AlarmInstance> {
 
 class AlarmInstancesCompanion extends UpdateCompanion<AlarmInstance> {
   final Value<int> id;
-  final Value<int> alarmId;
+  final Value<int?> alarmId;
   final Value<int?> alarmInstanceSetId;
   final Value<DateTime> time;
   final Value<bool> isEnabled;
@@ -996,12 +1079,11 @@ class AlarmInstancesCompanion extends UpdateCompanion<AlarmInstance> {
   });
   AlarmInstancesCompanion.insert({
     this.id = const Value.absent(),
-    required int alarmId,
+    this.alarmId = const Value.absent(),
     this.alarmInstanceSetId = const Value.absent(),
     required DateTime time,
     this.isEnabled = const Value.absent(),
-  })  : alarmId = Value(alarmId),
-        time = Value(time);
+  }) : time = Value(time);
   static Insertable<AlarmInstance> custom({
     Expression<int>? id,
     Expression<int>? alarmId,
@@ -1021,7 +1103,7 @@ class AlarmInstancesCompanion extends UpdateCompanion<AlarmInstance> {
 
   AlarmInstancesCompanion copyWith(
       {Value<int>? id,
-      Value<int>? alarmId,
+      Value<int?>? alarmId,
       Value<int?>? alarmInstanceSetId,
       Value<DateTime>? time,
       Value<bool>? isEnabled}) {
@@ -1092,13 +1174,6 @@ abstract class _$AlarmDatabase extends GeneratedDatabase {
             on: TableUpdateQuery.onTableName('db_alarms',
                 limitUpdateKind: UpdateKind.delete),
             result: [
-              TableUpdate('alarm_instance_sets', kind: UpdateKind.delete),
-            ],
-          ),
-          WritePropagation(
-            on: TableUpdateQuery.onTableName('db_alarms',
-                limitUpdateKind: UpdateKind.delete),
-            result: [
               TableUpdate('alarm_instances', kind: UpdateKind.delete),
             ],
           ),
@@ -1133,23 +1208,6 @@ typedef $$DbAlarmsTableUpdateCompanionBuilder = DbAlarmsCompanion Function({
 final class $$DbAlarmsTableReferences
     extends BaseReferences<_$AlarmDatabase, $DbAlarmsTable, DbAlarm> {
   $$DbAlarmsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$AlarmInstanceSetsTable, List<AlarmInstanceSet>>
-      _alarmInstanceSetsRefsTable(_$AlarmDatabase db) =>
-          MultiTypedResultKey.fromTable(db.alarmInstanceSets,
-              aliasName: $_aliasNameGenerator(
-                  db.dbAlarms.id, db.alarmInstanceSets.alarmId));
-
-  $$AlarmInstanceSetsTableProcessedTableManager get alarmInstanceSetsRefs {
-    final manager =
-        $$AlarmInstanceSetsTableTableManager($_db, $_db.alarmInstanceSets)
-            .filter((f) => f.alarmId.id($_item.id));
-
-    final cache =
-        $_typedResult.readTableOrNull(_alarmInstanceSetsRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
 
   static MultiTypedResultKey<$AlarmInstancesTable, List<AlarmInstance>>
       _alarmInstancesRefsTable(_$AlarmDatabase db) =>
@@ -1202,23 +1260,6 @@ class $$DbAlarmsTableFilterComposer
       column: $state.table.isEnabled,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ComposableFilter alarmInstanceSetsRefs(
-      ComposableFilter Function($$AlarmInstanceSetsTableFilterComposer f) f) {
-    final $$AlarmInstanceSetsTableFilterComposer composer =
-        $state.composerBuilder(
-            composer: this,
-            getCurrentColumn: (t) => t.id,
-            referencedTable: $state.db.alarmInstanceSets,
-            getReferencedColumn: (t) => t.alarmId,
-            builder: (joinBuilder, parentComposers) =>
-                $$AlarmInstanceSetsTableFilterComposer(ComposerState(
-                    $state.db,
-                    $state.db.alarmInstanceSets,
-                    joinBuilder,
-                    parentComposers)));
-    return f(composer);
-  }
 
   ComposableFilter alarmInstancesRefs(
       ComposableFilter Function($$AlarmInstancesTableFilterComposer f) f) {
@@ -1278,8 +1319,7 @@ class $$DbAlarmsTableTableManager extends RootTableManager<
     $$DbAlarmsTableUpdateCompanionBuilder,
     (DbAlarm, $$DbAlarmsTableReferences),
     DbAlarm,
-    PrefetchHooks Function(
-        {bool alarmInstanceSetsRefs, bool alarmInstancesRefs})> {
+    PrefetchHooks Function({bool alarmInstancesRefs})> {
   $$DbAlarmsTableTableManager(_$AlarmDatabase db, $DbAlarmsTable table)
       : super(TableManagerState(
           db: db,
@@ -1324,29 +1364,15 @@ class $$DbAlarmsTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$DbAlarmsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: (
-              {alarmInstanceSetsRefs = false, alarmInstancesRefs = false}) {
+          prefetchHooksCallback: ({alarmInstancesRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
-                if (alarmInstanceSetsRefs) db.alarmInstanceSets,
                 if (alarmInstancesRefs) db.alarmInstances
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (alarmInstanceSetsRefs)
-                    await $_getPrefetchedData(
-                        currentTable: table,
-                        referencedTable: $$DbAlarmsTableReferences
-                            ._alarmInstanceSetsRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$DbAlarmsTableReferences(db, table, p0)
-                                .alarmInstanceSetsRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.alarmId == item.id),
-                        typedResults: items),
                   if (alarmInstancesRefs)
                     await $_getPrefetchedData(
                         currentTable: table,
@@ -1376,14 +1402,15 @@ typedef $$DbAlarmsTableProcessedTableManager = ProcessedTableManager<
     $$DbAlarmsTableUpdateCompanionBuilder,
     (DbAlarm, $$DbAlarmsTableReferences),
     DbAlarm,
-    PrefetchHooks Function(
-        {bool alarmInstanceSetsRefs, bool alarmInstancesRefs})>;
+    PrefetchHooks Function({bool alarmInstancesRefs})>;
 typedef $$AlarmInstanceSetsTableCreateCompanionBuilder
     = AlarmInstanceSetsCompanion Function({
   Value<int> id,
-  required int alarmId,
+  Value<String?> name,
+  required String audioPath,
   required DateTime startTime,
   required DateTime endTime,
+  Value<EqualList<Weekday>?> daysOfWeek,
   required int intervalBetweenAlarms,
   Value<int?> pauseDuration,
   Value<bool> isEnabled,
@@ -1391,9 +1418,11 @@ typedef $$AlarmInstanceSetsTableCreateCompanionBuilder
 typedef $$AlarmInstanceSetsTableUpdateCompanionBuilder
     = AlarmInstanceSetsCompanion Function({
   Value<int> id,
-  Value<int> alarmId,
+  Value<String?> name,
+  Value<String> audioPath,
   Value<DateTime> startTime,
   Value<DateTime> endTime,
+  Value<EqualList<Weekday>?> daysOfWeek,
   Value<int> intervalBetweenAlarms,
   Value<int?> pauseDuration,
   Value<bool> isEnabled,
@@ -1403,20 +1432,6 @@ final class $$AlarmInstanceSetsTableReferences extends BaseReferences<
     _$AlarmDatabase, $AlarmInstanceSetsTable, AlarmInstanceSet> {
   $$AlarmInstanceSetsTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
-
-  static $DbAlarmsTable _alarmIdTable(_$AlarmDatabase db) =>
-      db.dbAlarms.createAlias(
-          $_aliasNameGenerator(db.alarmInstanceSets.alarmId, db.dbAlarms.id));
-
-  $$DbAlarmsTableProcessedTableManager? get alarmId {
-    if ($_item.alarmId == null) return null;
-    final manager = $$DbAlarmsTableTableManager($_db, $_db.dbAlarms)
-        .filter((f) => f.id($_item.alarmId!));
-    final item = $_typedResult.readTableOrNull(_alarmIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
 
   static MultiTypedResultKey<$AlarmInstancesTable, List<AlarmInstance>>
       _alarmInstancesRefsTable(_$AlarmDatabase db) =>
@@ -1442,6 +1457,16 @@ class $$AlarmInstanceSetsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get audioPath => $state.composableBuilder(
+      column: $state.table.audioPath,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<DateTime> get startTime => $state.composableBuilder(
       column: $state.table.startTime,
       builder: (column, joinBuilders) =>
@@ -1451,6 +1476,14 @@ class $$AlarmInstanceSetsTableFilterComposer
       column: $state.table.endTime,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<EqualList<Weekday>?, EqualList<Weekday>,
+          String>
+      get daysOfWeek => $state.composableBuilder(
+          column: $state.table.daysOfWeek,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
 
   ColumnFilters<int> get intervalBetweenAlarms => $state.composableBuilder(
       column: $state.table.intervalBetweenAlarms,
@@ -1466,18 +1499,6 @@ class $$AlarmInstanceSetsTableFilterComposer
       column: $state.table.isEnabled,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
-
-  $$DbAlarmsTableFilterComposer get alarmId {
-    final $$DbAlarmsTableFilterComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.alarmId,
-        referencedTable: $state.db.dbAlarms,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) =>
-            $$DbAlarmsTableFilterComposer(ComposerState(
-                $state.db, $state.db.dbAlarms, joinBuilder, parentComposers)));
-    return composer;
-  }
 
   ComposableFilter alarmInstancesRefs(
       ComposableFilter Function($$AlarmInstancesTableFilterComposer f) f) {
@@ -1501,6 +1522,16 @@ class $$AlarmInstanceSetsTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get audioPath => $state.composableBuilder(
+      column: $state.table.audioPath,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   ColumnOrderings<DateTime> get startTime => $state.composableBuilder(
       column: $state.table.startTime,
       builder: (column, joinBuilders) =>
@@ -1508,6 +1539,11 @@ class $$AlarmInstanceSetsTableOrderingComposer
 
   ColumnOrderings<DateTime> get endTime => $state.composableBuilder(
       column: $state.table.endTime,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get daysOfWeek => $state.composableBuilder(
+      column: $state.table.daysOfWeek,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -1525,18 +1561,6 @@ class $$AlarmInstanceSetsTableOrderingComposer
       column: $state.table.isEnabled,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  $$DbAlarmsTableOrderingComposer get alarmId {
-    final $$DbAlarmsTableOrderingComposer composer = $state.composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.alarmId,
-        referencedTable: $state.db.dbAlarms,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) =>
-            $$DbAlarmsTableOrderingComposer(ComposerState(
-                $state.db, $state.db.dbAlarms, joinBuilder, parentComposers)));
-    return composer;
-  }
 }
 
 class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
@@ -1549,7 +1573,7 @@ class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
     $$AlarmInstanceSetsTableUpdateCompanionBuilder,
     (AlarmInstanceSet, $$AlarmInstanceSetsTableReferences),
     AlarmInstanceSet,
-    PrefetchHooks Function({bool alarmId, bool alarmInstancesRefs})> {
+    PrefetchHooks Function({bool alarmInstancesRefs})> {
   $$AlarmInstanceSetsTableTableManager(
       _$AlarmDatabase db, $AlarmInstanceSetsTable table)
       : super(TableManagerState(
@@ -1561,36 +1585,44 @@ class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
               ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int> alarmId = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<String> audioPath = const Value.absent(),
             Value<DateTime> startTime = const Value.absent(),
             Value<DateTime> endTime = const Value.absent(),
+            Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
             Value<int> intervalBetweenAlarms = const Value.absent(),
             Value<int?> pauseDuration = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
           }) =>
               AlarmInstanceSetsCompanion(
             id: id,
-            alarmId: alarmId,
+            name: name,
+            audioPath: audioPath,
             startTime: startTime,
             endTime: endTime,
+            daysOfWeek: daysOfWeek,
             intervalBetweenAlarms: intervalBetweenAlarms,
             pauseDuration: pauseDuration,
             isEnabled: isEnabled,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required int alarmId,
+            Value<String?> name = const Value.absent(),
+            required String audioPath,
             required DateTime startTime,
             required DateTime endTime,
+            Value<EqualList<Weekday>?> daysOfWeek = const Value.absent(),
             required int intervalBetweenAlarms,
             Value<int?> pauseDuration = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
           }) =>
               AlarmInstanceSetsCompanion.insert(
             id: id,
-            alarmId: alarmId,
+            name: name,
+            audioPath: audioPath,
             startTime: startTime,
             endTime: endTime,
+            daysOfWeek: daysOfWeek,
             intervalBetweenAlarms: intervalBetweenAlarms,
             pauseDuration: pauseDuration,
             isEnabled: isEnabled,
@@ -1601,38 +1633,13 @@ class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
                     $$AlarmInstanceSetsTableReferences(db, table, e)
                   ))
               .toList(),
-          prefetchHooksCallback: (
-              {alarmId = false, alarmInstancesRefs = false}) {
+          prefetchHooksCallback: ({alarmInstancesRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (alarmInstancesRefs) db.alarmInstances
               ],
-              addJoins: <
-                  T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic>>(state) {
-                if (alarmId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.alarmId,
-                    referencedTable:
-                        $$AlarmInstanceSetsTableReferences._alarmIdTable(db),
-                    referencedColumn:
-                        $$AlarmInstanceSetsTableReferences._alarmIdTable(db).id,
-                  ) as T;
-                }
-
-                return state;
-              },
+              addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (alarmInstancesRefs)
@@ -1664,11 +1671,11 @@ typedef $$AlarmInstanceSetsTableProcessedTableManager = ProcessedTableManager<
     $$AlarmInstanceSetsTableUpdateCompanionBuilder,
     (AlarmInstanceSet, $$AlarmInstanceSetsTableReferences),
     AlarmInstanceSet,
-    PrefetchHooks Function({bool alarmId, bool alarmInstancesRefs})>;
+    PrefetchHooks Function({bool alarmInstancesRefs})>;
 typedef $$AlarmInstancesTableCreateCompanionBuilder = AlarmInstancesCompanion
     Function({
   Value<int> id,
-  required int alarmId,
+  Value<int?> alarmId,
   Value<int?> alarmInstanceSetId,
   required DateTime time,
   Value<bool> isEnabled,
@@ -1676,7 +1683,7 @@ typedef $$AlarmInstancesTableCreateCompanionBuilder = AlarmInstancesCompanion
 typedef $$AlarmInstancesTableUpdateCompanionBuilder = AlarmInstancesCompanion
     Function({
   Value<int> id,
-  Value<int> alarmId,
+  Value<int?> alarmId,
   Value<int?> alarmInstanceSetId,
   Value<DateTime> time,
   Value<bool> isEnabled,
@@ -1833,7 +1840,7 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
               $$AlarmInstancesTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int> alarmId = const Value.absent(),
+            Value<int?> alarmId = const Value.absent(),
             Value<int?> alarmInstanceSetId = const Value.absent(),
             Value<DateTime> time = const Value.absent(),
             Value<bool> isEnabled = const Value.absent(),
@@ -1847,7 +1854,7 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required int alarmId,
+            Value<int?> alarmId = const Value.absent(),
             Value<int?> alarmInstanceSetId = const Value.absent(),
             required DateTime time,
             Value<bool> isEnabled = const Value.absent(),

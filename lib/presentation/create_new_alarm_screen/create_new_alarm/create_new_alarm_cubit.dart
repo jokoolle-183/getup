@@ -46,11 +46,12 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
 
   Future<void> scheduleAlarm() async {
     if (state.type == AlarmType.regular) {
+      final selectedDateTime = convertStringToDate(state.selectedTime.left);
       final args = CalculationArgs(
-        selectedTime: state.selectedTime.left,
+        selectedTime: selectedDateTime,
         daysOfWeek: state.daysOfWeek,
       );
-      final selectedDateTime = await alarmScheduler.scheduleRegularAlarm(args);
+      await alarmScheduler.scheduleRegularAlarm(args);
 
       print('Alarm date: $selectedDateTime');
     } else {}

@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
 import 'package:walk_it_up/data/model/alarm_mapper.dart';
@@ -26,7 +27,7 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
     final alarmId =
         await _alarmDao.saveAlarm(AlarmMapper.mapArgsToCompanion(alarmArgs));
     final entry = AlarmInstancesCompanion.insert(
-      alarmId: alarmId,
+      alarmId: Value(alarmId),
       time: alarmArgs.time,
     );
     return _alarmInstancesDao.saveAlarmInstance(entry);
@@ -40,5 +41,18 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
   @override
   Future<DbAlarmDto?> getAlarmById(int id) {
     return _alarmDao.getAlarmById(id);
+  }
+
+  @override
+  Future<DbAlarmDto?> getAlarmByInstanceId(int instanceId) {
+    return _alarmDao.getAlarmByInstanceId(instanceId);
+  }
+
+  @override
+  Future<int> updateAlarmInstance(int alarmId, int instanceId, DateTime time) {
+    return _alarmInstancesDao.registerAlarmInstance(
+      instanceId,
+      AlarmInstancesCompanion.insert(alarmId: Value(alarmId), time: time),
+    );
   }
 }

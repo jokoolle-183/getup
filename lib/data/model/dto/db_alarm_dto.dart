@@ -14,7 +14,6 @@ class DbAlarmDto extends Equatable {
   final List<Weekday>? daysOfWeek;
   final bool isEnabled;
   final AlarmInstanceDto alarmInstance;
-  final AlarmInstanceSetDto? alarmInstanceSet;
 
   const DbAlarmDto._({
     required this.id,
@@ -23,7 +22,6 @@ class DbAlarmDto extends Equatable {
     required this.audioPath,
     required this.isEnabled,
     required this.alarmInstance,
-    this.alarmInstanceSet,
     this.name,
   });
 
@@ -40,7 +38,6 @@ class DbAlarmDto extends Equatable {
         daysOfWeek: tryCast(alarm.daysOfWeek),
         isEnabled: alarm.isEnabled,
         alarmInstance: alarmInstanceDto,
-        alarmInstanceSet: alarmInstanceSetDto,
       );
 
   @override
@@ -51,6 +48,7 @@ class DbAlarmDto extends Equatable {
         snoozeDuration,
         daysOfWeek,
         isEnabled,
+        alarmInstance,
       ];
 }
 

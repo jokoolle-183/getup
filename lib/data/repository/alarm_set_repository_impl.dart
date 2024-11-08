@@ -1,4 +1,5 @@
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
+import 'package:walk_it_up/data/model/alarm_mapper.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
@@ -18,23 +19,20 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
     AlarmInstanceSetDto alarmSet,
     List<AlarmInstanceDto> recurringAlarms,
   ) {
-    // final alarmSetCompanion =
-    //     AlarmMapper.mapAlarmInstanceSetToCompanion(alarmId, alarmSet);
-    // final recurringAlarmCompanions = recurringAlarms
-    //     .map(
-    //       (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
-    //         alarmId: null,
-    //         alarmInstanceSetId: ,
-    //         recurringAlarm: alarm,
-    //       ),
-    //     )
-    //     .toList();
+    final alarmSetCompanion =
+        AlarmMapper.mapAlarmInstanceSetToCompanion(alarmSet);
+    final recurringAlarmCompanions = recurringAlarms
+        .map(
+          (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
+            recurringAlarm: alarm,
+          ),
+        )
+        .toList();
 
-    // return _alarmSetDao.saveAlarmSet(
-    //   alarmSetCompanion,
-    //   recurringAlarmCompanions,
-    // );
-    return Future.value();
+    return _alarmSetDao.saveAlarmSet(
+      alarmSetCompanion,
+      recurringAlarmCompanions,
+    );
   }
 
   @override
@@ -42,22 +40,20 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
     AlarmInstanceSetDto alarmSet,
     List<AlarmInstanceDto> recurringAlarms,
   ) {
-    // final alarmSetCompanion =
-    //     AlarmMapper.mapAlarmInstanceSetToCompanion(alarmSet);
-    // final recurringAlarmCompanions = recurringAlarms
-    //     .map(
-    //       (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
-    //         alarmSet.id,
-    //         alarm,
-    //       ),
-    //     )
-    //     .toList();
+    final alarmSetCompanion =
+        AlarmMapper.mapAlarmInstanceSetToCompanion(alarmSet);
+    final recurringAlarmCompanions = recurringAlarms
+        .map(
+          (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
+            recurringAlarm: alarm,
+          ),
+        )
+        .toList();
 
-    // return _alarmSetDao.updateAlarmSet(
-    //   alarmSetCompanion,
-    //   recurringAlarmCompanions,
-    // );
-    return Future.value();
+    return _alarmSetDao.updateAlarmSet(
+      alarmSetCompanion,
+      recurringAlarmCompanions,
+    );
   }
 
   @override

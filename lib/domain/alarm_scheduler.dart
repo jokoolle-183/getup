@@ -6,31 +6,43 @@ import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/domain/calculation_args.dart';
 
 class AlarmScheduler {
-  RegularAlarmRepository _regularAlarmRepository;
+  final RegularAlarmRepository _regularAlarmRepository;
   AlarmScheduler(this._regularAlarmRepository);
 
   Future<DateTime?> scheduleRegularAlarm(CalculationArgs args) async {
-    final alarmDate = calculateDateTime(args);
-    final scheduleSuccess = scheduleAlarm(alarmDate);
+    final alarmDate = _calculateDateTime(args);
+    final scheduleSuccess = _scheduleAlarm(alarmDate);
     return Future.value(alarmDate);
   }
 
-  Future<DateTime?> scheduleNextRegularAlarm(CalculationArgs args) async {
-    // It's a repeating alarm with designated weekdays
-    if (args.daysOfWeek.isNotEmpty) {
-      final nextDate = calculateDateTime(args);
-      final scheduleSuccess = scheduleAlarm(nextDate);
-      return Future.value(nextDate);
+  Future<bool> scheduleNextRegularAlarm(AlarmSettings settings) async {
+    final currentAlarm =
+        await _regularAlarmRepository.getAlarmByInstanceId(settings.id);
+
+    if (currentAlarm != null && currentAlarm.daysOfWeek?.isNotEmpty == true) {
+      final nextDate = _calculateDateTime(CalculationArgs(
+        selectedTime: settings.dateTime,
+        daysOfWeek: currentAlarm.daysOfWeek ?? [],
+      ));
+
+      final scheduleSuccess = _scheduleNextAlarm(
+        currentAlarm.id,
+        settings.id,
+        nextDate,
+      );
+
+      return Future.value(scheduleSuccess);
     }
-    return Future.value(null);
+    return Future.value(false);
   }
 
-  Future<bool> scheduleAlarm(DateTime? alarmDate) async {
+  Future<bool> _scheduleAlarm(DateTime? alarmDate) async {
     if (alarmDate != null) {
       final alarmArgs = AlarmArgs(
-          time: alarmDate,
-          audioPath: 'assets/perfect_alarm.mp3',
-          enabled: true);
+        time: alarmDate,
+        audioPath: 'assets/perfect_alarm.mp3',
+        enabled: true,
+      );
 
       final alarmId = await _regularAlarmRepository.saveAlarm(alarmArgs);
 
@@ -47,15 +59,40 @@ class AlarmScheduler {
     return Future.value(false);
   }
 
-  DateTime? calculateDateTime(CalculationArgs args) {
-    DateTime? selectedDateTime = convertStringToDate(args.selectedTime);
+  Future<bool> _scheduleNextAlarm(
+    int alarmId,
+    int instanceId,
+    DateTime? alarmDate,
+  ) async {
+    if (alarmDate != null) {
+      final id = await _regularAlarmRepository.updateAlarmInstance(
+        alarmId,
+        instanceId,
+        alarmDate,
+      );
+
+      return await Alarm.set(
+        alarmSettings: AlarmSettings(
+          id: id,
+          dateTime: alarmDate,
+          assetAudioPath: 'assets/perfect_alarm.mp3',
+          notificationTitle: 'Get up',
+          notificationBody: 'Walk it up! ',
+        ),
+      );
+    }
+    return Future.value(false);
+  }
+
+  DateTime? _calculateDateTime(CalculationArgs args) {
+    DateTime? selectedDateTime = args.selectedTime;
     final DateTime now = DateTime.now();
 
     if (selectedDateTime != null) {
       // If weekdays are not empty, schedule alarm for the correct day
       if (args.daysOfWeek.isNotEmpty) {
         final int today = Weekday.today(now.weekday).position;
-        final nextDay = getNextScheduledDay(today, args.daysOfWeek);
+        final nextDay = _getNextScheduledDay(today, args.daysOfWeek);
 
         // Calculate the difference in days to the next scheduled day
         int daysToAdd = (nextDay - today + 7) % 7;
@@ -77,7 +114,7 @@ class AlarmScheduler {
     return selectedDateTime;
   }
 
-  int getNextScheduledDay(int currentDay, List<Weekday> enabledDays) {
+  int _getNextScheduledDay(int currentDay, List<Weekday> enabledDays) {
     // Sort enabled days by their corresponding int values for easy traversal
     final tmp = List.from(enabledDays);
     final sortedEnabledDays = tmp

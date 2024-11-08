@@ -40,12 +40,12 @@ void setup() {
     () => AlarmInstanceSetDao(getIt<AlarmDatabase>()),
   );
 
-  getIt.registerLazySingleton<RegularAlarmRepository>(
-    () => RegularAlarmRepositoryImpl(
-      getIt<DbAlarmDao>(),
-      getIt<AlarmInstancesDao>(),
-    ),
-  );
+  // getIt.registerLazySingleton<RegularAlarmRepository>(
+  //   () => RegularAlarmRepositoryImpl(
+  //     getIt<DbAlarmDao>(),
+  //     getIt<AlarmInstancesDao>(),
+  //   ),
+  // );
 
   getIt.registerLazySingleton<AlarmSetRepository>(
     () => AlarmSetRepositoryImpl(getIt<AlarmInstanceSetDao>()),
@@ -114,8 +114,6 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-
-StreamSubscription<AlarmSettings>? ringStream;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

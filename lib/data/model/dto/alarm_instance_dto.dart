@@ -5,23 +5,20 @@ import 'package:walk_it_up/data/database/alarm_database.dart';
 @immutable
 class AlarmInstanceDto extends Equatable {
   final int id;
-  final int alarmId;
-  final int? alarmInstanceSetId;
+  final int parentId;
   final DateTime time;
   final bool isEnabled;
 
   const AlarmInstanceDto._({
     required this.id,
-    required this.alarmId,
+    required this.parentId,
     required this.time,
     required this.isEnabled,
-    this.alarmInstanceSetId,
   });
 
   factory AlarmInstanceDto.from(AlarmInstance alarm) => AlarmInstanceDto._(
         id: alarm.id,
-        alarmId: alarm.alarmId,
-        alarmInstanceSetId: alarm.alarmInstanceSetId,
+        parentId: alarm.alarmId ?? alarm.alarmInstanceSetId!,
         time: alarm.time,
         isEnabled: alarm.isEnabled,
       );
@@ -29,8 +26,7 @@ class AlarmInstanceDto extends Equatable {
   @override
   List<Object?> get props => [
         id,
-        alarmId,
-        alarmInstanceSetId,
+        parentId,
         time,
         isEnabled,
       ];

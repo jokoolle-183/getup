@@ -1,12 +1,10 @@
 import 'dart:convert';
 
-import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:walk_it_up/data/model/alarm_details_model.dart';
-import 'package:walk_it_up/constants.dart';
+import 'package:walk_it_up/main.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_state.dart';
 
@@ -18,7 +16,7 @@ class RingAlarmScreen extends StatelessWidget {
     final alarmSettings =
         ModalRoute.of(context)!.settings.arguments as AlarmSettings;
     return BlocProvider(
-      create: (_) => RingAlarmCubit(),
+      create: (_) => RingAlarmCubit(getIt.get()),
       child: BlocBuilder<RingAlarmCubit, RingAlarmState>(
         builder: (context, state) => PopScope(
           canPop: false,
@@ -42,36 +40,12 @@ class RingAlarmScreen extends StatelessWidget {
                       if (state.completed)
                         RawMaterialButton(
                           onPressed: () async {
-                            final SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            String? jsonString = prefs.getString(ALARMS);
-                            if (jsonString != null) {
-                              var list = decodeAlarmDetailsList(jsonString);
-                              if (list.isNotEmpty) {
-                                list.sort((a, b) =>
-                                    a.dateTime.isBefore(b.dateTime) ? 0 : 1);
-                                list.removeAt(0);
-                                var nextAlarm = list.firstOrNull;
-                                if (nextAlarm != null) {
-                                  await Alarm.set(
-                                      alarmSettings: AlarmSettings(
-                                          id: nextAlarm.id,
-                                          dateTime: nextAlarm.dateTime,
-                                          assetAudioPath:
-                                              nextAlarm.assetAudioPath,
-                                          notificationTitle:
-                                              nextAlarm.notificationTitle,
-                                          notificationBody:
-                                              nextAlarm.notificationBody));
-                                  String encodedList =
-                                      encodeAlarmDetailsList(list);
-                                  await prefs.setString(ALARMS, encodedList);
-                                }
-                              }
-                            }
-
-                            await Alarm.stop(alarmSettings.id)
-                                .then((value) => Navigator.of(context).pop());
+                            context
+                                .read<RingAlarmCubit>()
+                                .scheduleNextAlarm(alarmSettings)
+                                .then((scheduleSuccess) {
+                              Navigator.of(context).pop();
+                            });
                           },
                           child: Text(
                             'Stop',

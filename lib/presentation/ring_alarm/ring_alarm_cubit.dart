@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:walk_it_up/domain/alarm_scheduler.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_state.dart';
 
 class RingAlarmCubit extends Cubit<RingAlarmState> {
-  RingAlarmCubit() : super(RingAlarmState.initial()) {
+  RingAlarmCubit(this._alarmScheduler) : super(RingAlarmState.initial()) {
     initStreams();
   }
+
+  final AlarmScheduler _alarmScheduler;
 
   StreamSubscription<StepCount>? _stepsSubscription;
   StreamSubscription<PedestrianStatus>? _statusSubscription;
@@ -28,6 +32,10 @@ class RingAlarmCubit extends Cubit<RingAlarmState> {
         completed: stepsSinceStart >= 5,
       ),
     );
+  }
+
+  Future<bool> scheduleNextAlarm(AlarmSettings settings) async {
+    return _alarmScheduler.scheduleNextRegularAlarm(settings);
   }
 
   @override

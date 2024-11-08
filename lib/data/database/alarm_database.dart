@@ -23,14 +23,12 @@ class DbAlarms extends Table {
 @DataClassName('AlarmInstanceSet')
 class AlarmInstanceSets extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get alarmId => integer().references(
-        DbAlarms,
-        #id,
-        onDelete: KeyAction
-            .cascade, // If the set is deleted, this will set alarmSetId to null
-      )();
+  TextColumn get name => text().nullable()();
+  TextColumn get audioPath => text()();
   DateTimeColumn get startTime => dateTime()();
   DateTimeColumn get endTime => dateTime()();
+  TextColumn get daysOfWeek =>
+      text().map(EnumListConverter(EqualList(Weekday.values))).nullable()();
   IntColumn get intervalBetweenAlarms => integer()();
   IntColumn get pauseDuration => integer().nullable()();
   BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
@@ -39,12 +37,14 @@ class AlarmInstanceSets extends Table {
 @DataClassName('AlarmInstance')
 class AlarmInstances extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get alarmId => integer().references(
+  IntColumn get alarmId => integer()
+      .references(
         DbAlarms,
         #id,
         onDelete: KeyAction
             .cascade, // If the set is deleted, this will set alarmSetId to null
-      )();
+      )
+      .nullable()();
   IntColumn get alarmInstanceSetId => integer()
       .references(
         AlarmInstanceSets,
@@ -55,6 +55,11 @@ class AlarmInstances extends Table {
       .nullable()();
   DateTimeColumn get time => dateTime()();
   BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+
+  @override
+  List<String> get customConstraints => [
+        'CHECK (CASE WHEN alarmId IS NULL THEN 0 ELSE 1 END + CASE WHEN alarmInstanceSetId IS NULL THEN 0 ELSE 1 END = 1)'
+      ];
 }
 
 @DriftDatabase(
@@ -75,7 +80,7 @@ class AlarmDatabase extends _$AlarmDatabase {
   }
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 6;
 
   // @override
   // MigrationStrategy get migration =>

@@ -30,23 +30,24 @@ class AlarmMapper {
   }
 
   static AlarmInstanceSetsCompanion mapAlarmInstanceSetToCompanion(
-      int alarmId, AlarmInstanceSetDto alarmSet) {
+      AlarmInstanceSetDto alarmSet) {
     return AlarmInstanceSetsCompanion.insert(
-      alarmId: alarmId,
+      audioPath: alarmSet.audioPath,
       startTime: alarmSet.startTime,
       endTime: alarmSet.endTime,
       intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
+      daysOfWeek: Value.absentIfNull(EqualList(alarmSet.daysOfWeek ?? [])),
       pauseDuration: Value.absentIfNull(alarmSet.pauseDuration),
     );
   }
 
   static AlarmInstancesCompanion mapAlarmInstanceToCompanion({
-    required int alarmId,
+    int? alarmId,
     int? alarmInstanceSetId,
     required AlarmInstanceDto recurringAlarm,
   }) {
     return AlarmInstancesCompanion.insert(
-      alarmId: alarmId,
+      alarmId: Value(alarmId),
       alarmInstanceSetId: Value(alarmInstanceSetId),
       time: recurringAlarm.time,
       isEnabled: Value(recurringAlarm.isEnabled),

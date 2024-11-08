@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
-import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
 
 part 'db_alarms_dao.g.dart';
@@ -12,17 +11,26 @@ class DbAlarmDao extends DatabaseAccessor<AlarmDatabase>
   DbAlarmDao(AlarmDatabase db) : super(db);
 
   Future<List<DbAlarmDto>> getAlarms() {
-    final alarmQuery = select(dbAlarms).join([
-      leftOuterJoin(
-        alarmInstanceSets,
-        alarmInstanceSets.alarmId.equalsExp(dbAlarms.id),
+    final query = select(dbAlarms).join([
+      innerJoin(
+        alarmInstances,
+        alarmInstances.alarmId.equalsExp(dbAlarms.id),
       ),
     ]);
-    return constructResults(alarmQuery);
+
+    return query.get().then((results) => results.map((row) {
+          final dbAlarm = row.readTable(dbAlarms);
+          final alarmInstance = row.readTable(alarmInstances);
+
+          return DbAlarmDto.from(
+            alarm: dbAlarm,
+            alarmInstanceDto: AlarmInstanceDto.from(alarmInstance),
+          );
+        }).toList());
   }
 
   Future<int> saveAlarm(DbAlarmsCompanion entry) {
-    return into(dbAlarms).insert(entry);
+    return into(dbAlarms).insertOnConflictUpdate(entry);
   }
 
   Future<bool> updateAlarm(DbAlarmsCompanion entry) {
@@ -35,58 +43,50 @@ class DbAlarmDao extends DatabaseAccessor<AlarmDatabase>
 
   Future<DbAlarmDto?> getAlarmById(int id) async {
     final alarmQuery = select(dbAlarms).join([
-      leftOuterJoin(
-        alarmInstanceSets,
-        alarmInstanceSets.alarmId.equalsExp(dbAlarms.id),
+      innerJoin(
+        alarmInstances,
+        alarmInstances.alarmId.equalsExp(dbAlarms.id),
       ),
     ])
       ..where(dbAlarms.id.equals(id));
 
-    final alarms = await constructResults(alarmQuery);
+    final result = await alarmQuery.getSingleOrNull();
 
-    return alarms.firstOrNull;
+    if (result == null) {
+      return null; // If no result is found for the specified alarmId
+    }
+
+    final alarm = result.readTable(db.dbAlarms);
+    final instance = result.readTable(
+        db.alarmInstances); // Guaranteed to be non-null due to inner join
+
+    return DbAlarmDto.from(
+      alarm: alarm,
+      alarmInstanceDto: AlarmInstanceDto.from(instance),
+    );
   }
 
-  Future<List<DbAlarmDto>> constructResults(
-      JoinedSelectStatement<HasResultSet, dynamic> query) async {
-    return query.get().then((rows) async {
-      final List<DbAlarmDto> alarmDtos = [];
+  Future<DbAlarmDto?> getAlarmByInstanceId(int instanceId) async {
+    final alarmInstance = await (select(alarmInstances)
+          ..where((instances) => instances.id.equals(instanceId)))
+        .getSingleOrNull();
 
-      for (final row in rows) {
-        final alarm = row.readTable(dbAlarms);
-        final alarmInstanceSet = row.readTableOrNull(alarmInstanceSets);
+    if (alarmInstance == null || alarmInstance.alarmId == null) {
+      return null;
+    }
 
-        if (alarmInstanceSet != null) {
-          final allSetInstances =
-              await getAlarmInstancesBySetId(alarmInstanceSet.id);
-          final alarmInstance = allSetInstances.firstOrNull;
+    final alarm = await (select(db.dbAlarms)
+          ..where((tbl) => tbl.id.equals(alarmInstance.alarmId!)))
+        .getSingleOrNull();
 
-          if (alarmInstance != null) {
-            final alarmInstanceDtos = allSetInstances
-                .map((instance) => AlarmInstanceDto.from(instance))
-                .toList();
+    if (alarm == null) {
+      return null;
+    }
 
-            alarmDtos.add(DbAlarmDto.from(
-              alarm: alarm,
-              alarmInstanceDto: AlarmInstanceDto.from(alarmInstance),
-              alarmInstanceSetDto:
-                  AlarmInstanceSetDto.from(alarmInstanceSet, alarmInstanceDtos),
-            ));
-          }
-        } else {
-          final alarmInstance = await getAlarmInstanceByAlarmId(alarm.id);
-
-          if (alarmInstance != null) {
-            alarmDtos.add(DbAlarmDto.from(
-              alarm: alarm,
-              alarmInstanceDto: AlarmInstanceDto.from(alarmInstance),
-            ));
-          }
-        }
-      }
-
-      return alarmDtos;
-    });
+    return DbAlarmDto.from(
+      alarm: alarm,
+      alarmInstanceDto: AlarmInstanceDto.from(alarmInstance),
+    );
   }
 
   // Helper function to get the next AlarmInstance by alarmInstanceSetId
