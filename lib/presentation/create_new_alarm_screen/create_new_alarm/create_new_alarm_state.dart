@@ -14,9 +14,10 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
     required String soundPath,
     required bool isVibrate,
     required List<Weekday> daysOfWeek,
+    required int snoozeDuration,
+    required bool isSnoozeEnabled,
     int? intervalBetweenAlarms,
     String? selectedDaysText,
-    int? snoozeDuration,
     String? label,
   }) = _CreateNewAlarmState;
 
@@ -24,7 +25,9 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
     return CreateNewAlarmState(
       selectedTime: Pair(DateFormat('HH:mm').format(DateTime.now()), ''),
       type: AlarmType.regular,
-      soundPath: '',
+      soundPath: 'assets/perfect_alarm.mp3',
+      snoozeDuration: 5,
+      isSnoozeEnabled: true,
       isVibrate: false,
       daysOfWeek: [],
     );

@@ -8,6 +8,8 @@ import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_state.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/day_picker/day_picker.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/snooze_duration_dialog.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_factory.dart';
 
@@ -52,7 +54,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                     ),
                     const Gap(16),
                     InkWell(
-                      onTap: () => openDialog(
+                      onTap: () => openAlarmTypeDialog(
                         context,
                         state,
                         context.read<CreateNewAlarmCubit>().onTypeChanged,
@@ -98,11 +100,12 @@ class CreateNewAlarmScreen extends StatelessWidget {
                                 ),
                               )),
                               Text(
-                                  state.intervalBetweenAlarms?.toString() ??
-                                      'N/A',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                  )),
+                                state.intervalBetweenAlarms?.toString() ??
+                                    'N/A',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
                               const Gap(4.0),
                               const Icon(Icons.chevron_right_outlined),
                               const Gap(16.0),
@@ -110,11 +113,73 @@ class CreateNewAlarmScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    TextButton(
-                      onPressed: () async {
-                        Alarm.stopAll();
-                      },
-                      child: const Text('Stop all'),
+                    InkWell(
+                      onTap: () => {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Gap(16.0),
+                            const Expanded(
+                                child: Text(
+                              'Sound',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
+                            Text(
+                              state.soundPath.substring(
+                                state.soundPath.indexOf('/') + 1,
+                                state.soundPath.indexOf('.'),
+                              ),
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            const Gap(4.0),
+                            const Icon(Icons.chevron_right_outlined),
+                            const Gap(16.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => openSnoozeDurationDialog(
+                        context,
+                        state,
+                        context
+                            .read<CreateNewAlarmCubit>()
+                            .onSnoozeSettingsChanged,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Gap(16.0),
+                            const Expanded(
+                                child: Text(
+                              'Snooze',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
+                            Text(
+                              state.isSnoozeEnabled
+                                  ? '${state.snoozeDuration} min'
+                                  : 'Off',
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            const Gap(4.0),
+                            const Gap(4.0),
+                            const Icon(Icons.chevron_right_outlined),
+                            const Gap(16.0),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -158,7 +223,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
     );
   }
 
-  Future<void> openDialog(
+  Future<void> openAlarmTypeDialog(
     BuildContext context,
     CreateNewAlarmState state,
     void Function(AlarmType) onTypeChanged,
@@ -168,5 +233,20 @@ class CreateNewAlarmScreen extends StatelessWidget {
       builder: (context) => AlarmTypeDialog(selectedType: state.type),
     );
     onTypeChanged(type);
+  }
+
+  Future<void> openSnoozeDurationDialog(
+    BuildContext context,
+    CreateNewAlarmState state,
+    void Function(Pair<bool, int>) onSnoozeSettingsChanged,
+  ) async {
+    final Pair<bool, int> result = await showDialog(
+      context: context,
+      builder: (context) => SnoozeDurationDialog(
+        selectedDuration: state.snoozeDuration,
+        isSnoozeEnabled: state.isSnoozeEnabled,
+      ),
+    );
+    onSnoozeSettingsChanged(result);
   }
 }

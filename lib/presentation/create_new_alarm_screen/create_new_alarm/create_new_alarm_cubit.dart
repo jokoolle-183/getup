@@ -31,6 +31,13 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
     emit(state.copyWith(type: selectedType));
   }
 
+  void onSnoozeSettingsChanged(Pair<bool, int> snoozeSettings) {
+    emit(state.copyWith(
+      isSnoozeEnabled: snoozeSettings.left,
+      snoozeDuration: snoozeSettings.right,
+    ));
+  }
+
   void onDaySelected(Weekday weekday) {
     final daysOfWeek = state.daysOfWeek;
     final newList = List<Weekday>.from(daysOfWeek);
