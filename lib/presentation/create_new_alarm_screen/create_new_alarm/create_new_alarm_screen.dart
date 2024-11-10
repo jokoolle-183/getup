@@ -181,6 +181,34 @@ class CreateNewAlarmScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    InkWell(
+                      onTap: () => {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Gap(16.0),
+                            const Expanded(
+                                child: Text(
+                              'Vibration',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
+                            Switch.adaptive(
+                              value: state.isVibrate,
+                              onChanged: (value) {
+                                context
+                                    .read<CreateNewAlarmCubit>()
+                                    .onVibrateChanged(value);
+                              },
+                            ),
+                            const Gap(16.0),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

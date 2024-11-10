@@ -54,9 +54,13 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
   Future<void> scheduleAlarm() async {
     if (state.type == AlarmType.regular) {
       final selectedDateTime = convertStringToDate(state.selectedTime.left);
-      final args = CalculationArgs(
+
+      final args = AlarmConfig(
         selectedTime: selectedDateTime,
         daysOfWeek: state.daysOfWeek,
+        soundPath: state.soundPath,
+        snoozeDuration: state.snoozeDuration,
+        isVibrate: state.isVibrate,
       );
       await alarmScheduler.scheduleRegularAlarm(args);
 
@@ -85,5 +89,9 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
     );
 
     return selectedDateTime;
+  }
+
+  void onVibrateChanged(bool value) {
+    emit(state.copyWith(isVibrate: value));
   }
 }

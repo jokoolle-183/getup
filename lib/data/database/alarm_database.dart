@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:walk_it_up/constants.dart';
+import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
 import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
 import 'package:walk_it_up/data/database/type_converter/enum_list_converter.dart';
@@ -64,7 +65,7 @@ class AlarmInstances extends Table {
 
 @DriftDatabase(
   tables: [DbAlarms, AlarmInstanceSets, AlarmInstances],
-  daos: [AlarmInstanceSetDao, AlarmInstancesDao],
+  daos: [AlarmInstanceSetDao, AlarmInstancesDao, DbAlarmDao],
 )
 class AlarmDatabase extends _$AlarmDatabase {
   bool isUnderTest = false;

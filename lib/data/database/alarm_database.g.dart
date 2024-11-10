@@ -1161,6 +1161,7 @@ abstract class _$AlarmDatabase extends GeneratedDatabase {
       AlarmInstanceSetDao(this as AlarmDatabase);
   late final AlarmInstancesDao alarmInstancesDao =
       AlarmInstancesDao(this as AlarmDatabase);
+  late final DbAlarmDao dbAlarmDao = DbAlarmDao(this as AlarmDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

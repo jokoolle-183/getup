@@ -1,6 +1,7 @@
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:walk_it_up/data/model/alarm_args.dart';
+import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/domain/calculation_args.dart';
@@ -9,10 +10,13 @@ class AlarmScheduler {
   final RegularAlarmRepository _regularAlarmRepository;
   AlarmScheduler(this._regularAlarmRepository);
 
-  Future<DateTime?> scheduleRegularAlarm(CalculationArgs args) async {
-    final alarmDate = _calculateDateTime(args);
-    final scheduleSuccess = await _scheduleAlarm(alarmDate, args.daysOfWeek);
-    print("Scheduled: $scheduleSuccess");
+  Future<DateTime?> scheduleRegularAlarm(AlarmConfig config) async {
+    final alarmDate = _calculateDateTime(
+      config.daysOfWeek,
+      config.selectedTime,
+    );
+    final scheduleSuccess =
+        await _scheduleAlarm(config.copyWith(selectedTime: alarmDate));
     return Future.value(alarmDate);
   }
 
@@ -21,14 +25,13 @@ class AlarmScheduler {
         await _regularAlarmRepository.getAlarmByInstanceId(settings.id);
 
     if (currentAlarm != null && currentAlarm.daysOfWeek?.isNotEmpty == true) {
-      final nextDate = _calculateDateTime(CalculationArgs(
-        selectedTime: settings.dateTime,
-        daysOfWeek: currentAlarm.daysOfWeek ?? [],
-      ));
+      final nextDate = _calculateDateTime(
+        currentAlarm.daysOfWeek ?? [],
+        settings.dateTime,
+      );
 
       final scheduleSuccess = _scheduleNextAlarm(
-        currentAlarm.id,
-        settings.id,
+        currentAlarm,
         nextDate,
       );
 
@@ -37,16 +40,13 @@ class AlarmScheduler {
     return Future.value(false);
   }
 
-  Future<bool> _scheduleAlarm(
-    DateTime? alarmDate,
-    List<Weekday> daysOfWeek,
-  ) async {
-    if (alarmDate != null) {
+  Future<bool> _scheduleAlarm(AlarmConfig config) async {
+    if (config.selectedTime != null) {
       final alarmArgs = AlarmArgs(
-        time: alarmDate,
-        audioPath: 'assets/perfect_alarm.mp3',
+        time: config.selectedTime!,
+        audioPath: config.soundPath,
         enabled: true,
-        daysOfWeek: daysOfWeek,
+        daysOfWeek: config.daysOfWeek,
       );
 
       final alarmId = await _regularAlarmRepository.saveAlarm(alarmArgs);
@@ -54,8 +54,8 @@ class AlarmScheduler {
       return await Alarm.set(
         alarmSettings: AlarmSettings(
           id: alarmId,
-          dateTime: alarmDate,
-          assetAudioPath: 'assets/perfect_alarm.mp3',
+          dateTime: config.selectedTime!,
+          assetAudioPath: config.soundPath,
           notificationTitle: 'Get up',
           notificationBody: 'Walk it up! ',
         ),
@@ -65,14 +65,13 @@ class AlarmScheduler {
   }
 
   Future<bool> _scheduleNextAlarm(
-    int alarmId,
-    int instanceId,
+    DbAlarmDto alarm,
     DateTime? alarmDate,
   ) async {
     if (alarmDate != null) {
       final id = await _regularAlarmRepository.updateAlarmInstance(
-        alarmId,
-        instanceId,
+        alarm.id,
+        alarm.alarmInstance.id,
         alarmDate,
       );
 
@@ -80,7 +79,7 @@ class AlarmScheduler {
         alarmSettings: AlarmSettings(
           id: id,
           dateTime: alarmDate,
-          assetAudioPath: 'assets/perfect_alarm.mp3',
+          assetAudioPath: alarm.audioPath,
           notificationTitle: 'Get up',
           notificationBody: 'Walk it up! ',
         ),
@@ -89,18 +88,20 @@ class AlarmScheduler {
     return Future.value(false);
   }
 
-  DateTime? _calculateDateTime(CalculationArgs args) {
-    DateTime? selectedDateTime = args.selectedTime;
+  DateTime? _calculateDateTime(
+    List<Weekday> daysOfWeek,
+    DateTime? selectedTime,
+  ) {
+    DateTime? selectedDateTime = selectedTime;
     final DateTime now = DateTime.now();
 
     if (selectedDateTime != null) {
       // If weekdays are not empty, schedule alarm for the correct day
-      if (args.daysOfWeek.isNotEmpty) {
+      if (daysOfWeek.isNotEmpty) {
         final int today = Weekday.today(now.weekday).position;
 
         // Check if today is included in the scheduled days
-        final isTodayScheduled =
-            args.daysOfWeek.any((day) => day.position == today);
+        final isTodayScheduled = daysOfWeek.any((day) => day.position == today);
 
         // Check if the selected time is later today
         final isTimeInFuture = selectedDateTime.hour > now.hour ||
@@ -112,7 +113,7 @@ class AlarmScheduler {
           return selectedDateTime;
         } else {
           // Otherwise, find the next scheduled day
-          final nextDay = _getNextScheduledDay(today, args.daysOfWeek);
+          final nextDay = _getNextScheduledDay(today, daysOfWeek);
 
           // Calculate the difference in days to the next scheduled day
           int daysToAdd = (nextDay - today + 7) % 7;

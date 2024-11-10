@@ -1,21 +1,33 @@
 import 'package:walk_it_up/data/model/weekdays.dart';
 
-class CalculationArgs {
+class AlarmConfig {
   final DateTime? selectedTime;
   final List<Weekday> daysOfWeek;
+  final String soundPath;
+  final int snoozeDuration;
+  final bool isVibrate;
 
-  const CalculationArgs({
+  const AlarmConfig({
     required this.selectedTime,
     required this.daysOfWeek,
+    required this.isVibrate,
+    required this.snoozeDuration,
+    required this.soundPath,
   });
 
-  CalculationArgs copyWith({
+  AlarmConfig copyWith({
     DateTime? selectedTime,
     List<Weekday>? daysOfWeek,
+    String? soundPath,
+    bool? isVibrate,
+    int? snoozeDuration,
   }) {
-    return CalculationArgs(
+    return AlarmConfig(
       selectedTime: selectedTime ?? this.selectedTime,
       daysOfWeek: daysOfWeek ?? this.daysOfWeek,
+      soundPath: soundPath ?? this.soundPath,
+      isVibrate: isVibrate ?? this.isVibrate,
+      snoozeDuration: snoozeDuration ?? this.snoozeDuration,
     );
   }
 }

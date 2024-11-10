@@ -24,7 +24,7 @@ class AlarmInstancesDao extends DatabaseAccessor<AlarmDatabase>
         .go();
   }
 
-  Future<int> registerAlarmInstance(
+  Future<int> registerNewAlarmInstance(
     int instanceId,
     AlarmInstancesCompanion entry,
   ) {

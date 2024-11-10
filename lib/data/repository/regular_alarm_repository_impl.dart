@@ -50,7 +50,7 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
 
   @override
   Future<int> updateAlarmInstance(int alarmId, int instanceId, DateTime time) {
-    return _alarmInstancesDao.registerAlarmInstance(
+    return _alarmInstancesDao.registerNewAlarmInstance(
       instanceId,
       AlarmInstancesCompanion.insert(alarmId: Value(alarmId), time: time),
     );
