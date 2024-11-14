@@ -1,44 +1,44 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
+import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
+import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
+import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 
 @immutable
-class RegularAlarmDto extends Equatable {
+class DbAlarmDto extends Equatable {
   final int id;
   final String? name;
   final String audioPath;
-  final DateTime time;
   final int? snoozeDuration;
-  final List<Weekday>? daysOfWeek;
+  final EqualList<Weekday>? daysOfWeek;
+  final bool isEnabled;
+  final AlarmInstanceDto alarmInstance;
 
-  const RegularAlarmDto._({
+  const DbAlarmDto._({
     required this.id,
-    required this.time,
     required this.daysOfWeek,
     required this.snoozeDuration,
     required this.audioPath,
+    required this.isEnabled,
+    required this.alarmInstance,
     this.name,
   });
 
-  factory RegularAlarmDto.fromDbAlarm(RegularAlarm alarm) => RegularAlarmDto._(
+  factory DbAlarmDto.from({
+    required DbAlarm alarm,
+    required AlarmInstanceDto alarmInstanceDto,
+    AlarmInstanceSetDto? alarmInstanceSetDto,
+  }) =>
+      DbAlarmDto._(
         id: alarm.id,
         name: alarm.name,
         audioPath: alarm.audioPath,
-        time: alarm.time,
         snoozeDuration: alarm.snoozeDuration,
         daysOfWeek: tryCast(alarm.daysOfWeek),
-      );
-
-  factory RegularAlarmDto.fromAlarmCompanion(
-          RegularAlarmsCompanion alarmCompanion) =>
-      RegularAlarmDto._(
-        id: alarmCompanion.id.value,
-        name: alarmCompanion.name.value,
-        audioPath: alarmCompanion.audioPath.value,
-        time: alarmCompanion.time.value,
-        snoozeDuration: alarmCompanion.snoozeDuration.value,
-        daysOfWeek: tryCast(alarmCompanion.daysOfWeek.value),
+        isEnabled: alarm.isEnabled,
+        alarmInstance: alarmInstanceDto,
       );
 
   @override
@@ -46,9 +46,10 @@ class RegularAlarmDto extends Equatable {
         id,
         name,
         audioPath,
-        time,
         snoozeDuration,
         daysOfWeek,
+        isEnabled,
+        alarmInstance,
       ];
 }
 

@@ -8,14 +8,19 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get_it/get_it.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:walk_it_up/data/database/dao/alarm_set/alarm_set_dao.dart';
-import 'package:walk_it_up/data/database/dao/regular_alarm/regular_alarms_dao.dart';
+import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
+import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
+import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository_impl.dart';
+import 'package:walk_it_up/domain/alarm_scheduler.dart';
+import 'package:walk_it_up/domain/time_selection_handler.dart';
+import 'package:walk_it_up/domain/time_selection_handler_impl.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_screen.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository_impl.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_screen.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_screen.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_screen.dart';
 
@@ -23,21 +28,33 @@ final getIt = GetIt.instance;
 void setup() {
   getIt.registerSingleton<AlarmDatabase>(AlarmDatabase());
 
-  getIt.registerFactory<RegularAlarmsDao>(
-    () => RegularAlarmsDao(getIt<AlarmDatabase>()),
+  getIt.registerFactory<DbAlarmDao>(
+    () => DbAlarmDao(getIt<AlarmDatabase>()),
   );
 
-  getIt.registerFactory<AlarmSetDao>(
-    () => AlarmSetDao(getIt<AlarmDatabase>()),
+  getIt.registerFactory<AlarmInstancesDao>(
+    () => AlarmInstancesDao(getIt<AlarmDatabase>()),
+  );
+
+  getIt.registerFactory<AlarmInstanceSetDao>(
+    () => AlarmInstanceSetDao(getIt<AlarmDatabase>()),
   );
 
   getIt.registerLazySingleton<RegularAlarmRepository>(
-    () => RegularAlarmRepositoryImpl(getIt<RegularAlarmsDao>()),
+    () => RegularAlarmRepositoryImpl(
+      getIt<DbAlarmDao>(),
+      getIt<AlarmInstancesDao>(),
+    ),
   );
 
   getIt.registerLazySingleton<AlarmSetRepository>(
-    () => AlarmSetRepositoryImpl(getIt<AlarmSetDao>()),
+    () => AlarmSetRepositoryImpl(getIt<AlarmInstanceSetDao>()),
   );
+
+  getIt.registerLazySingleton<TimeSelectionHandler>(
+      () => TimeSelectionHandlerImpl());
+
+  getIt.registerFactory(() => AlarmScheduler(getIt<RegularAlarmRepository>()));
 }
 
 int _id = 0;
@@ -98,8 +115,6 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-StreamSubscription<AlarmSettings>? ringStream;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setup();
@@ -126,8 +141,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: AlarmListScreen.routeName,
       routes: {
+        AlarmListScreen.routeName: (context) => const AlarmListScreen(),
         EditAlarmScreen.routeName: (context) => const EditAlarmScreen(),
         RingAlarmScreen.routeName: (context) => const RingAlarmScreen(),
+        CreateNewAlarmScreen.route: (context) => const CreateNewAlarmScreen(),
       },
       home: const AlarmListScreen(),
     );

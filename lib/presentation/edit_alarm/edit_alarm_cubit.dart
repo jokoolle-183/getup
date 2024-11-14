@@ -11,15 +11,15 @@ import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_state.dart';
 
 class EditAlarmCubit extends Cubit<EditAlarmState> {
-  final int? alarmId;
-  final AlarmSetRepository _alarmSetRepository;
-
   EditAlarmCubit(
     this._alarmSetRepository,
     this.alarmId,
   ) : super(EditAlarmState.initial()) {
     _loadInitial(alarmId: alarmId);
   }
+
+  final int? alarmId;
+  final AlarmSetRepository _alarmSetRepository;
 
   void selectFocusDuration(FocusDuration focusDuration) {
     emit(state.copyWith(focusDuration: focusDuration));

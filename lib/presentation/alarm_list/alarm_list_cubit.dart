@@ -13,10 +13,10 @@ class AlarmListCubit extends Cubit<AlarmListState> {
     this._alarmSetRepository,
     this._regularAlarmRepository,
   ) : super(AlarmListState.initial()) {
-    _loadAlarms();
+    loadAlarms();
   }
 
-  void _loadAlarms() async {
+  void loadAlarms() async {
     final alarms = await _regularAlarmRepository.getRegularAlarms();
     final alarmSets = await _alarmSetRepository.getAlarmSets();
 
@@ -25,7 +25,7 @@ class AlarmListCubit extends Cubit<AlarmListState> {
           (alarm) => AlarmItem.regular(
             alarm.id,
             'Regular Alarm',
-            DateFormat('HH:mm').format(alarm.time),
+            DateFormat('HH:mm').format(alarm.alarmInstance.time),
           ),
         )
         .toList();
