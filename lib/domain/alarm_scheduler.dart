@@ -16,7 +16,7 @@ class AlarmScheduler {
       config.selectedTime,
     );
     final scheduleSuccess =
-        await _scheduleAlarm(config.copyWith(selectedTime: alarmDate));
+        await _scheduleNewAlarm(config.copyWith(selectedTime: alarmDate));
     return Future.value(alarmDate);
   }
 
@@ -30,7 +30,7 @@ class AlarmScheduler {
         settings.dateTime,
       );
 
-      final scheduleSuccess = _scheduleNextAlarm(
+      final scheduleSuccess = _scheduleNextAlarmInstance(
         currentAlarm,
         nextDate,
       );
@@ -40,7 +40,7 @@ class AlarmScheduler {
     return Future.value(false);
   }
 
-  Future<bool> _scheduleAlarm(AlarmConfig config) async {
+  Future<bool> _scheduleNewAlarm(AlarmConfig config) async {
     if (config.selectedTime != null) {
       final alarmArgs = AlarmArgs(
         time: config.selectedTime!,
@@ -64,7 +64,7 @@ class AlarmScheduler {
     return Future.value(false);
   }
 
-  Future<bool> _scheduleNextAlarm(
+  Future<bool> _scheduleNextAlarmInstance(
     DbAlarmDto alarm,
     DateTime? alarmDate,
   ) async {

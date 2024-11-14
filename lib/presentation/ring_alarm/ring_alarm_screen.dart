@@ -38,24 +38,24 @@ class RingAlarmScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      // if (state.completed)
-                      RawMaterialButton(
-                        onPressed: () async {
-                          context
-                              .read<RingAlarmCubit>()
-                              .scheduleNextAlarm(alarmSettings)
-                              .then((scheduleSuccess) async {
-                            await Alarm.stop(alarmSettings.id);
-                            if (context.mounted) {
-                              Navigator.of(context).pop();
-                            }
-                          });
-                        },
-                        child: Text(
-                          'Stop',
-                          style: Theme.of(context).textTheme.titleLarge,
+                      if (state.completed)
+                        RawMaterialButton(
+                          onPressed: () async {
+                            context
+                                .read<RingAlarmCubit>()
+                                .scheduleNextAlarm(alarmSettings)
+                                .then((scheduleSuccess) async {
+                              await Alarm.stop(alarmSettings.id);
+                              if (context.mounted) {
+                                Navigator.of(context).pop();
+                              }
+                            });
+                          },
+                          child: Text(
+                            'Stop',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],

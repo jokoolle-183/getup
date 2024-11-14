@@ -15,7 +15,7 @@ import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository_impl.dart';
 import 'package:walk_it_up/domain/alarm_scheduler.dart';
 import 'package:walk_it_up/domain/time_selection_handler.dart';
-import 'package:walk_it_up/domain/time_store_impl.dart';
+import 'package:walk_it_up/domain/time_selection_handler_impl.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_screen.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
