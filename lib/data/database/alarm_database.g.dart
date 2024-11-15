@@ -1227,87 +1227,135 @@ final class $$DbAlarmsTableReferences
 }
 
 class $$DbAlarmsTableFilterComposer
-    extends FilterComposer<_$AlarmDatabase, $DbAlarmsTable> {
-  $$DbAlarmsTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AlarmDatabase, $DbAlarmsTable> {
+  $$DbAlarmsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get audioPath => $state.composableBuilder(
-      column: $state.table.audioPath,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get audioPath => $composableBuilder(
+      column: $table.audioPath, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get snoozeDuration => $state.composableBuilder(
-      column: $state.table.snoozeDuration,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get snoozeDuration => $composableBuilder(
+      column: $table.snoozeDuration,
+      builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<EqualList<Weekday>?, EqualList<Weekday>,
           String>
-      get daysOfWeek => $state.composableBuilder(
-          column: $state.table.daysOfWeek,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
+      get daysOfWeek => $composableBuilder(
+          column: $table.daysOfWeek,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
-  ColumnFilters<bool> get isEnabled => $state.composableBuilder(
-      column: $state.table.isEnabled,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+      column: $table.isEnabled, builder: (column) => ColumnFilters(column));
 
-  ComposableFilter alarmInstancesRefs(
-      ComposableFilter Function($$AlarmInstancesTableFilterComposer f) f) {
-    final $$AlarmInstancesTableFilterComposer composer = $state.composerBuilder(
+  Expression<bool> alarmInstancesRefs(
+      Expression<bool> Function($$AlarmInstancesTableFilterComposer f) f) {
+    final $$AlarmInstancesTableFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
-        referencedTable: $state.db.alarmInstances,
+        referencedTable: $db.alarmInstances,
         getReferencedColumn: (t) => t.alarmId,
-        builder: (joinBuilder, parentComposers) =>
-            $$AlarmInstancesTableFilterComposer(ComposerState($state.db,
-                $state.db.alarmInstances, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmInstancesTableFilterComposer(
+              $db: $db,
+              $table: $db.alarmInstances,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return f(composer);
   }
 }
 
 class $$DbAlarmsTableOrderingComposer
-    extends OrderingComposer<_$AlarmDatabase, $DbAlarmsTable> {
-  $$DbAlarmsTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AlarmDatabase, $DbAlarmsTable> {
+  $$DbAlarmsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get audioPath => $state.composableBuilder(
-      column: $state.table.audioPath,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get audioPath => $composableBuilder(
+      column: $table.audioPath, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get snoozeDuration => $state.composableBuilder(
-      column: $state.table.snoozeDuration,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get snoozeDuration => $composableBuilder(
+      column: $table.snoozeDuration,
+      builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get daysOfWeek => $state.composableBuilder(
-      column: $state.table.daysOfWeek,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get daysOfWeek => $composableBuilder(
+      column: $table.daysOfWeek, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isEnabled => $state.composableBuilder(
-      column: $state.table.isEnabled,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+      column: $table.isEnabled, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DbAlarmsTableAnnotationComposer
+    extends Composer<_$AlarmDatabase, $DbAlarmsTable> {
+  $$DbAlarmsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get audioPath =>
+      $composableBuilder(column: $table.audioPath, builder: (column) => column);
+
+  GeneratedColumn<int> get snoozeDuration => $composableBuilder(
+      column: $table.snoozeDuration, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<EqualList<Weekday>?, String>
+      get daysOfWeek => $composableBuilder(
+          column: $table.daysOfWeek, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  Expression<T> alarmInstancesRefs<T extends Object>(
+      Expression<T> Function($$AlarmInstancesTableAnnotationComposer a) f) {
+    final $$AlarmInstancesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.alarmInstances,
+        getReferencedColumn: (t) => t.alarmId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmInstancesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.alarmInstances,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$DbAlarmsTableTableManager extends RootTableManager<
@@ -1316,6 +1364,7 @@ class $$DbAlarmsTableTableManager extends RootTableManager<
     DbAlarm,
     $$DbAlarmsTableFilterComposer,
     $$DbAlarmsTableOrderingComposer,
+    $$DbAlarmsTableAnnotationComposer,
     $$DbAlarmsTableCreateCompanionBuilder,
     $$DbAlarmsTableUpdateCompanionBuilder,
     (DbAlarm, $$DbAlarmsTableReferences),
@@ -1325,10 +1374,12 @@ class $$DbAlarmsTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$DbAlarmsTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$DbAlarmsTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$DbAlarmsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DbAlarmsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DbAlarmsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
@@ -1399,6 +1450,7 @@ typedef $$DbAlarmsTableProcessedTableManager = ProcessedTableManager<
     DbAlarm,
     $$DbAlarmsTableFilterComposer,
     $$DbAlarmsTableOrderingComposer,
+    $$DbAlarmsTableAnnotationComposer,
     $$DbAlarmsTableCreateCompanionBuilder,
     $$DbAlarmsTableUpdateCompanionBuilder,
     (DbAlarm, $$DbAlarmsTableReferences),
@@ -1451,117 +1503,163 @@ final class $$AlarmInstanceSetsTableReferences extends BaseReferences<
 }
 
 class $$AlarmInstanceSetsTableFilterComposer
-    extends FilterComposer<_$AlarmDatabase, $AlarmInstanceSetsTable> {
-  $$AlarmInstanceSetsTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AlarmDatabase, $AlarmInstanceSetsTable> {
+  $$AlarmInstanceSetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get audioPath => $state.composableBuilder(
-      column: $state.table.audioPath,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get audioPath => $composableBuilder(
+      column: $table.audioPath, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get startTime => $state.composableBuilder(
-      column: $state.table.startTime,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get startTime => $composableBuilder(
+      column: $table.startTime, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get endTime => $state.composableBuilder(
-      column: $state.table.endTime,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get endTime => $composableBuilder(
+      column: $table.endTime, builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<EqualList<Weekday>?, EqualList<Weekday>,
           String>
-      get daysOfWeek => $state.composableBuilder(
-          column: $state.table.daysOfWeek,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
+      get daysOfWeek => $composableBuilder(
+          column: $table.daysOfWeek,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
-  ColumnFilters<int> get intervalBetweenAlarms => $state.composableBuilder(
-      column: $state.table.intervalBetweenAlarms,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get intervalBetweenAlarms => $composableBuilder(
+      column: $table.intervalBetweenAlarms,
+      builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get pauseDuration => $state.composableBuilder(
-      column: $state.table.pauseDuration,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get pauseDuration => $composableBuilder(
+      column: $table.pauseDuration, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isEnabled => $state.composableBuilder(
-      column: $state.table.isEnabled,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+      column: $table.isEnabled, builder: (column) => ColumnFilters(column));
 
-  ComposableFilter alarmInstancesRefs(
-      ComposableFilter Function($$AlarmInstancesTableFilterComposer f) f) {
-    final $$AlarmInstancesTableFilterComposer composer = $state.composerBuilder(
+  Expression<bool> alarmInstancesRefs(
+      Expression<bool> Function($$AlarmInstancesTableFilterComposer f) f) {
+    final $$AlarmInstancesTableFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
-        referencedTable: $state.db.alarmInstances,
+        referencedTable: $db.alarmInstances,
         getReferencedColumn: (t) => t.alarmInstanceSetId,
-        builder: (joinBuilder, parentComposers) =>
-            $$AlarmInstancesTableFilterComposer(ComposerState($state.db,
-                $state.db.alarmInstances, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmInstancesTableFilterComposer(
+              $db: $db,
+              $table: $db.alarmInstances,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return f(composer);
   }
 }
 
 class $$AlarmInstanceSetsTableOrderingComposer
-    extends OrderingComposer<_$AlarmDatabase, $AlarmInstanceSetsTable> {
-  $$AlarmInstanceSetsTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AlarmDatabase, $AlarmInstanceSetsTable> {
+  $$AlarmInstanceSetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get audioPath => $state.composableBuilder(
-      column: $state.table.audioPath,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get audioPath => $composableBuilder(
+      column: $table.audioPath, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get startTime => $state.composableBuilder(
-      column: $state.table.startTime,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get startTime => $composableBuilder(
+      column: $table.startTime, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get endTime => $state.composableBuilder(
-      column: $state.table.endTime,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get endTime => $composableBuilder(
+      column: $table.endTime, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get daysOfWeek => $state.composableBuilder(
-      column: $state.table.daysOfWeek,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get daysOfWeek => $composableBuilder(
+      column: $table.daysOfWeek, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get intervalBetweenAlarms => $state.composableBuilder(
-      column: $state.table.intervalBetweenAlarms,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get intervalBetweenAlarms => $composableBuilder(
+      column: $table.intervalBetweenAlarms,
+      builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get pauseDuration => $state.composableBuilder(
-      column: $state.table.pauseDuration,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get pauseDuration => $composableBuilder(
+      column: $table.pauseDuration,
+      builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isEnabled => $state.composableBuilder(
-      column: $state.table.isEnabled,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+      column: $table.isEnabled, builder: (column) => ColumnOrderings(column));
+}
+
+class $$AlarmInstanceSetsTableAnnotationComposer
+    extends Composer<_$AlarmDatabase, $AlarmInstanceSetsTable> {
+  $$AlarmInstanceSetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get audioPath =>
+      $composableBuilder(column: $table.audioPath, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startTime =>
+      $composableBuilder(column: $table.startTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endTime =>
+      $composableBuilder(column: $table.endTime, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<EqualList<Weekday>?, String>
+      get daysOfWeek => $composableBuilder(
+          column: $table.daysOfWeek, builder: (column) => column);
+
+  GeneratedColumn<int> get intervalBetweenAlarms => $composableBuilder(
+      column: $table.intervalBetweenAlarms, builder: (column) => column);
+
+  GeneratedColumn<int> get pauseDuration => $composableBuilder(
+      column: $table.pauseDuration, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  Expression<T> alarmInstancesRefs<T extends Object>(
+      Expression<T> Function($$AlarmInstancesTableAnnotationComposer a) f) {
+    final $$AlarmInstancesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.alarmInstances,
+        getReferencedColumn: (t) => t.alarmInstanceSetId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmInstancesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.alarmInstances,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
@@ -1570,6 +1668,7 @@ class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
     AlarmInstanceSet,
     $$AlarmInstanceSetsTableFilterComposer,
     $$AlarmInstanceSetsTableOrderingComposer,
+    $$AlarmInstanceSetsTableAnnotationComposer,
     $$AlarmInstanceSetsTableCreateCompanionBuilder,
     $$AlarmInstanceSetsTableUpdateCompanionBuilder,
     (AlarmInstanceSet, $$AlarmInstanceSetsTableReferences),
@@ -1580,10 +1679,13 @@ class $$AlarmInstanceSetsTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$AlarmInstanceSetsTableFilterComposer(ComposerState(db, table)),
-          orderingComposer: $$AlarmInstanceSetsTableOrderingComposer(
-              ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$AlarmInstanceSetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AlarmInstanceSetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AlarmInstanceSetsTableAnnotationComposer(
+                  $db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
@@ -1668,6 +1770,7 @@ typedef $$AlarmInstanceSetsTableProcessedTableManager = ProcessedTableManager<
     AlarmInstanceSet,
     $$AlarmInstanceSetsTableFilterComposer,
     $$AlarmInstanceSetsTableOrderingComposer,
+    $$AlarmInstanceSetsTableAnnotationComposer,
     $$AlarmInstanceSetsTableCreateCompanionBuilder,
     $$AlarmInstanceSetsTableUpdateCompanionBuilder,
     (AlarmInstanceSet, $$AlarmInstanceSetsTableReferences),
@@ -1726,95 +1829,179 @@ final class $$AlarmInstancesTableReferences extends BaseReferences<
 }
 
 class $$AlarmInstancesTableFilterComposer
-    extends FilterComposer<_$AlarmDatabase, $AlarmInstancesTable> {
-  $$AlarmInstancesTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AlarmDatabase, $AlarmInstancesTable> {
+  $$AlarmInstancesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get time => $state.composableBuilder(
-      column: $state.table.time,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get time => $composableBuilder(
+      column: $table.time, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isEnabled => $state.composableBuilder(
-      column: $state.table.isEnabled,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+      column: $table.isEnabled, builder: (column) => ColumnFilters(column));
 
   $$DbAlarmsTableFilterComposer get alarmId {
-    final $$DbAlarmsTableFilterComposer composer = $state.composerBuilder(
+    final $$DbAlarmsTableFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.alarmId,
-        referencedTable: $state.db.dbAlarms,
+        referencedTable: $db.dbAlarms,
         getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) =>
-            $$DbAlarmsTableFilterComposer(ComposerState(
-                $state.db, $state.db.dbAlarms, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DbAlarmsTableFilterComposer(
+              $db: $db,
+              $table: $db.dbAlarms,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return composer;
   }
 
   $$AlarmInstanceSetsTableFilterComposer get alarmInstanceSetId {
-    final $$AlarmInstanceSetsTableFilterComposer composer =
-        $state.composerBuilder(
-            composer: this,
-            getCurrentColumn: (t) => t.alarmInstanceSetId,
-            referencedTable: $state.db.alarmInstanceSets,
-            getReferencedColumn: (t) => t.id,
-            builder: (joinBuilder, parentComposers) =>
-                $$AlarmInstanceSetsTableFilterComposer(ComposerState(
-                    $state.db,
-                    $state.db.alarmInstanceSets,
-                    joinBuilder,
-                    parentComposers)));
+    final $$AlarmInstanceSetsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.alarmInstanceSetId,
+        referencedTable: $db.alarmInstanceSets,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmInstanceSetsTableFilterComposer(
+              $db: $db,
+              $table: $db.alarmInstanceSets,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return composer;
   }
 }
 
 class $$AlarmInstancesTableOrderingComposer
-    extends OrderingComposer<_$AlarmDatabase, $AlarmInstancesTable> {
-  $$AlarmInstancesTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AlarmDatabase, $AlarmInstancesTable> {
+  $$AlarmInstancesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get time => $state.composableBuilder(
-      column: $state.table.time,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get time => $composableBuilder(
+      column: $table.time, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isEnabled => $state.composableBuilder(
-      column: $state.table.isEnabled,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+      column: $table.isEnabled, builder: (column) => ColumnOrderings(column));
 
   $$DbAlarmsTableOrderingComposer get alarmId {
-    final $$DbAlarmsTableOrderingComposer composer = $state.composerBuilder(
+    final $$DbAlarmsTableOrderingComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.alarmId,
-        referencedTable: $state.db.dbAlarms,
+        referencedTable: $db.dbAlarms,
         getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) =>
-            $$DbAlarmsTableOrderingComposer(ComposerState(
-                $state.db, $state.db.dbAlarms, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DbAlarmsTableOrderingComposer(
+              $db: $db,
+              $table: $db.dbAlarms,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return composer;
   }
 
   $$AlarmInstanceSetsTableOrderingComposer get alarmInstanceSetId {
-    final $$AlarmInstanceSetsTableOrderingComposer composer =
-        $state.composerBuilder(
+    final $$AlarmInstanceSetsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.alarmInstanceSetId,
+        referencedTable: $db.alarmInstanceSets,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AlarmInstanceSetsTableOrderingComposer(
+              $db: $db,
+              $table: $db.alarmInstanceSets,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AlarmInstancesTableAnnotationComposer
+    extends Composer<_$AlarmDatabase, $AlarmInstancesTable> {
+  $$AlarmInstancesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get time =>
+      $composableBuilder(column: $table.time, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  $$DbAlarmsTableAnnotationComposer get alarmId {
+    final $$DbAlarmsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.alarmId,
+        referencedTable: $db.dbAlarms,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DbAlarmsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.dbAlarms,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$AlarmInstanceSetsTableAnnotationComposer get alarmInstanceSetId {
+    final $$AlarmInstanceSetsTableAnnotationComposer composer =
+        $composerBuilder(
             composer: this,
             getCurrentColumn: (t) => t.alarmInstanceSetId,
-            referencedTable: $state.db.alarmInstanceSets,
+            referencedTable: $db.alarmInstanceSets,
             getReferencedColumn: (t) => t.id,
-            builder: (joinBuilder, parentComposers) =>
-                $$AlarmInstanceSetsTableOrderingComposer(ComposerState(
-                    $state.db,
-                    $state.db.alarmInstanceSets,
-                    joinBuilder,
-                    parentComposers)));
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$AlarmInstanceSetsTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.alarmInstanceSets,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
     return composer;
   }
 }
@@ -1825,6 +2012,7 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
     AlarmInstance,
     $$AlarmInstancesTableFilterComposer,
     $$AlarmInstancesTableOrderingComposer,
+    $$AlarmInstancesTableAnnotationComposer,
     $$AlarmInstancesTableCreateCompanionBuilder,
     $$AlarmInstancesTableUpdateCompanionBuilder,
     (AlarmInstance, $$AlarmInstancesTableReferences),
@@ -1835,10 +2023,12 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$AlarmInstancesTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$AlarmInstancesTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$AlarmInstancesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AlarmInstancesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AlarmInstancesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int?> alarmId = const Value.absent(),
@@ -1889,6 +2079,7 @@ class $$AlarmInstancesTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic,
+                      dynamic,
                       dynamic>>(state) {
                 if (alarmId) {
                   state = state.withJoin(
@@ -1928,6 +2119,7 @@ typedef $$AlarmInstancesTableProcessedTableManager = ProcessedTableManager<
     AlarmInstance,
     $$AlarmInstancesTableFilterComposer,
     $$AlarmInstancesTableOrderingComposer,
+    $$AlarmInstancesTableAnnotationComposer,
     $$AlarmInstancesTableCreateCompanionBuilder,
     $$AlarmInstancesTableUpdateCompanionBuilder,
     (AlarmInstance, $$AlarmInstancesTableReferences),

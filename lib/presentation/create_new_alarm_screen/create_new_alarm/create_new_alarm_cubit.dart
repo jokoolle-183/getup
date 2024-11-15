@@ -16,6 +16,7 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
     required this.alarmSetRepository,
     required this.alarmScheduler,
   }) : super(CreateNewAlarmState.initial()) {
+    print("Create new alarm constructor invoked");
     _timeSubscription = timeStore.timeStream.listen((timePair) {
       emit(state.copyWith(
           selectedTime: timePair)); // Update the Cubit state with the new time

@@ -23,7 +23,9 @@ mixin _$TimePickerState {
   int? get endTimeHoursIndex => throw _privateConstructorUsedError;
   int? get endTimeMinutesIndex => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of TimePickerState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $TimePickerStateCopyWith<TimePickerState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -53,6 +55,8 @@ class _$TimePickerStateCopyWithImpl<$Res, $Val extends TimePickerState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of TimePickerState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -117,6 +121,8 @@ class __$$TimePickerStateImplCopyWithImpl<$Res>
       _$TimePickerStateImpl _value, $Res Function(_$TimePickerStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of TimePickerState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -213,7 +219,9 @@ class _$TimePickerStateImpl implements _TimePickerState {
       endTimeHoursIndex,
       endTimeMinutesIndex);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of TimePickerState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$TimePickerStateImplCopyWith<_$TimePickerStateImpl> get copyWith =>
@@ -242,8 +250,11 @@ abstract class _TimePickerState implements TimePickerState {
   int? get endTimeHoursIndex;
   @override
   int? get endTimeMinutesIndex;
+
+  /// Create a copy of TimePickerState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TimePickerStateImplCopyWith<_$TimePickerStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

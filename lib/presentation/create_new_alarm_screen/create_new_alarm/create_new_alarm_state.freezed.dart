@@ -27,7 +27,9 @@ mixin _$CreateNewAlarmState {
   String? get selectedDaysText => throw _privateConstructorUsedError;
   String? get label => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of CreateNewAlarmState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $CreateNewAlarmStateCopyWith<CreateNewAlarmState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -61,6 +63,8 @@ class _$CreateNewAlarmStateCopyWithImpl<$Res, $Val extends CreateNewAlarmState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of CreateNewAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -149,6 +153,8 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
       $Res Function(_$CreateNewAlarmStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of CreateNewAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -295,7 +301,9 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
       selectedDaysText,
       label);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of CreateNewAlarmState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$CreateNewAlarmStateImplCopyWith<_$CreateNewAlarmStateImpl> get copyWith =>
@@ -336,8 +344,11 @@ abstract class _CreateNewAlarmState implements CreateNewAlarmState {
   String? get selectedDaysText;
   @override
   String? get label;
+
+  /// Create a copy of CreateNewAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CreateNewAlarmStateImplCopyWith<_$CreateNewAlarmStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
