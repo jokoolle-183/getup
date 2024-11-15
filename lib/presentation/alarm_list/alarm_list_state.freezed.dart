@@ -19,7 +19,9 @@ mixin _$AlarmListState {
   bool get isLoading => throw _privateConstructorUsedError;
   List<AlarmItem> get alarmItems => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of AlarmListState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $AlarmListStateCopyWith<AlarmListState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -43,6 +45,8 @@ class _$AlarmListStateCopyWithImpl<$Res, $Val extends AlarmListState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of AlarmListState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -81,6 +85,8 @@ class __$$AlarmListStateImplCopyWithImpl<$Res>
       _$AlarmListStateImpl _value, $Res Function(_$AlarmListStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of AlarmListState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -137,7 +143,9 @@ class _$AlarmListStateImpl implements _AlarmListState {
   int get hashCode => Object.hash(
       runtimeType, isLoading, const DeepCollectionEquality().hash(_alarmItems));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of AlarmListState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$AlarmListStateImplCopyWith<_$AlarmListStateImpl> get copyWith =>
@@ -154,8 +162,11 @@ abstract class _AlarmListState implements AlarmListState {
   bool get isLoading;
   @override
   List<AlarmItem> get alarmItems;
+
+  /// Create a copy of AlarmListState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AlarmListStateImplCopyWith<_$AlarmListStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

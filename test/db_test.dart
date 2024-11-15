@@ -1,12 +1,9 @@
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:test/test.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/database/dao/alarm_dao/db_alarms_dao.dart';
 import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
-import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
-import 'package:walk_it_up/data/model/weekdays.dart';
 
 void main() {
   late AlarmDatabase database;

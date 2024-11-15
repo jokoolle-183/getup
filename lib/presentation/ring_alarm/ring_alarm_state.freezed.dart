@@ -20,7 +20,9 @@ mixin _$RingAlarmState {
   String get status => throw _privateConstructorUsedError;
   bool get completed => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of RingAlarmState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $RingAlarmStateCopyWith<RingAlarmState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -44,6 +46,8 @@ class _$RingAlarmStateCopyWithImpl<$Res, $Val extends RingAlarmState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of RingAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -87,6 +91,8 @@ class __$$RingAlarmStateImplCopyWithImpl<$Res>
       _$RingAlarmStateImpl _value, $Res Function(_$RingAlarmStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of RingAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -143,7 +149,9 @@ class _$RingAlarmStateImpl implements _RingAlarmState {
   @override
   int get hashCode => Object.hash(runtimeType, steps, status, completed);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of RingAlarmState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$RingAlarmStateImplCopyWith<_$RingAlarmStateImpl> get copyWith =>
@@ -163,8 +171,11 @@ abstract class _RingAlarmState implements RingAlarmState {
   String get status;
   @override
   bool get completed;
+
+  /// Create a copy of RingAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$RingAlarmStateImplCopyWith<_$RingAlarmStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

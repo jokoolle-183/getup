@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -139,7 +138,6 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: AlarmListScreen.routeName,
       routes: {
         AlarmListScreen.routeName: (context) => const AlarmListScreen(),
         EditAlarmScreen.routeName: (context) => const EditAlarmScreen(),

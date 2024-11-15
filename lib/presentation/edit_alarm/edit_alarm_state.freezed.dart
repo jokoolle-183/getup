@@ -22,7 +22,9 @@ mixin _$EditAlarmState {
   TimeOfDay get toTimeOfDay => throw _privateConstructorUsedError;
   AlarmDetails? get nextAlarm => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of EditAlarmState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $EditAlarmStateCopyWith<EditAlarmState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -51,6 +53,8 @@ class _$EditAlarmStateCopyWithImpl<$Res, $Val extends EditAlarmState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of EditAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -109,6 +113,8 @@ class __$$EditAlarmStateImplCopyWithImpl<$Res>
       _$EditAlarmStateImpl _value, $Res Function(_$EditAlarmStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of EditAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -189,7 +195,9 @@ class _$EditAlarmStateImpl implements _EditAlarmState {
   int get hashCode => Object.hash(runtimeType, alarmId, focusDuration,
       fromTimeOfDay, toTimeOfDay, nextAlarm);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of EditAlarmState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$EditAlarmStateImplCopyWith<_$EditAlarmStateImpl> get copyWith =>
@@ -215,8 +223,11 @@ abstract class _EditAlarmState implements EditAlarmState {
   TimeOfDay get toTimeOfDay;
   @override
   AlarmDetails? get nextAlarm;
+
+  /// Create a copy of EditAlarmState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$EditAlarmStateImplCopyWith<_$EditAlarmStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
