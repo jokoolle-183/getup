@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/web.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/domain/alarm_scheduler.dart';
+import 'package:walk_it_up/domain/alarm_set_config.dart';
 import 'package:walk_it_up/domain/calculation_args.dart';
 import 'package:walk_it_up/domain/time_selection_handler.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
@@ -11,12 +13,14 @@ import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm
 import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
 
 class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
+  late Logger _logger;
   CreateNewAlarmCubit({
     required this.timeStore,
     required this.alarmSetRepository,
     required this.alarmScheduler,
   }) : super(CreateNewAlarmState.initial()) {
-    print("Create new alarm constructor invoked");
+    _logger = Logger();
+    _logger.d("Create new alarm constructor invoked");
     _timeSubscription = timeStore.timeStream.listen((timePair) {
       emit(state.copyWith(
           selectedTime: timePair)); // Update the Cubit state with the new time
@@ -65,8 +69,25 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
       );
       await alarmScheduler.scheduleRegularAlarm(args);
 
-      print('Alarm date: $selectedDateTime');
-    } else {}
+      _logger.d('Alarm date: $selectedDateTime');
+    } else {
+      final selectedStartTime = convertStringToDate(state.selectedTime.left);
+      final selectedEndTime = convertStringToDate(state.selectedTime.right);
+
+      final config = AlarmSetConfig(
+        selectedStartTime: selectedStartTime,
+        selectedEndTime: selectedEndTime,
+        daysOfWeek: state.daysOfWeek,
+        audioPath: state.soundPath,
+        soundPath: state.soundPath,
+        snoozeDuration: state.snoozeDuration,
+        isVibrate: state.isVibrate,
+        interval: state.intervalBetweenAlarms!,
+        isEnabled: true,
+      );
+
+      await alarmScheduler.scheduleRecurringAlarm(config);
+    }
   }
 
   @override

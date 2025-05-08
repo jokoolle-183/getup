@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:walk_it_up/data/database/alarm_database.dart';
 import 'package:walk_it_up/data/database/type_converter/equal_list.dart';
+import 'package:walk_it_up/data/model/alarm_set_args.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
@@ -29,15 +30,15 @@ class AlarmMapper {
     );
   }
 
-  static AlarmInstanceSetsCompanion mapAlarmInstanceSetToCompanion(
-      AlarmInstanceSetDto alarmSet) {
+  static AlarmInstanceSetsCompanion mapAlarmSetArgsToCompanion(
+      AlarmSetArgs alarmSetArgs) {
     return AlarmInstanceSetsCompanion.insert(
-      audioPath: alarmSet.audioPath,
-      startTime: alarmSet.startTime,
-      endTime: alarmSet.endTime,
-      intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
-      daysOfWeek: Value.absentIfNull(EqualList(alarmSet.daysOfWeek ?? [])),
-      pauseDuration: Value.absentIfNull(alarmSet.pauseDuration),
+      audioPath: alarmSetArgs.audioPath,
+      startTime: alarmSetArgs.startTime,
+      endTime: alarmSetArgs.endTime,
+      intervalBetweenAlarms: alarmSetArgs.intervalBetweenAlarms,
+      daysOfWeek: Value.absentIfNull(EqualList(alarmSetArgs.daysOfWeek ?? [])),
+      pauseDuration: Value.absentIfNull(alarmSetArgs.pauseDuration),
     );
   }
 
@@ -51,6 +52,16 @@ class AlarmMapper {
       alarmInstanceSetId: Value(alarmInstanceSetId),
       time: recurringAlarm.time,
       isEnabled: Value(recurringAlarm.isEnabled),
+    );
+  }
+
+  static AlarmInstancesCompanion mapAlarmDateToInstanceCompanion({
+    required DateTime alarmDate,
+    required bool isEnabled,
+  }) {
+    return AlarmInstancesCompanion.insert(
+      time: alarmDate,
+      isEnabled: Value(isEnabled),
     );
   }
 }

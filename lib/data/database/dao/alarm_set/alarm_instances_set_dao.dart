@@ -48,7 +48,11 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
       final id = await into(alarmInstanceSets).insert(alarmSet);
       await batch((batch) {
         final alarmsWithParentId = alarmList
-            .map((alarm) => alarm.copyWith(alarmInstanceSetId: Value(id)))
+            .map((alarm) => AlarmInstancesCompanion.insert(
+                  alarmInstanceSetId: Value(id),
+                  time: alarm.time.value,
+                  isEnabled: alarm.isEnabled,
+                ))
             .toList();
         batch.insertAll(alarmInstances, alarmsWithParentId);
       });

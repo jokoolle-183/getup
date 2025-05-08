@@ -53,7 +53,10 @@ void setup() {
   getIt.registerLazySingleton<TimeSelectionHandler>(
       () => TimeSelectionHandlerImpl());
 
-  getIt.registerFactory(() => AlarmScheduler(getIt<RegularAlarmRepository>()));
+  getIt.registerFactory(() => AlarmScheduler(
+        getIt<RegularAlarmRepository>(),
+        getIt<AlarmSetRepository>(),
+      ));
 }
 
 int _id = 0;

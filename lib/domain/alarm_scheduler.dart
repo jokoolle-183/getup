@@ -1,14 +1,18 @@
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:walk_it_up/data/model/alarm_args.dart';
+import 'package:walk_it_up/data/model/alarm_set_args.dart';
 import 'package:walk_it_up/data/model/dto/db_alarm_dto.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
+import 'package:walk_it_up/domain/alarm_set_config.dart';
 import 'package:walk_it_up/domain/calculation_args.dart';
 
 class AlarmScheduler {
   final RegularAlarmRepository _regularAlarmRepository;
-  AlarmScheduler(this._regularAlarmRepository);
+  final AlarmSetRepository _alarmSetRepository;
+  AlarmScheduler(this._regularAlarmRepository, this._alarmSetRepository);
 
   Future<DateTime?> scheduleRegularAlarm(AlarmConfig config) async {
     final alarmDate = _calculateDateTime(
@@ -20,24 +24,24 @@ class AlarmScheduler {
     return Future.value(alarmDate);
   }
 
-  Future<bool> scheduleNextRegularAlarm(AlarmSettings settings) async {
-    final currentAlarm =
-        await _regularAlarmRepository.getAlarmByInstanceId(settings.id);
+  Future<DateTime?> scheduleRecurringAlarm(AlarmSetConfig config) async {
+    final startAlarmDate = _calculateDateTime(
+      config.daysOfWeek,
+      config.selectedStartTime,
+    );
 
-    if (currentAlarm != null && currentAlarm.daysOfWeek?.isNotEmpty == true) {
-      final nextDate = _calculateDateTime(
-        currentAlarm.daysOfWeek ?? [],
-        settings.dateTime,
-      );
+    final endAlarmDate = _calculateEndDateTime(
+      startAlarmDate,
+      config.selectedEndTime,
+    );
 
-      final scheduleSuccess = _scheduleNextAlarmInstance(
-        currentAlarm,
-        nextDate,
-      );
-
-      return Future.value(scheduleSuccess);
-    }
-    return Future.value(false);
+    final scheduleSuccess = await _scheduleNewAlarmForSet(
+      config.copyWith(
+        selectedTime: startAlarmDate,
+        selectedEndTime: endAlarmDate,
+      ),
+    );
+    return Future.value(startAlarmDate);
   }
 
   Future<bool> _scheduleNewAlarm(AlarmConfig config) async {
@@ -60,6 +64,26 @@ class AlarmScheduler {
           notificationBody: 'Walk it up! ',
         ),
       );
+    }
+    return Future.value(false);
+  }
+
+  Future<bool> scheduleNextRegularAlarm(AlarmSettings settings) async {
+    final currentAlarm =
+        await _regularAlarmRepository.getAlarmByInstanceId(settings.id);
+
+    if (currentAlarm != null && currentAlarm.daysOfWeek?.isNotEmpty == true) {
+      final nextDate = _calculateDateTime(
+        currentAlarm.daysOfWeek ?? [],
+        settings.dateTime,
+      );
+
+      final scheduleSuccess = _scheduleNextAlarmInstance(
+        currentAlarm,
+        nextDate,
+      );
+
+      return Future.value(scheduleSuccess);
     }
     return Future.value(false);
   }
@@ -163,5 +187,49 @@ class AlarmScheduler {
       return selectedDateTime;
     }
     return null;
+  }
+
+  DateTime? _calculateEndDateTime(
+      DateTime? calculatedStartAlarmDate, DateTime? endAlarmDate) {
+    DateTime? endAlarmDateTime = endAlarmDate;
+    if (calculatedStartAlarmDate != null && endAlarmDate != null) {
+      if (calculatedStartAlarmDate.day > endAlarmDate.day) {
+        // Calculated start date is tomorrow
+        endAlarmDateTime = endAlarmDateTime!.add(const Duration(days: 1));
+      } else if (calculatedStartAlarmDate.day == endAlarmDate.day) {
+        // If they're on the same day, we need to calculate following scenarios:
+        // 1. If the start date is greater than or equal to the end date -> end date is tomorrow
+        // 2. If the start date is lesser than the end date -> end date is today
+        if (calculatedStartAlarmDate.isAfter(endAlarmDateTime!) ||
+            calculatedStartAlarmDate == endAlarmDateTime) {
+          endAlarmDateTime = endAlarmDateTime.add(const Duration(days: 1));
+        }
+      }
+    }
+    return endAlarmDateTime;
+  }
+
+  Future<bool> _scheduleNewAlarmForSet(AlarmSetConfig config) async {
+    final alarmSetArgs = AlarmSetArgs(
+      startTime: config.selectedStartTime,
+      endTime: config.selectedEndTime,
+      intervalBetweenAlarms: config.interval,
+      recurringAlarmDates: config.alarmDates,
+      audioPath: config.audioPath,
+      daysOfWeek: config.daysOfWeek,
+      isEnabled: config.isEnabled,
+    );
+
+    final alarmId = await _alarmSetRepository.saveAlarmSet(alarmSetArgs);
+
+    return await Alarm.set(
+      alarmSettings: AlarmSettings(
+        id: alarmId,
+        dateTime: config.selectedStartTime,
+        assetAudioPath: config.soundPath,
+        notificationTitle: 'Get up',
+        notificationBody: 'Walk it up! ',
+      ),
+    );
   }
 }

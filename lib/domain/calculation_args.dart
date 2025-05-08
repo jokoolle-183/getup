@@ -17,6 +17,7 @@ class AlarmConfig {
 
   AlarmConfig copyWith({
     DateTime? selectedTime,
+    DateTime? selectedEndTime,
     List<Weekday>? daysOfWeek,
     String? soundPath,
     bool? isVibrate,

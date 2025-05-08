@@ -30,6 +30,7 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
       isSnoozeEnabled: true,
       isVibrate: false,
       daysOfWeek: [],
+      intervalBetweenAlarms: 60,
     );
   }
 }
