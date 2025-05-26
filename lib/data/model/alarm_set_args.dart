@@ -8,6 +8,7 @@ class AlarmSetArgs {
   final int intervalBetweenAlarms;
   final int? pauseDuration;
   final List<DateTime> recurringAlarmDates;
+  final bool isEnabled;
 
   const AlarmSetArgs({
     required this.startTime,
@@ -16,6 +17,7 @@ class AlarmSetArgs {
     required this.recurringAlarmDates,
     required this.audioPath,
     required this.daysOfWeek,
+    required this.isEnabled,
     this.pauseDuration,
   });
 
@@ -27,6 +29,7 @@ class AlarmSetArgs {
     int? intervalBetweenAlarms,
     int? pauseDuration,
     List<DateTime>? recurringAlarmDates,
+    bool? isEnabled,
   }) {
     return AlarmSetArgs(
       startTime: startTime ?? this.startTime,
@@ -37,6 +40,7 @@ class AlarmSetArgs {
           intervalBetweenAlarms ?? this.intervalBetweenAlarms,
       pauseDuration: pauseDuration ?? this.pauseDuration,
       recurringAlarmDates: recurringAlarmDates ?? this.recurringAlarmDates,
+      isEnabled: isEnabled ?? this.isEnabled
     );
   }
 }

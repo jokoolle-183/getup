@@ -40,7 +40,7 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
     });
   }
 
-  Future<void> saveAlarmSet(
+  Future<int> saveAlarmSet(
     AlarmInstanceSetsCompanion alarmSet,
     List<AlarmInstancesCompanion> alarmList,
   ) {
@@ -56,6 +56,7 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
             .toList();
         batch.insertAll(alarmInstances, alarmsWithParentId);
       });
+      return id;
     });
   }
 

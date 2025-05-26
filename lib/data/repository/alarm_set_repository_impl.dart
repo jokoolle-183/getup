@@ -11,20 +11,21 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
   AlarmSetRepositoryImpl(this._alarmSetDao);
 
   @override
-  Future<List<AlarmSetArgs>> getAlarmSets() async {
+  Future<List<AlarmInstanceSetDto>> getAlarmSets() async {
     return _alarmSetDao.getSetsWithAlarms();
   }
 
   @override
-  Future<void> saveAlarmSet(
+  Future<int> saveAlarmSet(
     AlarmSetArgs alarmSetArgs,
   ) {
     final alarmSetCompanion =
         AlarmMapper.mapAlarmSetArgsToCompanion(alarmSetArgs);
     final recurringAlarmCompanions = alarmSetArgs.recurringAlarmDates
         .map(
-          (alarm) => AlarmMapper.mapAlarmDateToAlarmInstanceCompanion(
-            recurringAlarm: alarm,
+          (alarm) => AlarmMapper.mapAlarmDateToInstanceCompanion(
+            alarmDate: alarm,
+            isEnabled: alarmSetArgs.isEnabled,
           ),
         )
         .toList();
@@ -37,13 +38,13 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
 
   @override
   Future<void> updateAlarmSet(
-    AlarmSetArgs alarmSet,
+    AlarmInstanceSetDto alarmSet,
     List<AlarmInstanceDto> recurringAlarms,
   ) {
     // final alarmSetCompanion = AlarmMapper.mapAlarmSetArgsToCompanion(alarmSet);
     // final recurringAlarmCompanions = recurringAlarms
     //     .map(
-    //       (alarm) => AlarmMapper.mapAlarmDateToAlarmInstanceCompanion(
+    //       (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
     //         recurringAlarm: alarm,
     //       ),
     //     )
@@ -57,7 +58,7 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
   }
 
   @override
-  Future<void> deleteAlarmSet(AlarmSetArgs alarmSet) {
+  Future<void> deleteAlarmSet(AlarmInstanceSetDto alarmSet) {
     return _alarmSetDao.deleteAlarmSet(alarmSet.id);
   }
 }
