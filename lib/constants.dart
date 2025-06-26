@@ -11,3 +11,5 @@ const toTimeOfDayKey = 'to_date';
 
 const intervalBetweenAlarms = 'Interval between alarms';
 const breakDuration = 'Break duration';
+
+const lastStepCountKey = 'last_step_count';
