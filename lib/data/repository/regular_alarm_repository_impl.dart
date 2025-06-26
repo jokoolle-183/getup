@@ -55,4 +55,9 @@ class RegularAlarmRepositoryImpl extends RegularAlarmRepository {
       AlarmInstancesCompanion.insert(alarmId: Value(alarmId), time: time),
     );
   }
+
+  @override
+  Future<AlarmInstance?> getAlarmInstanceById(int instanceId) {
+    return _alarmInstancesDao.getAlarmInstanceById(instanceId);
+  }
 }

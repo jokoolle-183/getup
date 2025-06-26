@@ -3,6 +3,7 @@ import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:walk_it_up/domain/alarm_scheduler.dart';
+import 'package:walk_it_up/utils/pair.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_state.dart';
 
 class RingAlarmCubit extends Cubit<RingAlarmState> {
@@ -34,8 +35,8 @@ class RingAlarmCubit extends Cubit<RingAlarmState> {
     );
   }
 
-  Future<bool> scheduleNextAlarm(AlarmSettings settings) async {
-    return _alarmScheduler.scheduleNextRegularAlarm(settings);
+  Future<Pair<DateTime?, bool>> scheduleNextAlarm(AlarmSettings settings) async {
+    return _alarmScheduler.scheduleNextAlarm(settings);
   }
 
   @override

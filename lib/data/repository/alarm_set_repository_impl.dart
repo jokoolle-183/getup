@@ -1,7 +1,6 @@
 import 'package:walk_it_up/data/database/dao/alarm_set/alarm_instances_set_dao.dart';
 import 'package:walk_it_up/data/model/alarm_mapper.dart';
 import 'package:walk_it_up/data/model/alarm_set_args.dart';
-import 'package:walk_it_up/data/model/dto/alarm_instance_dto.dart';
 import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 
@@ -16,11 +15,10 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
   }
 
   @override
-  Future<int> saveAlarmSet(
+  Future<int?> saveAlarmSet(
     AlarmSetArgs alarmSetArgs,
   ) {
-    final alarmSetCompanion =
-        AlarmMapper.mapAlarmSetArgsToCompanion(alarmSetArgs);
+    final alarmSetCompanion = AlarmMapper.mapAlarmSetArgsToCompanion(alarmSetArgs);
     final recurringAlarmCompanions = alarmSetArgs.recurringAlarmDates
         .map(
           (alarm) => AlarmMapper.mapAlarmDateToInstanceCompanion(
@@ -37,28 +35,29 @@ class AlarmSetRepositoryImpl extends AlarmSetRepository {
   }
 
   @override
-  Future<void> updateAlarmSet(
-    AlarmInstanceSetDto alarmSet,
-    List<AlarmInstanceDto> recurringAlarms,
-  ) {
-    // final alarmSetCompanion = AlarmMapper.mapAlarmSetArgsToCompanion(alarmSet);
-    // final recurringAlarmCompanions = recurringAlarms
-    //     .map(
-    //       (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
-    //         recurringAlarm: alarm,
-    //       ),
-    //     )
-    //     .toList();
+  Future<void> updateAlarmSet(AlarmInstanceSetDto alarmSet) {
+    final alarmSetCompanion = AlarmMapper.mapAlarmInstanceSetDtoToCompanion(alarmSet);
+    final recurringAlarmCompanions = alarmSet.recurringAlarms
+        .map(
+          (alarm) => AlarmMapper.mapAlarmInstanceToCompanion(
+            recurringAlarm: alarm,
+          ),
+        )
+        .toList();
 
-    // return _alarmSetDao.updateAlarmSet(
-    //   alarmSetCompanion,
-    //   recurringAlarmCompanions,
-    // );
-    return Future.value();
+    return _alarmSetDao.updateAlarmSet(
+      alarmSetCompanion,
+      recurringAlarmCompanions,
+    );
   }
 
   @override
   Future<void> deleteAlarmSet(AlarmInstanceSetDto alarmSet) {
     return _alarmSetDao.deleteAlarmSet(alarmSet.id);
+  }
+
+  @override
+  Future<AlarmInstanceSetDto?> getAlarmInstanceSetById(int instanceSetId) {
+    return _alarmSetDao.getAlarmInstanceSetById(instanceSetId);
   }
 }

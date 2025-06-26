@@ -5,7 +5,7 @@ class AlarmSetConfig {
   final DateTime selectedEndTime;
   final List<Weekday> daysOfWeek;
   final String audioPath;
-  final int interval;
+  final Duration interval;
   final String soundPath;
   final int snoozeDuration;
   final bool isVibrate;
@@ -23,24 +23,25 @@ class AlarmSetConfig {
     required this.isEnabled,
   });
 
-  List<DateTime> get alarmDates =>
-      _createAlarmDatesInSet(selectedStartTime, selectedEndTime, interval);
+  List<DateTime> get alarmDates => _createAlarmDatesInSet(selectedStartTime, selectedEndTime, interval);
 
   List<DateTime> _createAlarmDatesInSet(
     DateTime startAlarmDate,
     DateTime endAlarmDate,
-    int interval,
+    Duration interval,
   ) {
     final List<DateTime> list = [];
 
-    final differenceInMinutes =
-        endAlarmDate.difference(startAlarmDate).inMinutes;
-    final numAlarms = differenceInMinutes / interval;
+    final differenceInMinutes = endAlarmDate.difference(startAlarmDate).inMinutes;
+    final numAlarms = differenceInMinutes / interval.inMinutes + 1;
+
+    /// End time included
 
     for (int i = 0; i < numAlarms; i++) {
-      list.add(startAlarmDate.add(Duration(hours: i)));
+      list.add(startAlarmDate.add(interval));
     }
 
+    list.forEach((date) => print("Alarm instance time: $date"));
     return list;
   }
 
@@ -48,7 +49,7 @@ class AlarmSetConfig {
     DateTime? selectedTime,
     DateTime? selectedEndTime,
     List<Weekday>? daysOfWeek,
-    int? interval,
+    Duration? interval,
     String? soundPath,
     bool? isVibrate,
     int? snoozeDuration,

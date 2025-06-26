@@ -5,7 +5,7 @@ class AlarmSetArgs {
   final DateTime endTime;
   final String audioPath;
   final List<Weekday>? daysOfWeek;
-  final int intervalBetweenAlarms;
+  final Duration intervalBetweenAlarms;
   final int? pauseDuration;
   final List<DateTime> recurringAlarmDates;
   final bool isEnabled;
@@ -26,21 +26,19 @@ class AlarmSetArgs {
     DateTime? endTime,
     String? audioPath,
     List<Weekday>? daysOfWeek,
-    int? intervalBetweenAlarms,
+    Duration? intervalBetweenAlarms,
     int? pauseDuration,
     List<DateTime>? recurringAlarmDates,
     bool? isEnabled,
   }) {
     return AlarmSetArgs(
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
-      audioPath: audioPath ?? this.audioPath,
-      daysOfWeek: daysOfWeek ?? this.daysOfWeek,
-      intervalBetweenAlarms:
-          intervalBetweenAlarms ?? this.intervalBetweenAlarms,
-      pauseDuration: pauseDuration ?? this.pauseDuration,
-      recurringAlarmDates: recurringAlarmDates ?? this.recurringAlarmDates,
-      isEnabled: isEnabled ?? this.isEnabled
-    );
+        startTime: startTime ?? this.startTime,
+        endTime: endTime ?? this.endTime,
+        audioPath: audioPath ?? this.audioPath,
+        daysOfWeek: daysOfWeek ?? this.daysOfWeek,
+        intervalBetweenAlarms: intervalBetweenAlarms ?? this.intervalBetweenAlarms,
+        pauseDuration: pauseDuration ?? this.pauseDuration,
+        recurringAlarmDates: recurringAlarmDates ?? this.recurringAlarmDates,
+        isEnabled: isEnabled ?? this.isEnabled);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/web.dart';
 import 'package:walk_it_up/domain/time_selection_handler.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/pair.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_state.dart';
 
 class TimePickerCubit extends Cubit<TimePickerState> {

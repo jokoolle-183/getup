@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:walk_it_up/debouncer.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/debouncer.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
+@immutable
 class SnoozeDurationDialog extends StatefulWidget {
-  SnoozeDurationDialog({
+  const SnoozeDurationDialog({
     this.selectedDuration,
     this.isSnoozeEnabled,
     super.key,
   });
 
-  int? selectedDuration;
-  bool? isSnoozeEnabled;
+  final int? selectedDuration;
+  final bool? isSnoozeEnabled;
 
   @override
   State<SnoozeDurationDialog> createState() => _SnoozeDurationDialogState();
 }
 
 class _SnoozeDurationDialogState extends State<SnoozeDurationDialog> {
-  final Debouncer _debouncer =
-      Debouncer(delay: const Duration(milliseconds: 300));
+  final Debouncer _debouncer = Debouncer(delay: const Duration(milliseconds: 300));
   late FixedExtentScrollController _controller;
   late bool isSnoozeEnabled = widget.isSnoozeEnabled ?? false;
   late int selectedDuration = widget.selectedDuration ?? 1;
   @override
   void initState() {
     super.initState();
-    final initialItemIndex =
-        getMinuteStrings().indexOf(selectedDuration.toString());
+    final initialItemIndex = getMinuteStrings().indexOf(selectedDuration.toString());
     _controller = FixedExtentScrollController(initialItem: initialItemIndex);
   }
 
@@ -120,8 +119,7 @@ class _SnoozeDurationDialogState extends State<SnoozeDurationDialog> {
                         onSelectedItemChanged: (index) {
                           _debouncer.call(() {
                             setState(() {
-                              selectedDuration =
-                                  int.parse(getMinuteStrings()[index]);
+                              selectedDuration = int.parse(getMinuteStrings()[index]);
                             });
                           });
                         },

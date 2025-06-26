@@ -10,7 +10,7 @@ import 'package:walk_it_up/domain/calculation_args.dart';
 import 'package:walk_it_up/domain/time_selection_handler.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_state.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
 class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
   late Logger _logger;
@@ -22,8 +22,7 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
     _logger = Logger();
     _logger.d("Create new alarm constructor invoked");
     _timeSubscription = timeStore.timeStream.listen((timePair) {
-      emit(state.copyWith(
-          selectedTime: timePair)); // Update the Cubit state with the new time
+      emit(state.copyWith(selectedTime: timePair)); // Update the Cubit state with the new time
     });
   }
 
@@ -82,7 +81,7 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
         soundPath: state.soundPath,
         snoozeDuration: state.snoozeDuration,
         isVibrate: state.isVibrate,
-        interval: state.intervalBetweenAlarms!,
+        interval: const Duration(minutes: 10),
         isEnabled: true,
       );
 

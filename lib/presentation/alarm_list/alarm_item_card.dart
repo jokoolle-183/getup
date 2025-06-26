@@ -17,31 +17,34 @@ class AlarmItemCard extends StatelessWidget {
     return InkWell(
       onTap: () => navigateToEditAlarm(alarmItem: alarmItem),
       child: Card(
-        child: Builder(builder: (context) {
-          switch (alarmItem) {
-            case RegularAlarmItem regular:
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(regular.time),
-                  Text(regular.name ?? ''),
-                ],
-              );
-            case AlarmSetItem set:
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      Text(set.startTime),
-                      Text(set.endTime),
-                    ],
-                  ),
-                  Text(set.name ?? ''),
-                ],
-              );
-          }
-        }),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Builder(builder: (context) {
+            switch (alarmItem) {
+              case RegularAlarmItem regular:
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(regular.time),
+                    Text(regular.name ?? ''),
+                  ],
+                );
+              case AlarmSetItem set:
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Text(set.startTime),
+                        Text(set.endTime),
+                      ],
+                    ),
+                    Text(set.name ?? ''),
+                  ],
+                );
+            }
+          }),
+        ),
       ),
     );
   }

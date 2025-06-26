@@ -13,8 +13,7 @@ class AlarmMapper {
       name: Value.absentIfNull(regularAlarmDto.name),
       audioPath: regularAlarmDto.audioPath,
       snoozeDuration: Value.absentIfNull(regularAlarmDto.snoozeDuration),
-      daysOfWeek:
-          Value.absentIfNull(EqualList(regularAlarmDto.daysOfWeek ?? [])),
+      daysOfWeek: Value.absentIfNull(EqualList(regularAlarmDto.daysOfWeek ?? [])),
     );
   }
 
@@ -30,15 +29,26 @@ class AlarmMapper {
     );
   }
 
-  static AlarmInstanceSetsCompanion mapAlarmSetArgsToCompanion(
-      AlarmSetArgs alarmSetArgs) {
+  static AlarmInstanceSetsCompanion mapAlarmSetArgsToCompanion(AlarmSetArgs alarmSetArgs) {
     return AlarmInstanceSetsCompanion.insert(
       audioPath: alarmSetArgs.audioPath,
       startTime: alarmSetArgs.startTime,
       endTime: alarmSetArgs.endTime,
-      intervalBetweenAlarms: alarmSetArgs.intervalBetweenAlarms,
+      intervalBetweenAlarms: alarmSetArgs.intervalBetweenAlarms.inMinutes,
       daysOfWeek: Value.absentIfNull(EqualList(alarmSetArgs.daysOfWeek ?? [])),
       pauseDuration: Value.absentIfNull(alarmSetArgs.pauseDuration),
+    );
+  }
+
+  static AlarmInstanceSetsCompanion mapAlarmInstanceSetDtoToCompanion(
+      AlarmInstanceSetDto alarmInstanceSetDto) {
+    return AlarmInstanceSetsCompanion.insert(
+      audioPath: alarmInstanceSetDto.audioPath,
+      startTime: alarmInstanceSetDto.startTime,
+      endTime: alarmInstanceSetDto.endTime,
+      intervalBetweenAlarms: alarmInstanceSetDto.intervalBetweenAlarms.inMinutes,
+      daysOfWeek: Value.absentIfNull(EqualList(alarmInstanceSetDto.daysOfWeek ?? [])),
+      pauseDuration: Value.absentIfNull(alarmInstanceSetDto.pauseDuration),
     );
   }
 

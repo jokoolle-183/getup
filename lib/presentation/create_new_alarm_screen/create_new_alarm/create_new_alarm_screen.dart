@@ -7,8 +7,9 @@ import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_state.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/day_picker/day_picker.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/snooze_duration_dialog.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/dialogs/interval_duration_dialog.dart';
+import 'package:walk_it_up/utils/pair.dart';
+import 'package:walk_it_up/presentation/create_new_alarm_screen/dialogs/snooze_duration_dialog.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_cubit.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/time_pickers/time_picker_factory.dart';
 
@@ -48,8 +49,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                     DayPicker(
                       selectedDays: state.daysOfWeek,
                       selectedTime: state.selectedTime,
-                      onSelected:
-                          context.read<CreateNewAlarmCubit>().onDaySelected,
+                      onSelected: context.read<CreateNewAlarmCubit>().onDaySelected,
                     ),
                     const Gap(16),
                     InkWell(
@@ -99,8 +99,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                                 ),
                               )),
                               Text(
-                                state.intervalBetweenAlarms?.toString() ??
-                                    'N/A',
+                                state.intervalBetweenAlarms?.toString() ?? 'N/A',
                                 style: const TextStyle(
                                   fontSize: 16,
                                 ),
@@ -147,9 +146,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                       onTap: () => openSnoozeDurationDialog(
                         context,
                         state,
-                        context
-                            .read<CreateNewAlarmCubit>()
-                            .onSnoozeSettingsChanged,
+                        context.read<CreateNewAlarmCubit>().onSnoozeSettingsChanged,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -165,9 +162,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                               ),
                             )),
                             Text(
-                              state.isSnoozeEnabled
-                                  ? '${state.snoozeDuration} min'
-                                  : 'Off',
+                              state.isSnoozeEnabled ? '${state.snoozeDuration} min' : 'Off',
                               style: const TextStyle(
                                 fontSize: 16,
                               ),
@@ -198,9 +193,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                             Switch.adaptive(
                               value: state.isVibrate,
                               onChanged: (value) {
-                                context
-                                    .read<CreateNewAlarmCubit>()
-                                    .onVibrateChanged(value);
+                                context.read<CreateNewAlarmCubit>().onVibrateChanged(value);
                               },
                             ),
                             const Gap(16.0),
@@ -214,8 +207,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
                   child: FilledButton(
                     style: ButtonStyle(
                       fixedSize: WidgetStatePropertyAll(
@@ -224,8 +216,7 @@ class CreateNewAlarmScreen extends StatelessWidget {
                           50,
                         ),
                       ),
-                      backgroundColor:
-                          const WidgetStatePropertyAll(Colors.black),
+                      backgroundColor: const WidgetStatePropertyAll(Colors.black),
                       shape: WidgetStatePropertyAll(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4.0),
@@ -275,5 +266,19 @@ class CreateNewAlarmScreen extends StatelessWidget {
       ),
     );
     onSnoozeSettingsChanged(result);
+  }
+
+  Future<void> openIntervalDurationDialog(
+    BuildContext context,
+    CreateNewAlarmState state,
+    void Function(int) onIntervalDurationChanged,
+  ) async {
+    final int result = await showDialog(
+      context: context,
+      builder: (context) => IntervalDurationDialog(
+        duration: state.intervalBetweenAlarms,
+      ),
+    );
+    onIntervalDurationChanged(result);
   }
 }

@@ -23,7 +23,7 @@ mixin _$CreateNewAlarmState {
   List<Weekday> get daysOfWeek => throw _privateConstructorUsedError;
   int get snoozeDuration => throw _privateConstructorUsedError;
   bool get isSnoozeEnabled => throw _privateConstructorUsedError;
-  int? get intervalBetweenAlarms => throw _privateConstructorUsedError;
+  int get intervalBetweenAlarms => throw _privateConstructorUsedError;
   String? get selectedDaysText => throw _privateConstructorUsedError;
   String? get label => throw _privateConstructorUsedError;
 
@@ -48,7 +48,7 @@ abstract class $CreateNewAlarmStateCopyWith<$Res> {
       List<Weekday> daysOfWeek,
       int snoozeDuration,
       bool isSnoozeEnabled,
-      int? intervalBetweenAlarms,
+      int intervalBetweenAlarms,
       String? selectedDaysText,
       String? label});
 }
@@ -75,7 +75,7 @@ class _$CreateNewAlarmStateCopyWithImpl<$Res, $Val extends CreateNewAlarmState>
     Object? daysOfWeek = null,
     Object? snoozeDuration = null,
     Object? isSnoozeEnabled = null,
-    Object? intervalBetweenAlarms = freezed,
+    Object? intervalBetweenAlarms = null,
     Object? selectedDaysText = freezed,
     Object? label = freezed,
   }) {
@@ -108,10 +108,10 @@ class _$CreateNewAlarmStateCopyWithImpl<$Res, $Val extends CreateNewAlarmState>
           ? _value.isSnoozeEnabled
           : isSnoozeEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
-      intervalBetweenAlarms: freezed == intervalBetweenAlarms
+      intervalBetweenAlarms: null == intervalBetweenAlarms
           ? _value.intervalBetweenAlarms
           : intervalBetweenAlarms // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
       selectedDaysText: freezed == selectedDaysText
           ? _value.selectedDaysText
           : selectedDaysText // ignore: cast_nullable_to_non_nullable
@@ -140,7 +140,7 @@ abstract class _$$CreateNewAlarmStateImplCopyWith<$Res>
       List<Weekday> daysOfWeek,
       int snoozeDuration,
       bool isSnoozeEnabled,
-      int? intervalBetweenAlarms,
+      int intervalBetweenAlarms,
       String? selectedDaysText,
       String? label});
 }
@@ -165,7 +165,7 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
     Object? daysOfWeek = null,
     Object? snoozeDuration = null,
     Object? isSnoozeEnabled = null,
-    Object? intervalBetweenAlarms = freezed,
+    Object? intervalBetweenAlarms = null,
     Object? selectedDaysText = freezed,
     Object? label = freezed,
   }) {
@@ -198,10 +198,10 @@ class __$$CreateNewAlarmStateImplCopyWithImpl<$Res>
           ? _value.isSnoozeEnabled
           : isSnoozeEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
-      intervalBetweenAlarms: freezed == intervalBetweenAlarms
+      intervalBetweenAlarms: null == intervalBetweenAlarms
           ? _value.intervalBetweenAlarms
           : intervalBetweenAlarms // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
       selectedDaysText: freezed == selectedDaysText
           ? _value.selectedDaysText
           : selectedDaysText // ignore: cast_nullable_to_non_nullable
@@ -225,7 +225,7 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
       required final List<Weekday> daysOfWeek,
       required this.snoozeDuration,
       required this.isSnoozeEnabled,
-      this.intervalBetweenAlarms,
+      required this.intervalBetweenAlarms,
       this.selectedDaysText,
       this.label})
       : _daysOfWeek = daysOfWeek;
@@ -251,7 +251,7 @@ class _$CreateNewAlarmStateImpl implements _CreateNewAlarmState {
   @override
   final bool isSnoozeEnabled;
   @override
-  final int? intervalBetweenAlarms;
+  final int intervalBetweenAlarms;
   @override
   final String? selectedDaysText;
   @override
@@ -320,7 +320,7 @@ abstract class _CreateNewAlarmState implements CreateNewAlarmState {
       required final List<Weekday> daysOfWeek,
       required final int snoozeDuration,
       required final bool isSnoozeEnabled,
-      final int? intervalBetweenAlarms,
+      required final int intervalBetweenAlarms,
       final String? selectedDaysText,
       final String? label}) = _$CreateNewAlarmStateImpl;
 
@@ -339,7 +339,7 @@ abstract class _CreateNewAlarmState implements CreateNewAlarmState {
   @override
   bool get isSnoozeEnabled;
   @override
-  int? get intervalBetweenAlarms;
+  int get intervalBetweenAlarms;
   @override
   String? get selectedDaysText;
   @override

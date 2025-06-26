@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:walk_it_up/domain/time_selection_handler.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
 class TimeSelectionHandlerImpl extends TimeSelectionHandler {
   final BehaviorSubject<Pair<String, String>> _timeSubject =

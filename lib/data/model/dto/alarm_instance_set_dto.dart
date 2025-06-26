@@ -11,7 +11,7 @@ class AlarmInstanceSetDto extends Equatable {
   final DateTime endTime;
   final String audioPath;
   final List<Weekday>? daysOfWeek;
-  final int intervalBetweenAlarms;
+  final Duration intervalBetweenAlarms;
   final int? pauseDuration;
   final List<AlarmInstanceDto> recurringAlarms;
 
@@ -34,12 +34,34 @@ class AlarmInstanceSetDto extends Equatable {
         id: alarmSet.id,
         startTime: alarmSet.startTime,
         endTime: alarmSet.endTime,
-        intervalBetweenAlarms: alarmSet.intervalBetweenAlarms,
+        intervalBetweenAlarms: Duration(minutes: alarmSet.intervalBetweenAlarms),
         pauseDuration: alarmSet.pauseDuration,
         recurringAlarms: recurringAlarms,
         audioPath: alarmSet.audioPath,
         daysOfWeek: alarmSet.daysOfWeek,
       );
+
+  AlarmInstanceSetDto copyWith({
+    int? id,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? audioPath,
+    List<Weekday>? daysOfWeek,
+    Duration? intervalBetweenAlarms,
+    int? pauseDuration,
+    List<AlarmInstanceDto>? recurringAlarms,
+  }) {
+    return AlarmInstanceSetDto._(
+      id: id ?? this.id,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      audioPath: audioPath ?? this.audioPath,
+      daysOfWeek: daysOfWeek ?? this.daysOfWeek,
+      intervalBetweenAlarms: intervalBetweenAlarms ?? this.intervalBetweenAlarms,
+      pauseDuration: pauseDuration ?? this.pauseDuration,
+      recurringAlarms: recurringAlarms ?? this.recurringAlarms,
+    );
+  }
 
   @override
   List<Object?> get props => [

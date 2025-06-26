@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:walk_it_up/debouncer.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/debouncer.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
 class TimeWheelPicker extends StatefulWidget {
   const TimeWheelPicker({

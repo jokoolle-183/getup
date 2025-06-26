@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
 class DayPicker extends StatelessWidget {
   const DayPicker({
