@@ -8,14 +8,14 @@ import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_cubit.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_state.dart';
 import 'package:walk_it_up/main.dart';
 
+@Deprecated("To be removed in favor of create_new_alarm_screen.dart")
 class EditAlarmScreen extends StatelessWidget {
   const EditAlarmScreen({super.key});
   static const routeName = '/edit-alarm';
 
   @override
   Widget build(BuildContext context) {
-    final AlarmItem? alarmItem =
-        ModalRoute.of(context)!.settings.arguments as AlarmItem?;
+    final AlarmItem? alarmItem = ModalRoute.of(context)!.settings.arguments as AlarmItem?;
     return BlocProvider(
       create: (_) => EditAlarmCubit(
         getIt.get<AlarmSetRepository>(),
@@ -54,9 +54,7 @@ class EditAlarmScreen extends StatelessWidget {
                   selected: {state.focusDuration},
                   onSelectionChanged: (Set<FocusDuration> durations) {
                     if (durations.firstOrNull != null) {
-                      context
-                          .read<EditAlarmCubit>()
-                          .selectFocusDuration(durations.first);
+                      context.read<EditAlarmCubit>().selectFocusDuration(durations.first);
                     }
                   },
                 ),
@@ -74,9 +72,7 @@ class EditAlarmScreen extends StatelessWidget {
                           initialEntryMode: TimePickerEntryMode.dial,
                         );
                         if (time != null && context.mounted) {
-                          context
-                              .read<EditAlarmCubit>()
-                              .selectFromTimeOfDay(time);
+                          context.read<EditAlarmCubit>().selectFromTimeOfDay(time);
                         }
                       },
                     ),
@@ -90,9 +86,7 @@ class EditAlarmScreen extends StatelessWidget {
                             initialEntryMode: TimePickerEntryMode.dial,
                           );
                           if (time != null && context.mounted) {
-                            context
-                                .read<EditAlarmCubit>()
-                                .selectToTimeOfDay(time);
+                            context.read<EditAlarmCubit>().selectToTimeOfDay(time);
                           }
                         }),
                   ],
@@ -110,8 +104,7 @@ class EditAlarmScreen extends StatelessWidget {
                   child: const Text('Stop all alarms'),
                 ),
                 if (state.nextAlarm != null)
-                  Text(
-                      'Alarm ${state.nextAlarm!.id} at ${state.nextAlarm!.dateTime}')
+                  Text('Alarm ${state.nextAlarm!.id} at ${state.nextAlarm!.dateTime}')
               ],
             ),
           ),

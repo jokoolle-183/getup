@@ -6,6 +6,7 @@ class AlarmSetConfig {
   final List<Weekday> daysOfWeek;
   final String audioPath;
   final Duration interval;
+  final Duration breakDuration;
   final String soundPath;
   final int snoozeDuration;
   final bool isVibrate;
@@ -16,6 +17,7 @@ class AlarmSetConfig {
     required this.selectedEndTime,
     required this.daysOfWeek,
     required this.interval,
+    required this.breakDuration,
     required this.isVibrate,
     required this.snoozeDuration,
     required this.soundPath,
@@ -25,23 +27,42 @@ class AlarmSetConfig {
 
   List<DateTime> get alarmDates => _createAlarmDatesInSet(selectedStartTime, selectedEndTime, interval);
 
+  /// Generates a list of alarm DateTime instances between [startAlarmDate] and [endAlarmDate].
+  /// Alarms are scheduled at each [interval] plus [breakDuration].
+  /// If the gap between the last calculated alarm and [endAlarmDate] is greater than or equal to 3/4 of the interval,
+  /// a final alarm is added at [endAlarmDate] to ensure coverage of the full session without alarms being too close together.
   List<DateTime> _createAlarmDatesInSet(
     DateTime startAlarmDate,
     DateTime endAlarmDate,
     Duration interval,
   ) {
     final List<DateTime> list = [];
+    final Duration step = interval + breakDuration;
 
-    final differenceInMinutes = endAlarmDate.difference(startAlarmDate).inMinutes;
-    final numAlarms = differenceInMinutes / interval.inMinutes + 1;
-
-    /// End time included
-
-    for (int i = 0; i < numAlarms; i++) {
-      list.add(startAlarmDate.add(interval));
+    DateTime current = startAlarmDate;
+    while (current.isBefore(endAlarmDate)) {
+      list.add(current);
+      current = current.add(step);
     }
 
-    list.forEach((date) => print("Alarm instance time: $date"));
+    // Check if we should add a final alarm at endAlarmDate
+    if (list.isNotEmpty) {
+      final lastAlarm = list.last;
+      final gap = endAlarmDate.difference(lastAlarm).inMinutes;
+      final threshold = (interval.inMinutes * 0.75).round();
+
+      // Only add if the gap is greater than or equal to 3/4 of the interval
+      if (gap >= threshold) {
+        list.add(endAlarmDate);
+      }
+    } else {
+      // If no alarms were added (shouldn't happen), add the end time
+      list.add(endAlarmDate);
+    }
+
+    for (var date in list) {
+      print("Alarm instance time: $date");
+    }
     return list;
   }
 
@@ -50,6 +71,7 @@ class AlarmSetConfig {
     DateTime? selectedEndTime,
     List<Weekday>? daysOfWeek,
     Duration? interval,
+    Duration? breakDuration,
     String? soundPath,
     bool? isVibrate,
     int? snoozeDuration,
@@ -57,10 +79,11 @@ class AlarmSetConfig {
     bool? isEnabled,
   }) {
     return AlarmSetConfig(
-      selectedStartTime: selectedTime ?? this.selectedStartTime,
+      selectedStartTime: selectedTime ?? selectedStartTime,
       selectedEndTime: selectedEndTime ?? this.selectedEndTime,
       daysOfWeek: daysOfWeek ?? this.daysOfWeek,
       interval: interval ?? this.interval,
+      breakDuration: breakDuration ?? this.breakDuration,
       soundPath: soundPath ?? this.soundPath,
       isVibrate: isVibrate ?? this.isVibrate,
       snoozeDuration: snoozeDuration ?? this.snoozeDuration,

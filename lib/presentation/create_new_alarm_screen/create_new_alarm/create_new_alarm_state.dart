@@ -17,6 +17,7 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
     required int snoozeDuration,
     required bool isSnoozeEnabled,
     required int intervalBetweenAlarms,
+    required int breakDuration,
     String? selectedDaysText,
     String? label,
   }) = _CreateNewAlarmState;
@@ -31,6 +32,7 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
       isVibrate: false,
       daysOfWeek: [],
       intervalBetweenAlarms: 60,
+      breakDuration: 0,
     );
   }
 }

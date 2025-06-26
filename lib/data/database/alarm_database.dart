@@ -16,8 +16,7 @@ class DbAlarms extends Table {
   TextColumn get name => text().nullable()();
   TextColumn get audioPath => text()();
   IntColumn get snoozeDuration => integer().nullable()();
-  TextColumn get daysOfWeek =>
-      text().map(EnumListConverter(EqualList(Weekday.values))).nullable()();
+  TextColumn get daysOfWeek => text().map(EnumListConverter(EqualList(Weekday.values))).nullable()();
   BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
 }
 
@@ -28,8 +27,7 @@ class AlarmInstanceSets extends Table {
   TextColumn get audioPath => text()();
   DateTimeColumn get startTime => dateTime()();
   DateTimeColumn get endTime => dateTime()();
-  TextColumn get daysOfWeek =>
-      text().map(EnumListConverter(EqualList(Weekday.values))).nullable()();
+  TextColumn get daysOfWeek => text().map(EnumListConverter(EqualList(Weekday.values))).nullable()();
   IntColumn get intervalBetweenAlarms => integer()();
   IntColumn get pauseDuration => integer().nullable()();
   BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
@@ -42,16 +40,14 @@ class AlarmInstances extends Table {
       .references(
         DbAlarms,
         #id,
-        onDelete: KeyAction
-            .cascade, // If the set is deleted, this will set alarmSetId to null
+        onDelete: KeyAction.cascade, // If the set is deleted, this will set alarmSetId to null
       )
       .nullable()();
   IntColumn get alarmInstanceSetId => integer()
       .references(
         AlarmInstanceSets,
         #id,
-        onDelete: KeyAction
-            .cascade, // If the set is deleted, this will set alarmSetId to null
+        onDelete: KeyAction.cascade, // If the set is deleted, this will set alarmSetId to null
       )
       .nullable()();
   DateTimeColumn get time => dateTime()();
@@ -77,15 +73,14 @@ class AlarmDatabase extends _$AlarmDatabase {
   }
 
   static QueryExecutor _openConnection() {
-    return driftDatabase(name: ALARM_DATABASE);
+    return driftDatabase(name: alarmDatabase);
   }
 
   @override
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration =>
-      MigrationStrategy(beforeOpen: (details) async {
+  MigrationStrategy get migration => MigrationStrategy(beforeOpen: (details) async {
         // Prepopulate the db on first creation and in case it's not
         // for testing
         if (details.wasCreated && !isUnderTest) {

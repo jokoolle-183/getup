@@ -5,6 +5,7 @@ import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
 
 part 'edit_alarm_state.freezed.dart';
 
+@Deprecated("To be removed in favor of create_new_alarm_state.dart")
 @freezed
 class EditAlarmState with _$EditAlarmState {
   factory EditAlarmState({
@@ -17,9 +18,7 @@ class EditAlarmState with _$EditAlarmState {
 
   factory EditAlarmState.initial() => EditAlarmState(
         focusDuration: FocusDuration.sixty,
-        fromTimeOfDay:
-            TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0)),
-        toTimeOfDay: TimeOfDay.fromDateTime(
-            DateTime.now().copyWith(hour: 17, minute: 0)),
+        fromTimeOfDay: TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 9, minute: 0)),
+        toTimeOfDay: TimeOfDay.fromDateTime(DateTime.now().copyWith(hour: 17, minute: 0)),
       );
 }

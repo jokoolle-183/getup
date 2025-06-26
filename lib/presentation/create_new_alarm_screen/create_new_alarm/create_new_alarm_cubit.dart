@@ -80,8 +80,9 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
         audioPath: state.soundPath,
         soundPath: state.soundPath,
         snoozeDuration: state.snoozeDuration,
+        interval: Duration(minutes: state.intervalBetweenAlarms),
+        breakDuration: Duration(minutes: state.breakDuration),
         isVibrate: state.isVibrate,
-        interval: const Duration(minutes: 10),
         isEnabled: true,
       );
 
@@ -114,5 +115,13 @@ class CreateNewAlarmCubit extends Cubit<CreateNewAlarmState> {
 
   void onVibrateChanged(bool value) {
     emit(state.copyWith(isVibrate: value));
+  }
+
+  void onIntervalDurationChanged(int duration) {
+    emit(state.copyWith(intervalBetweenAlarms: duration));
+  }
+
+  void onBreakDurationChanged(int duration) {
+    emit(state.copyWith(breakDuration: duration));
   }
 }
