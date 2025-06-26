@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walk_it_up/data/model/alarm_details_model.dart';

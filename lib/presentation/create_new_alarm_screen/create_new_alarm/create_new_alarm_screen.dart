@@ -35,246 +35,252 @@ class CreateNewAlarmScreen extends StatelessWidget {
       child: BlocBuilder<CreateNewAlarmCubit, CreateNewAlarmState>(
         builder: (context, state) => Scaffold(
           backgroundColor: Colors.white,
-          body: LayoutBuilder(builder: (context, constraints) {
-            return Stack(children: [
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Gap(50),
-                    TimePickerFactory.getPicker(
-                      state.type,
-                      context.read<TimePickerCubit>(),
-                    ).buildPicker(),
-                    const Gap(24),
-                    DayPicker(
-                      selectedDays: state.daysOfWeek,
-                      selectedTime: state.selectedTime,
-                      onSelected: context.read<CreateNewAlarmCubit>().onDaySelected,
-                    ),
-                    const Gap(16),
-                    InkWell(
-                      onTap: () => openAlarmTypeDialog(
-                        context,
-                        state,
-                        context.read<CreateNewAlarmCubit>().onTypeChanged,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Gap(16.0),
-                            const Expanded(
-                                child: Text(
-                              'Type',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
-                            Text(state.type.typeName,
-                                style: const TextStyle(
-                                  fontSize: 16,
+          body: SafeArea(
+            child: LayoutBuilder(builder: (context, constraints) {
+              return Stack(children: [
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 50.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Gap(16.0),
+                        TimePickerFactory.getPicker(
+                          state.type,
+                          context.read<TimePickerCubit>(),
+                        ).buildPicker(),
+                        const Gap(24),
+                        DayPicker(
+                          selectedDays: state.daysOfWeek,
+                          selectedTime: state.selectedTime,
+                          onSelected: context.read<CreateNewAlarmCubit>().onDaySelected,
+                        ),
+                        const Gap(16),
+                        InkWell(
+                          onTap: () => openAlarmTypeDialog(
+                            context,
+                            state,
+                            context.read<CreateNewAlarmCubit>().onTypeChanged,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Gap(16.0),
+                                const Expanded(
+                                    child: Text(
+                                  'Type',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 )),
-                            const Gap(4.0),
-                            const Icon(Icons.chevron_right_outlined),
-                            const Gap(16.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (state.type == AlarmType.recurringDaily)
-                      InkWell(
-                        onTap: () => openDurationDialog(
-                          context,
-                          intervalBetweenAlarms,
-                          state.intervalBetweenAlarms,
-                          context.read<CreateNewAlarmCubit>().onIntervalDurationChanged,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              const Gap(16.0),
-                              const Expanded(
-                                  child: Text(
-                                'Interval',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              )),
-                              Text(
-                                '${state.intervalBetweenAlarms} min',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const Gap(4.0),
-                              const Icon(Icons.chevron_right_outlined),
-                              const Gap(16.0),
-                            ],
+                                Text(state.type.typeName,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                    )),
+                                const Gap(4.0),
+                                const Icon(Icons.chevron_right_outlined),
+                                const Gap(16.0),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    InkWell(
-                      onTap: () => openDurationDialog(
-                        context,
-                        breakDuration,
-                        state.breakDuration,
-                        context.read<CreateNewAlarmCubit>().onBreakDurationChanged,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Gap(16.0),
-                            const Expanded(
-                                child: Text(
-                              'Break duration',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
-                            Text(
-                              '${state.breakDuration} min',
-                              style: const TextStyle(
-                                fontSize: 16,
+                        if (state.type == AlarmType.recurringDaily)
+                          InkWell(
+                            onTap: () => openDurationDialog(
+                              context,
+                              intervalBetweenAlarms,
+                              state.intervalBetweenAlarms,
+                              context.read<CreateNewAlarmCubit>().onIntervalDurationChanged,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  const Gap(16.0),
+                                  const Expanded(
+                                      child: Text(
+                                    'Interval',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  )),
+                                  Text(
+                                    '${state.intervalBetweenAlarms} min',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Gap(4.0),
+                                  const Icon(Icons.chevron_right_outlined),
+                                  const Gap(16.0),
+                                ],
                               ),
                             ),
-                            const Gap(4.0),
-                            const Icon(Icons.chevron_right_outlined),
-                            const Gap(16.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => {},
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Gap(16.0),
-                            const Expanded(
-                                child: Text(
-                              'Sound',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
-                            Text(
-                              state.soundPath.substring(
-                                state.soundPath.indexOf('/') + 1,
-                                state.soundPath.indexOf('.'),
-                              ),
-                              style: const TextStyle(
-                                fontSize: 16,
+                          ),
+                        if (state.type == AlarmType.recurringDaily)
+                          InkWell(
+                            onTap: () => openDurationDialog(
+                              context,
+                              breakDuration,
+                              state.breakDuration,
+                              context.read<CreateNewAlarmCubit>().onBreakDurationChanged,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  const Gap(16.0),
+                                  const Expanded(
+                                      child: Text(
+                                    'Break duration',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  )),
+                                  Text(
+                                    '${state.breakDuration} min',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Gap(4.0),
+                                  const Icon(Icons.chevron_right_outlined),
+                                  const Gap(16.0),
+                                ],
                               ),
                             ),
-                            const Gap(4.0),
-                            const Icon(Icons.chevron_right_outlined),
-                            const Gap(16.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => openSnoozeDurationDialog(
-                        context,
-                        state,
-                        context.read<CreateNewAlarmCubit>().onSnoozeSettingsChanged,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Gap(16.0),
-                            const Expanded(
-                                child: Text(
-                              'Snooze',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
-                            Text(
-                              state.isSnoozeEnabled ? '${state.snoozeDuration} min' : 'Off',
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
+                          ),
+                        InkWell(
+                          onTap: () => {},
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Gap(16.0),
+                                const Expanded(
+                                    child: Text(
+                                  'Sound',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )),
+                                Text(
+                                  state.soundPath.substring(
+                                    state.soundPath.indexOf('/') + 1,
+                                    state.soundPath.indexOf('.'),
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(4.0),
+                                const Icon(Icons.chevron_right_outlined),
+                                const Gap(16.0),
+                              ],
                             ),
-                            const Gap(4.0),
-                            const Gap(4.0),
-                            const Icon(Icons.chevron_right_outlined),
-                            const Gap(16.0),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => {},
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Gap(16.0),
-                            const Expanded(
-                                child: Text(
-                              'Vibration',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
-                            Switch.adaptive(
-                              value: state.isVibrate,
-                              onChanged: (value) {
-                                context.read<CreateNewAlarmCubit>().onVibrateChanged(value);
-                              },
+                        InkWell(
+                          onTap: () => openSnoozeDurationDialog(
+                            context,
+                            state,
+                            context.read<CreateNewAlarmCubit>().onSnoozeSettingsChanged,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Gap(16.0),
+                                const Expanded(
+                                    child: Text(
+                                  'Snooze',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )),
+                                Text(
+                                  state.isSnoozeEnabled ? '${state.snoozeDuration} min' : 'Off',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Gap(4.0),
+                                const Gap(4.0),
+                                const Icon(Icons.chevron_right_outlined),
+                                const Gap(16.0),
+                              ],
                             ),
-                            const Gap(16.0),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-                  child: FilledButton(
-                    style: ButtonStyle(
-                      fixedSize: WidgetStatePropertyAll(
-                        Size(
-                          constraints.maxWidth,
-                          50,
+                        InkWell(
+                          onTap: () => {},
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Gap(16.0),
+                                const Expanded(
+                                    child: Text(
+                                  'Vibration',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )),
+                                Switch.adaptive(
+                                  value: state.isVibrate,
+                                  onChanged: (value) {
+                                    context.read<CreateNewAlarmCubit>().onVibrateChanged(value);
+                                  },
+                                ),
+                                const Gap(16.0),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      backgroundColor: const WidgetStatePropertyAll(Colors.black),
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                      ),
-                    ),
-                    onPressed: () async {
-                      await context.read<CreateNewAlarmCubit>().scheduleAlarm();
-                      if (context.mounted) Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      'OK',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ]);
-          }),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                    child: FilledButton(
+                      style: ButtonStyle(
+                        fixedSize: WidgetStatePropertyAll(
+                          Size(
+                            constraints.maxWidth,
+                            50,
+                          ),
+                        ),
+                        backgroundColor: const WidgetStatePropertyAll(Colors.black),
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                        ),
+                      ),
+                      onPressed: () async {
+                        await context.read<CreateNewAlarmCubit>().scheduleAlarm();
+                        if (context.mounted) Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ]);
+            }),
+          ),
         ),
       ),
     );

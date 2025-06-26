@@ -1,5 +1,4 @@
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:collection/collection.dart';
 import 'package:walk_it_up/data/model/alarm_args.dart';
 import 'package:walk_it_up/data/model/alarm_set_args.dart';
@@ -58,13 +57,19 @@ class AlarmScheduler {
 
       final alarmId = await _regularAlarmRepository.saveAlarm(alarmArgs);
 
+      var notifSettings = const NotificationSettings(
+        title: 'Get up',
+        body: 'Walk it up! ',
+      );
+
       return await Alarm.set(
         alarmSettings: AlarmSettings(
           id: alarmId,
           dateTime: config.selectedTime!,
           assetAudioPath: config.soundPath,
-          notificationTitle: 'Get up',
-          notificationBody: 'Walk it up! ',
+          notificationSettings: notifSettings,
+          volumeSettings: VolumeSettings.fade(fadeDuration: const Duration(seconds: 1)),
+          vibrate: config.isVibrate,
         ),
       );
     }
@@ -144,13 +149,19 @@ class AlarmScheduler {
   }) async {
     if (alarmInstance != null) {
       /// Schedule next alarm in today's alarm set session
+
+      var notifSettings = const NotificationSettings(
+        title: 'Get up',
+        body: 'Walk it up! ',
+      );
+
       final result = await Alarm.set(
         alarmSettings: AlarmSettings(
           id: alarmInstance.id,
           dateTime: alarmInstance.time,
           assetAudioPath: alarmInstanceSet.audioPath,
-          notificationTitle: 'Get up',
-          notificationBody: 'Walk it up! ',
+          notificationSettings: notifSettings,
+          volumeSettings: VolumeSettings.fade(fadeDuration: const Duration(seconds: 1)),
         ),
       );
 
@@ -160,13 +171,19 @@ class AlarmScheduler {
       final firstUpcomingAlarmInstance = alarmInstanceSet.recurringAlarms.firstOrNull;
 
       if (firstUpcomingAlarmInstance != null) {
+        var notifSettings = const NotificationSettings(
+          title: 'Get up',
+          body: 'Walk it up! ',
+        );
         final result = await Alarm.set(
           alarmSettings: AlarmSettings(
             id: firstUpcomingAlarmInstance.id,
             dateTime: firstUpcomingAlarmInstance.time,
             assetAudioPath: alarmInstanceSet.audioPath,
-            notificationTitle: 'Get up',
-            notificationBody: 'Walk it up! ',
+            notificationSettings: notifSettings,
+            volumeSettings: VolumeSettings.fade(
+              fadeDuration: const Duration(seconds: 1),
+            ),
           ),
         );
 
@@ -188,13 +205,18 @@ class AlarmScheduler {
         alarmDate,
       );
 
+      var notifSettings = const NotificationSettings(
+        title: 'Get up',
+        body: 'Walk it up! ',
+      );
+
       final result = await Alarm.set(
         alarmSettings: AlarmSettings(
           id: id,
           dateTime: alarmDate,
           assetAudioPath: alarm.audioPath,
-          notificationTitle: 'Get up',
-          notificationBody: 'Walk it up! ',
+          notificationSettings: notifSettings,
+          volumeSettings: VolumeSettings.fade(fadeDuration: const Duration(seconds: 1)),
         ),
       );
 
@@ -310,13 +332,20 @@ class AlarmScheduler {
     final alarmId = await _alarmSetRepository.saveAlarmSet(alarmSetArgs);
 
     if (alarmId != null) {
+      var notifSettings = const NotificationSettings(
+        title: 'Get up',
+        body: 'Walk it up! ',
+      );
+
       return await Alarm.set(
         alarmSettings: AlarmSettings(
           id: alarmId,
           dateTime: config.selectedStartTime,
           assetAudioPath: config.soundPath,
-          notificationTitle: 'Get up',
-          notificationBody: 'Walk it up! ',
+          notificationSettings: notifSettings,
+          volumeSettings: VolumeSettings.fade(
+            fadeDuration: const Duration(seconds: 1),
+          ),
         ),
       );
     }

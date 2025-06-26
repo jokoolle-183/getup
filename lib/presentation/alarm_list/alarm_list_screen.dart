@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
@@ -58,26 +57,27 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
       child: BlocBuilder<AlarmListCubit, AlarmListState>(
         builder: (context, state) => Scaffold(
           body: Scaffold(
-            body: Builder(
-              builder: (context) {
-                if (state.alarmItems.isEmpty) {
-                  return const Center(
-                    child: Text('No alarms have been set.'),
-                  );
-                } else {
-                  return ListView.builder(
-                      itemCount: state.alarmItems.length,
-                      itemBuilder: (context, i) => AlarmItemCard(
-                            alarmItem: state.alarmItems[i],
-                            navigateToEditAlarm: navigateToEditAlarm,
-                          ));
-                }
-              },
+            body: SafeArea(
+              child: Builder(
+                builder: (context) {
+                  if (state.alarmItems.isEmpty) {
+                    return const Center(
+                      child: Text('No alarms have been set.'),
+                    );
+                  } else {
+                    return ListView.builder(
+                        itemCount: state.alarmItems.length,
+                        itemBuilder: (context, i) => AlarmItemCard(
+                              alarmItem: state.alarmItems[i],
+                              navigateToEditAlarm: navigateToEditAlarm,
+                            ));
+                  }
+                },
+              ),
             ),
           ),
           floatingActionButton: FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () => navigateToCreateNewAlarm(context)),
+              child: const Icon(Icons.add), onPressed: () => navigateToCreateNewAlarm(context)),
         ),
       ),
     );
@@ -92,8 +92,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
   }
 
   Future<void> navigateToCreateNewAlarm(BuildContext context) async {
-    await Navigator.pushNamed(context, CreateNewAlarmScreen.route)
-        .then((shouldRefresh) {
+    await Navigator.pushNamed(context, CreateNewAlarmScreen.route).then((shouldRefresh) {
       context.read<AlarmListCubit>().loadAlarms();
     });
   }

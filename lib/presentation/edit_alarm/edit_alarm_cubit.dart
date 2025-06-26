@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,14 +87,18 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
 
     if (list.isNotEmpty) {
       var nextAlarm = list.first;
+      var notifSettings = NotificationSettings(
+        title: nextAlarm.notificationTitle,
+        body: nextAlarm.notificationBody,
+      );
       await Alarm.set(
         alarmSettings: AlarmSettings(
           id: nextAlarm.id,
+          volumeSettings: VolumeSettings.fade(fadeDuration: const Duration(seconds: 1)),
           vibrate: false,
           dateTime: nextAlarm.dateTime,
           assetAudioPath: nextAlarm.assetAudioPath,
-          notificationTitle: nextAlarm.notificationTitle,
-          notificationBody: nextAlarm.notificationBody,
+          notificationSettings: notifSettings,
         ),
       );
 
