@@ -84,46 +84,46 @@ class AlarmDatabase extends _$AlarmDatabase {
         // Prepopulate the db on first creation and in case it's not
         // for testing
         if (details.wasCreated && !isUnderTest) {
-          // final date = DateTime.now();
-          // final alarmId = await into(dbAlarm).insert(
-          //   DbAlarmCompanion.insert(
-          //     audioPath: 'assets/perfect_alarm.mp3',
-          //     time: DateTime(date.year, date.month, date.day, 10, 0),
-          //     daysOfWeek: Value(EqualList([
-          //       Weekday.monday,
-          //       Weekday.tuesday,
-          //       Weekday.wednesday,
-          //     ])),
-          //   ),
-          // );
+          final date = DateTime.now();
+          final alarmId = await into(dbAlarms).insert(
+            DbAlarmsCompanion.insert(
+              audioPath: 'assets/perfect_alarm.mp3',
+              daysOfWeek: Value(EqualList([
+                Weekday.monday,
+                Weekday.tuesday,
+                Weekday.wednesday,
+              ])),
+            ),
+          );
 
-          // final alarmSetId = await into(alarmInstanceSet).insert(
-          //   AlarmInstanceSetCompanion.insert(
-          //     alarmId: alarmId,
-          //     startTime: DateTime(date.year, date.month, date.day, 9, 0),
-          //     endTime: DateTime(date.year, date.month, date.day, 12, 0),
-          //     intervalBetweenAlarms: 60,
-          //   ),
-          // );
+          final alarmSetId = await into(alarmInstanceSets).insert(
+            AlarmInstanceSetsCompanion.insert(
+              id: Value(alarmId),
+              audioPath: 'assets/perfect_alarm.mp3',
+              startTime: DateTime(date.year, date.month, date.day, 9, 0),
+              endTime: DateTime(date.year, date.month, date.day, 12, 0),
+              intervalBetweenAlarms: 60,
+            ),
+          );
 
-          // final alarmInstances = [
-          //   AlarmInstanceCompanion.insert(
-          //     alarmInstanceSetId: Value(alarmSetId),
-          //     time: DateTime(date.year, date.month, date.day, 10, 0),
-          //   ),
-          //   AlarmInstanceCompanion.insert(
-          //     alarmInstanceSetId: Value(alarmSetId),
-          //     time: DateTime(date.year, date.month, date.day, 11, 0),
-          //   ),
-          //   AlarmInstanceCompanion.insert(
-          //     alarmInstanceSetId: Value(alarmSetId),
-          //     time: DateTime(date.year, date.month, date.day, 12, 0),
-          //   ),
-          // ];
+          final alarmInstanceList = [
+            AlarmInstancesCompanion.insert(
+              alarmInstanceSetId: Value(alarmSetId),
+              time: DateTime(date.year, date.month, date.day, 10, 0),
+            ),
+            AlarmInstancesCompanion.insert(
+              alarmInstanceSetId: Value(alarmSetId),
+              time: DateTime(date.year, date.month, date.day, 11, 0),
+            ),
+            AlarmInstancesCompanion.insert(
+              alarmInstanceSetId: Value(alarmSetId),
+              time: DateTime(date.year, date.month, date.day, 12, 0),
+            ),
+          ];
 
-          // batch((batch) {
-          //   batch.insertAll(alarmInstance, alarmInstances);
-          // });
+          batch((batch) {
+            batch.insertAll(alarmInstances, alarmInstanceList);
+          });
         }
         // Turned off by default in sqlite 3, needs to be manually activated
         await customStatement('PRAGMA foreign_keys = ON');

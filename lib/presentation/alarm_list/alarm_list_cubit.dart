@@ -25,7 +25,6 @@ class AlarmListCubit extends Cubit<AlarmListState> {
   Future<void> checkAllPermissions() async {
     await checkAndroidNotificationPermission();
     await requestScheduleExactAlarm();
-    await requestActivityRecognition();
   }
 
   void loadAlarms() async {
@@ -63,18 +62,6 @@ class AlarmListCubit extends Cubit<AlarmListState> {
       print(
         'Notification permission ${res.isGranted ? '' : 'not '}granted',
       );
-    }
-  }
-
-  Future<void> requestActivityRecognition() async {
-    final status = await Permission.activityRecognition.status;
-
-    try {
-      print("Requesting activity recognition permission...");
-      final res = await Permission.activityRecognition.request();
-      print("Activity recognition permission granted: ${status.isGranted}");
-    } on Exception catch (e) {
-      print("Exception caught: $e");
     }
   }
 
