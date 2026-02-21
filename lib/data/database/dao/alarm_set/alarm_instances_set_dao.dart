@@ -7,27 +7,19 @@ import 'package:walk_it_up/data/model/dto/alarm_instance_set_dto.dart';
 part 'alarm_instances_set_dao.g.dart';
 
 @DriftAccessor(tables: [AlarmInstanceSets, AlarmInstances])
-class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
-    with _$AlarmInstanceSetDaoMixin {
+class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase> with _$AlarmInstanceSetDaoMixin {
   AlarmInstanceSetDao(AlarmDatabase db) : super(db);
 
-  Future<List<AlarmInstance>> get allRecurringAlarms =>
-      select(alarmInstances).get();
+  Future<List<AlarmInstance>> get allRecurringAlarms => select(alarmInstances).get();
 
-  Future<List<AlarmInstanceSet>> get allAlarmSets =>
-      select(alarmInstanceSets).get();
+  Future<List<AlarmInstanceSet>> get allAlarmSets => select(alarmInstanceSets).get();
 
   Future<List<AlarmInstanceSetDto>> getSetsWithAlarms() async {
     final query = select(alarmInstanceSets).join([
-      leftOuterJoin(alarmInstances,
-          alarmInstances.alarmInstanceSetId.equalsExp(alarmInstanceSets.id)),
+      leftOuterJoin(alarmInstances, alarmInstances.alarmInstanceSetId.equalsExp(alarmInstanceSets.id)),
     ]);
 
-    return query
-        .get()
-        .then(
-            (rows) => groupBy(rows, (row) => row.readTable(alarmInstanceSets)))
-        .then((map) {
+    return query.get().then((rows) => groupBy(rows, (row) => row.readTable(alarmInstanceSets))).then((map) {
       return map.entries.map((entry) {
         final alarmSet = entry.key;
         final alarms = entry.value
@@ -40,7 +32,29 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
     });
   }
 
-  Future<void> saveAlarmSet(
+  Future<AlarmInstanceSetDto?> getAlarmInstanceSetById(int instanceSetId) async {
+    final query = select(alarmInstanceSets).join([
+      leftOuterJoin(
+        alarmInstances,
+        alarmInstances.alarmInstanceSetId.equalsExp(alarmInstanceSets.id),
+      ),
+    ])
+      ..where(alarmInstanceSets.id.equals(instanceSetId));
+
+    return query.get().then((rows) {
+      if (rows.isEmpty) return null;
+
+      final alarms = rows
+          .map((row) => row.readTableOrNull(alarmInstances))
+          .whereType<AlarmInstance>()
+          .map(AlarmInstanceDto.from)
+          .toList();
+      final alarmSet = rows.first.readTable(alarmInstanceSets);
+      return AlarmInstanceSetDto.from(alarmSet, alarms);
+    });
+  }
+
+  Future<int?> saveAlarmSet(
     AlarmInstanceSetsCompanion alarmSet,
     List<AlarmInstancesCompanion> alarmList,
   ) {
@@ -48,10 +62,19 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
       final id = await into(alarmInstanceSets).insert(alarmSet);
       await batch((batch) {
         final alarmsWithParentId = alarmList
-            .map((alarm) => alarm.copyWith(alarmInstanceSetId: Value(id)))
+            .map((alarm) => AlarmInstancesCompanion.insert(
+                  alarmInstanceSetId: Value(id),
+                  time: alarm.time.value,
+                  isEnabled: alarm.isEnabled,
+                ))
             .toList();
         batch.insertAll(alarmInstances, alarmsWithParentId);
       });
+
+      final alarmInstancesForSet = await (select(alarmInstances)
+            ..where((alarmInstance) => alarmInstance.alarmInstanceSetId.equals(id)))
+          .get();
+      return alarmInstancesForSet.firstOrNull?.id;
     });
   }
 
@@ -64,22 +87,16 @@ class AlarmInstanceSetDao extends DatabaseAccessor<AlarmDatabase>
 
       // Update existing alarms under this alarm set
       for (AlarmInstancesCompanion alarm in alarmList) {
-        await (update(alarmInstances)
-              ..where((table) => table.id.equals(alarm.id.value)))
-            .write(alarm);
+        await (update(alarmInstances)..where((table) => table.id.equals(alarm.id.value))).write(alarm);
       }
     });
   }
 
   Future<int> deleteAlarmSet(int id) {
-    return (delete(alarmInstanceSets)
-          ..where((alarmSet) => alarmSet.id.equals(id)))
-        .go();
+    return (delete(alarmInstanceSets)..where((alarmSet) => alarmSet.id.equals(id))).go();
   }
 
   Stream<AlarmInstanceSet> watchAlarmSetById(int id) {
-    return (select(alarmInstanceSets)
-          ..where((alarmSet) => alarmSet.id.equals(id)))
-        .watchSingle();
+    return (select(alarmInstanceSets)..where((alarmSet) => alarmSet.id.equals(id))).watchSingle();
   }
 }

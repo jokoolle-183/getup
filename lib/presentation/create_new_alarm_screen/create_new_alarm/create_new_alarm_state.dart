@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:walk_it_up/data/model/weekdays.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/alarm_type/alarm_type.dart';
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
 part 'create_new_alarm_state.freezed.dart';
 
@@ -16,7 +16,8 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
     required List<Weekday> daysOfWeek,
     required int snoozeDuration,
     required bool isSnoozeEnabled,
-    int? intervalBetweenAlarms,
+    required int intervalBetweenAlarms,
+    required int breakDuration,
     String? selectedDaysText,
     String? label,
   }) = _CreateNewAlarmState;
@@ -30,6 +31,8 @@ class CreateNewAlarmState with _$CreateNewAlarmState {
       isSnoozeEnabled: true,
       isVibrate: false,
       daysOfWeek: [],
+      intervalBetweenAlarms: 60,
+      breakDuration: 0,
     );
   }
 }

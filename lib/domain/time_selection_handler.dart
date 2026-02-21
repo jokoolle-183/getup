@@ -1,4 +1,4 @@
-import 'package:walk_it_up/presentation/create_new_alarm_screen/pair.dart';
+import 'package:walk_it_up/utils/pair.dart';
 
 abstract class TimeSelectionHandler {
   Stream<Pair<String, String>> get timeStream;

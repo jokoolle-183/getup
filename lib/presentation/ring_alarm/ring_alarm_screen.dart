@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walk_it_up/data/model/alarm_details_model.dart';
@@ -14,8 +13,7 @@ class RingAlarmScreen extends StatelessWidget {
   static const routeName = '/ring-alarm';
   @override
   Widget build(BuildContext context) {
-    final alarmSettings =
-        ModalRoute.of(context)!.settings.arguments as AlarmSettings;
+    final alarmSettings = ModalRoute.of(context)!.settings.arguments as AlarmSettings;
     return BlocProvider(
       create: (_) => RingAlarmCubit(getIt.get()),
       child: BlocBuilder<RingAlarmCubit, RingAlarmState>(
@@ -44,9 +42,14 @@ class RingAlarmScreen extends StatelessWidget {
                             context
                                 .read<RingAlarmCubit>()
                                 .scheduleNextAlarm(alarmSettings)
-                                .then((scheduleSuccess) async {
+                                .then((resultPair) async {
                               await Alarm.stop(alarmSettings.id);
                               if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      duration: const Duration(seconds: 10),
+                                      content: Text("Next alarm scheduled at: ${resultPair.left}")),
+                                );
                                 Navigator.of(context).pop();
                               }
                             });

@@ -23,6 +23,12 @@ class AlarmInstanceDto extends Equatable {
         isEnabled: alarm.isEnabled,
       );
 
+  AlarmInstanceDto copyWith({int? id, int? parentId, DateTime? time, bool? isEnabled}) => AlarmInstanceDto._(
+      id: id ?? this.id,
+      parentId: parentId ?? this.parentId,
+      time: time ?? this.time,
+      isEnabled: isEnabled ?? this.isEnabled);
+
   @override
   List<Object?> get props => [
         id,

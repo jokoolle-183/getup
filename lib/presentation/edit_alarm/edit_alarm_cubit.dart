@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +9,7 @@ import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/presentation/edit_alarm/durations.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_state.dart';
 
+@Deprecated("To be removed in favor of create_new_alarm_cubit.dart")
 class EditAlarmCubit extends Cubit<EditAlarmState> {
   EditAlarmCubit(
     this._alarmSetRepository,
@@ -35,12 +35,11 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
 
   void _loadInitial({int? alarmId}) async {
     final prefs = await SharedPreferences.getInstance();
-    final focusDurationIndex =
-        prefs.getInt(FOCUS_DURATION_KEY) ?? FocusDuration.sixty.index;
-    final fromTimeOfDay = await _getTimeOfDayFromPrefs(FROM_TIME_OF_DAY_KEY);
-    final toTimeOfDay = await _getTimeOfDayFromPrefs(TO_TIME_OF_DAY_KEY);
+    final focusDurationIndex = prefs.getInt(focusDurationKey) ?? FocusDuration.sixty.index;
+    final fromTimeOfDay = await _getTimeOfDayFromPrefs(fromTimeOfDayKey);
+    final toTimeOfDay = await _getTimeOfDayFromPrefs(toTimeOfDayKey);
 
-    final alarmsJson = prefs.getString(ALARMS);
+    final alarmsJson = prefs.getString(alarms);
     AlarmDetails? nextAlarm;
     if (alarmsJson != null) {
       final alarms = decodeAlarmDetailsList(alarmsJson);
@@ -59,10 +58,8 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
 
   void setAlarms() async {
     final FocusDuration focusDuration = state.focusDuration;
-    final DateTime selectedFromTime =
-        _convertTimeOfDayToDateTime(state.fromTimeOfDay);
-    final DateTime selectedToTime =
-        _convertTimeOfDayToDateTime(state.toTimeOfDay);
+    final DateTime selectedFromTime = _convertTimeOfDayToDateTime(state.fromTimeOfDay);
+    final DateTime selectedToTime = _convertTimeOfDayToDateTime(state.toTimeOfDay);
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     Duration difference = selectedToTime.difference(selectedFromTime);
@@ -70,8 +67,7 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
     List<AlarmDetails> list = [];
 
     for (int i = 0; i <= occurrences; i++) {
-      DateTime newTime =
-          selectedFromTime.add(Duration(minutes: focusDuration.duration * i));
+      DateTime newTime = selectedFromTime.add(Duration(minutes: focusDuration.duration * i));
       print("$newTime");
       final alarmDetails = AlarmDetails(
         id: UniqueKey().hashCode,
@@ -91,23 +87,26 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
 
     if (list.isNotEmpty) {
       var nextAlarm = list.first;
+      var notifSettings = NotificationSettings(
+        title: nextAlarm.notificationTitle,
+        body: nextAlarm.notificationBody,
+      );
       await Alarm.set(
         alarmSettings: AlarmSettings(
           id: nextAlarm.id,
+          volumeSettings: VolumeSettings.fade(fadeDuration: const Duration(seconds: 1)),
           vibrate: false,
           dateTime: nextAlarm.dateTime,
           assetAudioPath: nextAlarm.assetAudioPath,
-          notificationTitle: nextAlarm.notificationTitle,
-          notificationBody: nextAlarm.notificationBody,
+          notificationSettings: notifSettings,
         ),
       );
 
       String encodedList = _encodeAlarmDetailsList(list);
-      prefs.setString(ALARMS, encodedList);
-      prefs.setInt(FOCUS_DURATION_KEY, state.focusDuration.index);
-      prefs.setString(
-          FROM_TIME_OF_DAY_KEY, timeOfDayToString(state.fromTimeOfDay));
-      prefs.setString(TO_TIME_OF_DAY_KEY, timeOfDayToString(state.toTimeOfDay));
+      prefs.setString(alarms, encodedList);
+      prefs.setInt(focusDurationKey, state.focusDuration.index);
+      prefs.setString(fromTimeOfDayKey, timeOfDayToString(state.fromTimeOfDay));
+      prefs.setString(toTimeOfDayKey, timeOfDayToString(state.toTimeOfDay));
       emit(state.copyWith(nextAlarm: nextAlarm));
     }
   }
@@ -115,7 +114,7 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
   void stopAllAlarms() async {
     final prefs = await SharedPreferences.getInstance();
     await Alarm.stopAll();
-    await prefs.remove(ALARMS);
+    await prefs.remove(alarms);
     _loadInitial();
   }
 
@@ -149,7 +148,6 @@ class EditAlarmCubit extends Cubit<EditAlarmState> {
 
   DateTime _convertTimeOfDayToDateTime(TimeOfDay timeOfDay, [DateTime? date]) {
     final currentDate = date ?? DateTime.now();
-    return DateTime(currentDate.year, currentDate.month, currentDate.day,
-        timeOfDay.hour, timeOfDay.minute);
+    return DateTime(currentDate.year, currentDate.month, currentDate.day, timeOfDay.hour, timeOfDay.minute);
   }
 }
