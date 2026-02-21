@@ -10,6 +10,5 @@ class AlarmListState with _$AlarmListState {
     required List<AlarmItem> alarmItems,
   }) = _AlarmListState;
 
-  factory AlarmListState.initial() =>
-      AlarmListState(isLoading: true, alarmItems: List.empty());
+  factory AlarmListState.initial() => AlarmListState(isLoading: true, alarmItems: List.empty());
 }

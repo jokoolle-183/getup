@@ -3,8 +3,8 @@ import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get_it/get_it.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:walk_it_up/data/database/dao/alarm_instance_dao/alarm_instance_dao.dart';
@@ -50,8 +50,7 @@ void setup() {
     () => AlarmSetRepositoryImpl(getIt<AlarmInstanceSetDao>()),
   );
 
-  getIt.registerLazySingleton<TimeSelectionHandler>(
-      () => TimeSelectionHandlerImpl());
+  getIt.registerLazySingleton<TimeSelectionHandler>(() => TimeSelectionHandlerImpl());
 
   getIt.registerFactory(() => AlarmScheduler(getIt<RegularAlarmRepository>()));
 }
@@ -63,11 +62,9 @@ int _id = 0;
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
     StreamController<ReceivedNotification>.broadcast();
 
-final StreamController<String?> selectNotificationStream =
-    StreamController<String?>.broadcast();
+final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 
-const MethodChannel platform =
-    MethodChannel('dexterx.dev/flutter_local_notifications_example');
+const MethodChannel platform = MethodChannel('dexterx.dev/flutter_local_notifications_example');
 
 const String portName = 'notification_send_port';
 
@@ -106,13 +103,11 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
       ' payload: ${notificationResponse.payload}');
   if (notificationResponse.input?.isNotEmpty ?? false) {
     // ignore: avoid_print
-    print(
-        'notification action tapped with input: ${notificationResponse.input}');
+    print('notification action tapped with input: ${notificationResponse.input}');
   }
 }
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -150,25 +145,23 @@ class MyApp extends StatelessWidget {
 }
 
 Future<void> showNotification(String title, String body) async {
-  const AndroidNotificationDetails androidNotificationDetails =
-      AndroidNotificationDetails('getup_channel_id', 'Getup',
-          channelDescription: 'Getup notification channel',
-          importance: Importance.low,
-          priority: Priority.min,
-          ticker: 'ticker');
+  const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+      'getup_channel_id', 'Getup',
+      channelDescription: 'Getup notification channel',
+      importance: Importance.low,
+      priority: Priority.min,
+      ticker: 'ticker');
   const NotificationDetails notificationDetails = NotificationDetails(
     android: androidNotificationDetails,
   );
-  await flutterLocalNotificationsPlugin.show(
-      ++_id, title, body, notificationDetails);
+  await flutterLocalNotificationsPlugin.show(++_id, title, body, notificationDetails);
 }
 
 InitializationSettings notificationInit() {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  final List<DarwinNotificationCategory> darwinNotificationCategories =
-      <DarwinNotificationCategory>[
+  final List<DarwinNotificationCategory> darwinNotificationCategories = <DarwinNotificationCategory>[
     DarwinNotificationCategory(
       darwinNotificationCategoryText,
       actions: <DarwinNotificationAction>[
@@ -212,13 +205,11 @@ InitializationSettings notificationInit() {
     )
   ];
 
-  final DarwinInitializationSettings initializationSettingsDarwin =
-      DarwinInitializationSettings(
+  final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
     requestAlertPermission: false,
     requestBadgePermission: false,
     requestSoundPermission: false,
-    onDidReceiveLocalNotification:
-        (int id, String? title, String? body, String? payload) async {
+    onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {
       didReceiveLocalNotificationStream.add(
         ReceivedNotification(
           id: id,
@@ -235,12 +226,6 @@ InitializationSettings notificationInit() {
     iOS: initializationSettingsDarwin,
   );
   return initializationSettings;
-}
-
-Future<tz.TZDateTime> convertDateTimeToTZDateTime(DateTime dateTime) async {
-  tz.Location location =
-      tz.getLocation(await FlutterTimezone.getLocalTimezone());
-  return tz.TZDateTime.from(dateTime, location);
 }
 
 Future<String> getIANATimeZone() async {

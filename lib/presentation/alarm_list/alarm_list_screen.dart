@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/data/repository/regular_alarm_repository.dart';
+import 'package:walk_it_up/main.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_item.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_item_card.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_cubit.dart';
 import 'package:walk_it_up/presentation/alarm_list/alarm_list_state.dart';
-import 'package:walk_it_up/data/repository/alarm_set_repository.dart';
 import 'package:walk_it_up/presentation/create_new_alarm_screen/create_new_alarm/create_new_alarm_screen.dart';
 import 'package:walk_it_up/presentation/edit_alarm/edit_alarm_screen.dart';
-import 'package:walk_it_up/main.dart';
 import 'package:walk_it_up/presentation/ring_alarm/ring_alarm_screen.dart';
 
 StreamSubscription<AlarmSettings>? ringStream;
@@ -76,8 +75,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-              child: const Icon(Icons.add),
-              onPressed: () => navigateToCreateNewAlarm(context)),
+              child: const Icon(Icons.add), onPressed: () => navigateToCreateNewAlarm(context)),
         ),
       ),
     );
@@ -92,8 +90,7 @@ class _AlarmListScreenState extends State<AlarmListScreen> {
   }
 
   Future<void> navigateToCreateNewAlarm(BuildContext context) async {
-    await Navigator.pushNamed(context, CreateNewAlarmScreen.route)
-        .then((shouldRefresh) {
+    await Navigator.pushNamed(context, CreateNewAlarmScreen.route).then((shouldRefresh) {
       context.read<AlarmListCubit>().loadAlarms();
     });
   }
